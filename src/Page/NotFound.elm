@@ -1,4 +1,4 @@
-module Pages.NotFound exposing (Model, Msg(..), details, update, view)
+module Page.NotFound exposing (Model, Msg(..), details, update, view)
 
 import Html exposing (Html, div, li, p, text, ul)
 import Page
@@ -51,10 +51,19 @@ view model =
 
 viewUrlDetails : Url -> Html Msg
 viewUrlDetails url =
+    let
+        protocolString =
+            case url.protocol of
+                Http ->
+                    "http"
+
+                Https ->
+                    "https"
+    in
     div []
         [ p [] [ text <| Url.toString url ]
         , ul []
-            [ li [] [ text <| "protocol:" ++ protocolString url.protocol ]
+            [ li [] [ text <| "protocol:" ++ protocolString ]
             , li [] [ text <| "host:" ++ url.host ]
             , li [] [ text <| "port:" ++ Maybe.withDefault "" (Maybe.map String.fromInt url.port_) ]
             , li [] [ text <| "path:" ++ url.path ]
@@ -62,17 +71,3 @@ viewUrlDetails url =
             , li [] [ text <| "fragment:" ++ Maybe.withDefault "" url.fragment ]
             ]
         ]
-
-
-
--- View Helpers
-
-
-protocolString : Protocol -> String
-protocolString protocol =
-    case protocol of
-        Url.Http ->
-            "http"
-
-        Url.Https ->
-            "https"

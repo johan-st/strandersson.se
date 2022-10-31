@@ -5,7 +5,7 @@ import Browser.Navigation as Nav
 import Html exposing (Html, a, div, h1, li, p, text, ul)
 import Html.Attributes exposing (href)
 import Page exposing (Page(..))
-import Pages.NotFound as NotFound
+import Page.NotFound as NotFound
 import String
 import Url exposing (Protocol, Url)
 
