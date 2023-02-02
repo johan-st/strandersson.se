@@ -3,8 +3,8 @@ module Main exposing (main)
 import Browser
 import FoodCalculator as FC
 import Html exposing (..)
-import Html.Attributes exposing (classList, disabled, name, placeholder, type_, value)
-import Html.Events exposing (onInput, onSubmit)
+import Html.Attributes exposing (class, classList, disabled, name, placeholder, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 
 
 main : Program () Model Msg
@@ -64,6 +64,7 @@ inputsInit fc =
 type Msg
     = InputChanged InputField String
     | AddFood
+    | RemoveFood Int
 
 
 update : Msg -> Model -> Model
@@ -90,6 +91,9 @@ update msg model =
 
                 Nothing ->
                     model
+
+        RemoveFood index ->
+            { model | foodCalculator = FC.remove index model.foodCalculator }
 
 
 updateInputs : InputField -> String -> Inputs -> Inputs
@@ -217,6 +221,7 @@ viewFoods fs =
                     , th [] [ text "Fat" ]
                     , th [] [ text "Carbs" ]
                     , th [] [ text "Weight" ]
+                    , th [] [ text "Remove" ]
                     ]
                 ]
             , tbody []
@@ -234,6 +239,7 @@ viewFood food =
         , td [] [ text (String.fromFloat food.fat) ]
         , td [] [ text (String.fromFloat food.carbs) ]
         , td [] [ text (String.fromInt food.weight) ]
+        , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
         ]
 
 

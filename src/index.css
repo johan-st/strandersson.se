@@ -15,3 +15,8 @@ input.valid {
 input {
   width: 100px;
 }
+
+.interactable {
+  cursor: pointer;
+  text-decoration: underline;
+}
