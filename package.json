@@ -1,0 +1,27 @@
+{
+  "name": "strandersson.se",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "elm-test \"src/**/*Tests.elm\"",
+    "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
+    "start": "parcel src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johan-st/strandersson.se.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johan-st/strandersson.se/issues"
+  },
+  "homepage": "https://github.com/johan-st/strandersson.se#readme",
+  "devDependencies": {
+    "@parcel/transformer-elm": "^2.8.3",
+    "elm": "^0.19.1-5",
+    "parcel": "^2.8.3"
+  }
+}
