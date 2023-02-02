@@ -56,7 +56,7 @@ suite =
                     Expect.equalLists (FC.foods newFC) foods
             ]
         , describe "result" <|
-            [ test "returns the total calories" <|
+            [ test "returns the total Macros for one (1) portion" <|
                 \() ->
                     let
                         newFC =
@@ -64,10 +64,24 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
+                                |> FC.setPortions 1
                     in
                     Expect.equal
                         (FC.result newFC)
-                        (FC.Result 332 3.5 76.4 2.3 450)
+                        (FC.Result 332 3.5 76.4 1.3 450 450)
+            , test "returns the total Macros for two (2) portion" <|
+                \() ->
+                    let
+                        newFC =
+                            FC.init
+                                |> FC.add apple
+                                |> FC.add orange
+                                |> FC.add banana
+                                |> FC.setPortions 2
+                    in
+                    Expect.equal
+                        (FC.result newFC)
+                        (FC.Result 166 1.8 38.2 0.6 450 225)
             ]
         ]
 

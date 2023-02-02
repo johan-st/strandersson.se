@@ -1,4 +1,4 @@
-module FoodCalculator exposing (Food, FoodCalculator(..), NewFood, Result, add, foods, init, remove, result)
+module FoodCalculator exposing (Food, FoodCalculator(..), NewFood, Result, add, foods, init, remove, result, setPortions)
 
 
 type FoodCalculator
@@ -7,7 +7,7 @@ type FoodCalculator
 
 type alias Internals =
     { foods : List Food
-    , doneWeight : Int
+    , doneWeight : Maybe Int
     , portions : Int
     , latestId : Int
     }
@@ -64,7 +64,7 @@ add newFood (FoodCalculator internals) =
     FoodCalculator
         { internals
             | foods = food :: internals.foods
-            , doneWeight = internals.doneWeight + newFood.weight
+            , doneWeight = internals.doneWeight
             , latestId = id
         }
 
@@ -79,39 +79,73 @@ remove id (FoodCalculator internals) =
         }
 
 
+setPortions : Int -> FoodCalculator -> FoodCalculator
+setPortions portions (FoodCalculator internals) =
+    FoodCalculator
+        { internals
+            | portions = portions
+        }
+
+
 result : FoodCalculator -> Result
 result (FoodCalculator internals) =
     let
         totalWeight =
-            internals.foods
-                |> List.map .weight
-                |> List.sum
+            case internals.doneWeight of
+                Just weight ->
+                    weight
+
+                Nothing ->
+                    internals.foods
+                        |> List.map .weight
+                        |> List.sum
+
+        portionWeight =
+            round (toFloat totalWeight / toFloat internals.portions)
 
         totalCalories =
             internals.foods
-                |> List.map (\food -> food.calories * (food.weight // 100))
+                |> List.map (\food -> toFloat food.calories * (toFloat food.weight / 100))
                 |> List.sum
+                |> (\x -> x / toFloat internals.portions)
+                |> round
 
         totalProtein =
             internals.foods
                 |> List.map (\food -> food.protein * (toFloat food.weight / 100))
                 |> List.sum
+                |> (\x -> x / toFloat internals.portions)
+                |> (*) 10
+                |> round
+                |> toFloat
+                |> (\x -> x / 10)
 
         totalCarbs =
             internals.foods
                 |> List.map (\food -> food.carbs * (toFloat food.weight / 100))
                 |> List.sum
+                |> (\x -> x / toFloat internals.portions)
+                |> (*) 10
+                |> round
+                |> toFloat
+                |> (\x -> x / 10)
 
         totalFat =
             internals.foods
                 |> List.map (\food -> food.fat * (toFloat food.weight / 100))
                 |> List.sum
+                |> (\x -> x / toFloat internals.portions)
+                |> (*) 10
+                |> round
+                |> toFloat
+                |> (\x -> x / 10)
     in
     { calories = totalCalories
     , protein = totalProtein
     , carbs = totalCarbs
     , fat = totalFat
-    , unpreparedWeight = totalWeight
+    , totalWeight = totalWeight
+    , portionWeight = portionWeight
     }
 
 
@@ -120,7 +154,8 @@ type alias Result =
     , protein : Float
     , carbs : Float
     , fat : Float
-    , unpreparedWeight : Int
+    , totalWeight : Int
+    , portionWeight : Int
     }
 
 
@@ -128,7 +163,7 @@ init : FoodCalculator
 init =
     FoodCalculator
         { foods = []
-        , doneWeight = 0
-        , portions = 4
+        , doneWeight = Nothing
+        , portions = 1
         , latestId = 0
         }
