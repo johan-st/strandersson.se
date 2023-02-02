@@ -1,0 +1,17 @@
+html {
+  background-color: #333;
+  color: #59b;
+}
+
+input {
+  border: 1px solid #59b;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+input.valid {
+  background-color: rgb(141, 228, 141);
+}
+input {
+  width: 100px;
+}

@@ -1,4 +1,4 @@
-module FoodCalculator exposing (Food, FoodCalculator(..), NewFood, Result, add, foods, init, remove, result, setPortions)
+module FoodCalculator exposing (Food, FoodCalculator(..), NewFood, Result, add, foods, init, portions, remove, result, setPortions)
 
 
 type FoodCalculator
@@ -80,11 +80,16 @@ remove id (FoodCalculator internals) =
 
 
 setPortions : Int -> FoodCalculator -> FoodCalculator
-setPortions portions (FoodCalculator internals) =
+setPortions ports (FoodCalculator internals) =
     FoodCalculator
         { internals
-            | portions = portions
+            | portions = ports
         }
+
+
+portions : FoodCalculator -> Int
+portions (FoodCalculator internals) =
+    internals.portions
 
 
 result : FoodCalculator -> Result
