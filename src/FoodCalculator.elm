@@ -185,6 +185,7 @@ init =
 
 
 -- ENCODE/DECODE
+-- TODO: add version of encoding to encode & decode
 
 
 encode : FoodCalculator -> String
