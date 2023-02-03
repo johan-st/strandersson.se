@@ -265,8 +265,8 @@ decodeFood =
 findLatestId : List Food -> D.Decoder Int
 findLatestId fs =
     case List.maximum (List.map .id fs) of
-        Just id ->
-            D.succeed id
+        Just maxId ->
+            D.succeed maxId
 
         Nothing ->
             D.succeed 0
