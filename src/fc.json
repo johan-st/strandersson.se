@@ -1,0 +1,32 @@
+{
+    "foods": [
+        {
+            "id": 3,
+            "name": "Banana",
+            "calories": 101,
+            "protein": 1,
+            "carbs": 22,
+            "fat": 0.5,
+            "weight": 200
+        },
+        {
+            "id": 2,
+            "name": "Orange",
+            "calories": 49,
+            "protein": 0.8,
+            "carbs": 12.1,
+            "fat": 0.1,
+            "weight": 150
+        },
+        {
+            "id": 1,
+            "name": "Apple",
+            "calories": 56,
+            "protein": 0.3,
+            "carbs": 14.2,
+            "fat": 0.1,
+            "weight": 100
+        }
+    ],
+    "portions": 2
+}

@@ -243,7 +243,7 @@ viewFood food =
         ]
 
 
-viewResult : FC.Result -> Html Msg
+viewResult : FC.FCResult -> Html Msg
 viewResult result =
     div []
         [ h2 [] [ text "Result" ]

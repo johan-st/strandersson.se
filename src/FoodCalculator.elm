@@ -1,4 +1,7 @@
-module FoodCalculator exposing (Food, FoodCalculator(..), NewFood, Result, add, foods, init, portions, remove, result, setPortions)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, encode, foods, init, portions, remove, result, setPortions)
+
+import Json.Decode as D
+import Json.Encode as E
 
 
 type FoodCalculator
@@ -92,7 +95,7 @@ portions (FoodCalculator internals) =
     internals.portions
 
 
-result : FoodCalculator -> Result
+result : FoodCalculator -> FCResult
 result (FoodCalculator internals) =
     let
         totalWeight =
@@ -154,13 +157,19 @@ result (FoodCalculator internals) =
     }
 
 
-type alias Result =
+type alias FCResult =
     { calories : Int
     , protein : Float
     , carbs : Float
     , fat : Float
     , totalWeight : Int
     , portionWeight : Int
+    }
+
+
+type alias FCError =
+    { from : String
+    , error : D.Error
     }
 
 
@@ -172,3 +181,92 @@ init =
         , portions = 1
         , latestId = 0
         }
+
+
+
+-- ENCODE/DECODE
+
+
+encode : FoodCalculator -> String
+encode fc =
+    E.encode 0 <|
+        encodeFoodCalculator fc
+
+
+encodeFoodCalculator : FoodCalculator -> E.Value
+encodeFoodCalculator (FoodCalculator internals) =
+    case internals.doneWeight of
+        Just weight ->
+            E.object
+                [ ( "foods", E.list encodeFood internals.foods )
+                , ( "doneWeight", E.int weight )
+                , ( "portions", E.int internals.portions )
+                ]
+
+        Nothing ->
+            E.object
+                [ ( "foods", E.list encodeFood internals.foods )
+                , ( "doneWeight", E.string "not set" )
+                , ( "portions", E.int internals.portions )
+                ]
+
+
+encodeFood : Food -> E.Value
+encodeFood food =
+    E.object
+        [ ( "id", E.int food.id )
+        , ( "name", E.string food.name )
+        , ( "calories", E.int food.calories )
+        , ( "protein", E.float food.protein )
+        , ( "carbs", E.float food.carbs )
+        , ( "fat", E.float food.fat )
+        , ( "weight", E.int food.weight )
+        ]
+
+
+decode : String -> Result FCError FoodCalculator
+decode str =
+    case D.decodeString decodeFoodCalculator str of
+        Ok fc ->
+            Ok fc
+
+        Err err ->
+            Debug.log "decodeError" <| Err { from = "decode", error = err }
+
+
+decodeFoodCalculator : D.Decoder FoodCalculator
+decodeFoodCalculator =
+    let
+        latestId =
+            D.field "foods" (D.list decodeFood) |> D.andThen (\x -> findLatestId x)
+
+        internals =
+            D.map4 Internals
+                (D.field "foods" (D.list decodeFood))
+                (D.field "doneWeight" (D.maybe D.int))
+                (D.field "portions" D.int)
+                latestId
+    in
+    D.map FoodCalculator internals
+
+
+decodeFood : D.Decoder Food
+decodeFood =
+    D.map7 Food
+        (D.field "id" D.int)
+        (D.field "name" D.string)
+        (D.field "calories" D.int)
+        (D.field "protein" D.float)
+        (D.field "carbs" D.float)
+        (D.field "fat" D.float)
+        (D.field "weight" D.int)
+
+
+findLatestId : List Food -> D.Decoder Int
+findLatestId fs =
+    case List.maximum (List.map .id fs) of
+        Just id ->
+            D.succeed id
+
+        Nothing ->
+            D.succeed 0

@@ -68,7 +68,7 @@ suite =
                     in
                     Expect.equal
                         (FC.result newFC)
-                        (FC.Result 332 3.5 76.4 1.3 450 450)
+                        (FC.FCResult 332 3.5 76.4 1.3 450 450)
             , test "returns the total Macros for two (2) portion" <|
                 \() ->
                     let
@@ -81,7 +81,32 @@ suite =
                     in
                     Expect.equal
                         (FC.result newFC)
-                        (FC.Result 166 1.8 38.2 0.6 450 225)
+                        (FC.FCResult 166 1.8 38.2 0.6 450 225)
+            ]
+        , describe
+            "encode / decode"
+          <|
+            [ test "encode and decode a model" <|
+                \() ->
+                    let
+                        newFC =
+                            FC.init
+                                |> FC.add apple
+                                |> FC.add orange
+                                |> FC.add banana
+                                |> FC.setPortions 2
+
+                        decoded =
+                            case FC.decode (FC.encode newFC) of
+                                Ok fc ->
+                                    fc
+
+                                Err _ ->
+                                    Debug.log "got Err from decode" FC.init
+                    in
+                    Expect.equal
+                        decoded
+                        newFC
             ]
         ]
 
