@@ -1,4 +1,4 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, encode, foods, init, portions, remove, result, setPortions)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, decoder, encode, encoder, foods, init, portions, remove, result, setPortions)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -191,11 +191,11 @@ init =
 encode : FoodCalculator -> String
 encode fc =
     E.encode 0 <|
-        encodeFoodCalculator fc
+        encoder fc
 
 
-encodeFoodCalculator : FoodCalculator -> E.Value
-encodeFoodCalculator (FoodCalculator internals) =
+encoder : FoodCalculator -> E.Value
+encoder (FoodCalculator internals) =
     case internals.doneWeight of
         Just weight ->
             E.object
@@ -227,7 +227,7 @@ encodeFood food =
 
 decode : String -> Result FCError FoodCalculator
 decode str =
-    case D.decodeString decodeFoodCalculator str of
+    case D.decodeString decoder str of
         Ok fc ->
             Ok fc
 
@@ -235,8 +235,8 @@ decode str =
             Debug.log "decodeError" <| Err { from = "decode", error = err }
 
 
-decodeFoodCalculator : D.Decoder FoodCalculator
-decodeFoodCalculator =
+decoder : D.Decoder FoodCalculator
+decoder =
     let
         latestId =
             D.field "foods" (D.list decodeFood) |> D.andThen (\x -> findLatestId x)
