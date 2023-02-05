@@ -1,18 +1,21 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import FoodCalculator as FC
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, disabled, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Json.Decode as D
+import Json.Encode
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
-    Browser.sandbox
+    Browser.element
         { init = init
         , view = view
         , update = update
+        , subscriptions = subscriptions
         }
 
 
@@ -26,9 +29,45 @@ type alias Model =
     }
 
 
-init : Model
-init =
-    Model FC.init (inputsInit FC.init)
+{-| TODO: add versioning to flags
+-}
+type alias Flags =
+    { foodCalculator : Json.Encode.Value
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flagsValue =
+    let
+        fcNull =
+            D.decodeValue (D.null True) flagsValue.foodCalculator
+    in
+    if fcNull == Ok True then
+        ( { foodCalculator = FC.init
+          , inputs = inputsInit FC.init
+          }
+        , Cmd.none
+        )
+
+    else
+        let
+            fcRes =
+                D.decodeValue FC.decoder flagsValue.foodCalculator
+        in
+        case fcRes of
+            Err _ ->
+                ( { foodCalculator = FC.init
+                  , inputs = inputsInit FC.init
+                  }
+                , Cmd.none
+                )
+
+            Ok fc ->
+                ( { foodCalculator = fc
+                  , inputs = inputsInit fc
+                  }
+                , Cmd.none
+                )
 
 
 type alias Inputs =
@@ -67,58 +106,104 @@ type Msg
     | RemoveFood Int
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         InputChanged field value ->
-            case field of
-                Portions ->
-                    { model
-                        | foodCalculator = FC.setPortions (Maybe.withDefault 1 (String.toInt value)) model.foodCalculator
-                        , inputs = updateInputs field value model.inputs
-                    }
-
-                _ ->
-                    { model | inputs = updateInputs field value model.inputs }
+            updateModelWithInputs model field value
 
         AddFood ->
             case inputsToNewFood model.inputs of
                 Just new ->
-                    { model
-                        | foodCalculator = FC.add new model.foodCalculator
-                        , inputs = inputsInit model.foodCalculator
-                    }
+                    let
+                        newModel =
+                            { model
+                                | foodCalculator = FC.add new model.foodCalculator
+                                , inputs = inputsInit model.foodCalculator
+                            }
+                    in
+                    ( newModel
+                    , localStorageSet <| FC.encoder newModel.foodCalculator
+                    )
 
                 Nothing ->
-                    model
+                    ( model, Cmd.none )
 
         RemoveFood index ->
-            { model | foodCalculator = FC.remove index model.foodCalculator }
+            let
+                newModel =
+                    { model | foodCalculator = FC.remove index model.foodCalculator }
+            in
+            ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
+
+
+updateModelWithInputs : Model -> InputField -> String -> ( Model, Cmd Msg )
+updateModelWithInputs model field value =
+    let
+        maybeNewPortions =
+            case field of
+                Portions ->
+                    String.toInt value
+
+                _ ->
+                    Nothing
+
+        newFC =
+            case maybeNewPortions of
+                Just newPortions ->
+                    FC.setPortions newPortions model.foodCalculator
+
+                Nothing ->
+                    model.foodCalculator
+    in
+    ( { model
+        | inputs = updateInputs field value model.inputs
+        , foodCalculator = newFC
+      }
+    , if field == Portions then
+        localStorageSet <| FC.encoder newFC
+
+      else
+        Cmd.none
+    )
 
 
 updateInputs : InputField -> String -> Inputs -> Inputs
 updateInputs field value inputs =
+    let
+        new =
+            case field of
+                Name ->
+                    { inputs | name = value }
+
+                Calories ->
+                    { inputs | calories = value }
+
+                Protein ->
+                    { inputs | protein = value }
+
+                Fat ->
+                    { inputs | fat = value }
+
+                Carbs ->
+                    { inputs | carbs = value }
+
+                Weight ->
+                    { inputs | weight = value }
+
+                Portions ->
+                    { inputs | portions = value }
+    in
     case field of
         Name ->
-            { inputs | name = value }
+            new
 
-        Calories ->
-            { inputs | calories = value }
+        _ ->
+            if inputValid field new then
+                new
 
-        Protein ->
-            { inputs | protein = value }
-
-        Fat ->
-            { inputs | fat = value }
-
-        Carbs ->
-            { inputs | carbs = value }
-
-        Weight ->
-            { inputs | weight = value }
-
-        Portions ->
-            { inputs | portions = value }
+            else
+                inputs
 
 
 
@@ -401,3 +486,19 @@ maybePositiveFloat maybeFloat =
                 Nothing
         )
         maybeFloat
+
+
+
+-- PORTS
+
+
+port localStorageSet : Json.Encode.Value -> Cmd msg
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
