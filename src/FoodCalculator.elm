@@ -225,6 +225,9 @@ encodeFood food =
         ]
 
 
+{-| Decode a FoodCalculator from a JSON string
+TODO: handle error?
+-}
 decode : String -> Result FCError FoodCalculator
 decode str =
     case D.decodeString decoder str of
@@ -232,7 +235,7 @@ decode str =
             Ok fc
 
         Err err ->
-            Debug.log "decodeError" <| Err { from = "decode", error = err }
+            Err { from = "decode", error = err }
 
 
 decoder : D.Decoder FoodCalculator
