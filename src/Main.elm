@@ -159,13 +159,13 @@ updateModelWithInputs model field value =
 
                 ( CookedWeight, Just int ) ->
                     if int > 0 then
-                        FC.doneWeightSet maybeInt model.foodCalculator
+                        FC.cookedWeightSet maybeInt model.foodCalculator
 
                     else
                         model.foodCalculator
 
                 ( CookedWeight, Nothing ) ->
-                    FC.doneWeightSet Nothing model.foodCalculator
+                    FC.cookedWeightSet Nothing model.foodCalculator
 
                 _ ->
                     model.foodCalculator
@@ -229,7 +229,7 @@ view : Model -> Html Msg
 view model =
     let
         _ =
-            Debug.log "cookedWeight" (FC.doneWeight model.foodCalculator)
+            Debug.log "cookedWeight" (FC.cookedWeight model.foodCalculator)
     in
     div [ class "wrapper" ]
         [ viewHeader

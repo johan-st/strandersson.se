@@ -66,7 +66,7 @@ suite =
                                 |> FC.add banana
                     in
                     Expect.equal
-                        (FC.doneWeight newFC)
+                        (FC.cookedWeight newFC)
                         Nothing
             , test "set and get" <|
                 \() ->
@@ -76,10 +76,10 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
-                                |> FC.doneWeightSet (Just 300)
+                                |> FC.cookedWeightSet (Just 300)
                     in
                     Expect.equal
-                        (FC.doneWeight newFC_weight)
+                        (FC.cookedWeight newFC_weight)
                         (Just 300)
             ]
         , describe "result" <|

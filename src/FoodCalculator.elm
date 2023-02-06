@@ -1,4 +1,4 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, decoder, doneWeight, doneWeightSet, encode, encoder, foods, init, portions, portionsSet, remove, result)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, foods, init, portions, portionsSet, remove, result)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -95,16 +95,16 @@ portions (FoodCalculator internals) =
     internals.portions
 
 
-doneWeightSet : Maybe Int -> FoodCalculator -> FoodCalculator
-doneWeightSet weight (FoodCalculator internals) =
+cookedWeightSet : Maybe Int -> FoodCalculator -> FoodCalculator
+cookedWeightSet weight (FoodCalculator internals) =
     FoodCalculator
         { internals
             | doneWeight = weight
         }
 
 
-doneWeight : FoodCalculator -> Maybe Int
-doneWeight (FoodCalculator internals) =
+cookedWeight : FoodCalculator -> Maybe Int
+cookedWeight (FoodCalculator internals) =
     internals.doneWeight
 
 
