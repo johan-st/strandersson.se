@@ -161,6 +161,9 @@ updateModelWithInputs model field value =
                     if int > 0 then
                         FC.cookedWeightSet maybeInt model.foodCalculator
 
+                    else if int <= 0 then
+                        FC.cookedWeightSet Nothing model.foodCalculator
+
                     else
                         model.foodCalculator
 
@@ -171,7 +174,7 @@ updateModelWithInputs model field value =
                     model.foodCalculator
     in
     ( { model
-        | inputs = updateInputs field value model.inputs
+        | inputs = updateInputs field value (commaFloats model.inputs)
         , foodCalculator = newFC
       }
     , if field == Portions then
@@ -449,17 +452,20 @@ inputValid f i =
                 |> Maybe.withDefault False
 
         Protein ->
-            String.toFloat i.protein
+            i.protein
+                |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
         Fat ->
-            String.toFloat i.fat
+            i.fat
+                |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
         Carbs ->
-            String.toFloat i.carbs
+            i.carbs
+                |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
@@ -481,12 +487,28 @@ inputValid f i =
 
 allValid : Inputs -> Bool
 allValid i =
-    case inputsToFood i of
+    case inputsToFood (commaFloats i) of
         Just _ ->
             True
 
         Nothing ->
             False
+
+
+commaFloats : Inputs -> Inputs
+commaFloats i =
+    { i
+        | protein = String.replace "," "." i.protein
+        , fat = String.replace "," "." i.fat
+        , carbs = String.replace "," "." i.carbs
+    }
+
+
+commaFloat : String -> Maybe Float
+commaFloat s =
+    s
+        |> String.replace "," "."
+        |> String.toFloat
 
 
 inputsToFood : Inputs -> Maybe FC.NewFood
