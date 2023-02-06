@@ -1,4 +1,4 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, decoder, encode, encoder, foods, init, portions, remove, result, setPortions)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, decode, decoder, doneWeight, doneWeightSet, encode, encoder, foods, init, portions, portionsSet, remove, result)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -82,8 +82,8 @@ remove id (FoodCalculator internals) =
         }
 
 
-setPortions : Int -> FoodCalculator -> FoodCalculator
-setPortions ports (FoodCalculator internals) =
+portionsSet : Int -> FoodCalculator -> FoodCalculator
+portionsSet ports (FoodCalculator internals) =
     FoodCalculator
         { internals
             | portions = ports
@@ -93,6 +93,19 @@ setPortions ports (FoodCalculator internals) =
 portions : FoodCalculator -> Int
 portions (FoodCalculator internals) =
     internals.portions
+
+
+doneWeightSet : Int -> FoodCalculator -> FoodCalculator
+doneWeightSet weight (FoodCalculator internals) =
+    FoodCalculator
+        { internals
+            | doneWeight = Just weight
+        }
+
+
+doneWeight : FoodCalculator -> Maybe Int
+doneWeight (FoodCalculator internals) =
+    internals.doneWeight
 
 
 result : FoodCalculator -> FCResult

@@ -153,16 +153,31 @@ updateModelWithInputs model field value =
                 _ ->
                     Nothing
 
+        maybeCookedWeight =
+            case field of
+                CookedWeight ->
+                    String.toFloat value
+
+                _ ->
+                    Nothing
+
         newFC =
-            case maybeNewPortions of
-                Just newPortions ->
+            case ( maybeNewPortions, maybeCookedWeight ) of
+                ( Just newPortions, _ ) ->
                     if newPortions > 0 then
-                        FC.setPortions newPortions model.foodCalculator
+                        FC.portionsSet newPortions model.foodCalculator
 
                     else
                         model.foodCalculator
 
-                Nothing ->
+                ( _, Just newCookedWeight ) ->
+                    if newCookedWeight > 0 then
+                        FC.doneWeightSet newCookedWeight model.foodCalculator
+
+                    else
+                        model.foodCalculator
+
+                _ ->
                     model.foodCalculator
     in
     ( { model

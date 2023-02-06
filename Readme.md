@@ -29,7 +29,6 @@ _A domain and collection of tools and things for our family._
 
 
 #### TODOs
-- make it possible to empty out a numbers or text field
 - make input feedback more clear.
 - add "done weight" input to override weight sum of foodstuffs as finnished weight.
 - add units to inputs

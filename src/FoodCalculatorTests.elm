@@ -55,6 +55,33 @@ suite =
                     in
                     Expect.equalLists (FC.foods newFC) foods
             ]
+        , describe "setDoneWeight" <|
+            [ test "get when no weight set returns Nothing" <|
+                \() ->
+                    let
+                        newFC =
+                            FC.init
+                                |> FC.add apple
+                                |> FC.add orange
+                                |> FC.add banana
+                    in
+                    Expect.equal
+                        (FC.doneWeight newFC)
+                        Nothing
+            , test "set and get" <|
+                \() ->
+                    let
+                        newFC_weight =
+                            FC.init
+                                |> FC.add apple
+                                |> FC.add orange
+                                |> FC.add banana
+                                |> FC.doneWeightSet 300
+                    in
+                    Expect.equal
+                        (FC.doneWeight newFC_weight)
+                        (Just 300)
+            ]
         , describe "result" <|
             [ test "returns the total Macros for one (1) portion" <|
                 \() ->
@@ -64,7 +91,7 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
-                                |> FC.setPortions 1
+                                |> FC.portionsSet 1
                     in
                     Expect.equal
                         (FC.result newFC)
@@ -77,7 +104,7 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
-                                |> FC.setPortions 2
+                                |> FC.portionsSet 2
                     in
                     Expect.equal
                         (FC.result newFC)
@@ -94,7 +121,7 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
-                                |> FC.setPortions 2
+                                |> FC.portionsSet 2
 
                         decoded =
                             case FC.decode (FC.encode newFC) of
