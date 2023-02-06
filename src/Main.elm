@@ -464,7 +464,8 @@ inputValid f i =
                 True
 
         Calories ->
-            String.toInt i.calories
+            i.calories
+                |> String.toInt
                 |> Maybe.map (\int -> int >= 0)
                 |> Maybe.withDefault False
 
@@ -487,17 +488,20 @@ inputValid f i =
                 |> Maybe.withDefault False
 
         Weight ->
-            String.toInt i.weight
+            i.weight
+                |> String.toInt
                 |> Maybe.map (\int -> int >= 0)
                 |> Maybe.withDefault False
 
         Portions ->
-            String.toInt i.portions
+            i.portions
+                |> String.toInt
                 |> Maybe.map (\int -> int > 0)
                 |> Maybe.withDefault False
 
         CookedWeight ->
-            String.toInt i.cookedWeight
+            i.cookedWeight
+                |> String.toInt
                 |> Maybe.map (\int -> int > 0)
                 |> Maybe.withDefault False
 
