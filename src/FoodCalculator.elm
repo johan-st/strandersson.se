@@ -95,11 +95,11 @@ portions (FoodCalculator internals) =
     internals.portions
 
 
-doneWeightSet : Int -> FoodCalculator -> FoodCalculator
+doneWeightSet : Maybe Int -> FoodCalculator -> FoodCalculator
 doneWeightSet weight (FoodCalculator internals) =
     FoodCalculator
         { internals
-            | doneWeight = Just weight
+            | doneWeight = weight
         }
 
 

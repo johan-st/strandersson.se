@@ -145,37 +145,27 @@ update msg model =
 updateModelWithInputs : Model -> InputField -> String -> ( Model, Cmd Msg )
 updateModelWithInputs model field value =
     let
-        maybeNewPortions =
-            case field of
-                Portions ->
-                    String.toInt value
-
-                _ ->
-                    Nothing
-
-        maybeCookedWeight =
-            case field of
-                CookedWeight ->
-                    String.toInt value
-
-                _ ->
-                    Nothing
+        maybeInt =
+            String.toInt value
 
         newFC =
-            case ( maybeNewPortions, maybeCookedWeight ) of
-                ( Just newPortions, _ ) ->
-                    if newPortions > 0 then
-                        FC.portionsSet newPortions model.foodCalculator
+            case ( field, maybeInt ) of
+                ( Portions, Just int ) ->
+                    if int > 0 then
+                        FC.portionsSet int model.foodCalculator
 
                     else
                         model.foodCalculator
 
-                ( _, Just newCookedWeight ) ->
-                    if newCookedWeight > 0 then
-                        FC.doneWeightSet newCookedWeight model.foodCalculator
+                ( CookedWeight, Just int ) ->
+                    if int > 0 then
+                        FC.doneWeightSet maybeInt model.foodCalculator
 
                     else
                         model.foodCalculator
+
+                ( CookedWeight, Nothing ) ->
+                    FC.doneWeightSet Nothing model.foodCalculator
 
                 _ ->
                     model.foodCalculator
@@ -237,6 +227,10 @@ type alias Input =
 
 view : Model -> Html Msg
 view model =
+    let
+        _ =
+            Debug.log "cookedWeight" (FC.doneWeight model.foodCalculator)
+    in
     div [ class "wrapper" ]
         [ viewHeader
         , viewCalculator model

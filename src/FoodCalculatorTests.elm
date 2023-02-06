@@ -76,7 +76,7 @@ suite =
                                 |> FC.add apple
                                 |> FC.add orange
                                 |> FC.add banana
-                                |> FC.doneWeightSet 300
+                                |> FC.doneWeightSet (Just 300)
                     in
                     Expect.equal
                         (FC.doneWeight newFC_weight)
