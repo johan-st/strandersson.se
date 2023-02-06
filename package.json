@@ -6,7 +6,8 @@
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/index.html",
+    "report": "parcel build src/index.html --reporter @parcel/reporter-bundle-analyzer"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/johan-st/strandersson.se#readme",
   "devDependencies": {
+    "@parcel/reporter-bundle-analyzer": "^2.8.3",
     "@parcel/transformer-elm": "^2.8.3",
     "elm": "^0.19.1-5",
     "parcel": "^2.8.3"
