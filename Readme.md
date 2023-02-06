@@ -32,4 +32,3 @@ _A domain and collection of tools and things for our family._
 - make input feedback more clear.
 - add units to list
 - prettier "remove"
-- weight of portion is not set correctly
