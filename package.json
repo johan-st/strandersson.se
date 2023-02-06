@@ -5,8 +5,8 @@
   "scripts": {
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
-    "start": "set BUILD_TIME=%DATE% %TIME% && parcel src/index.html & set BUILD_TIME= ",
-    "build": "set BUILD_TIME=%DATE% %TIME% && parcel build src/index.html & set BUILD_TIME=",
+    "start": "set BUILD_TIME=%DATE% %TIME% && parcel src/index.html && set BUILD_TIME= ",
+    "build": "set BUILD_TIME=%DATE% %TIME% && parcel build src/index.html && set BUILD_TIME=",
     "report": "parcel build src/index.html --reporter @parcel/reporter-bundle-analyzer"
   },
   "repository": {
