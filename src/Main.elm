@@ -156,7 +156,7 @@ updateModelWithInputs model field value =
         maybeCookedWeight =
             case field of
                 CookedWeight ->
-                    String.toFloat value
+                    String.toInt value
 
                 _ ->
                     Nothing
