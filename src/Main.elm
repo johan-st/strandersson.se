@@ -247,10 +247,6 @@ type alias Input =
 
 view : Model -> Html Msg
 view model =
-    let
-        _ =
-            Debug.log "cookedWeight" (FC.cookedWeight model.foodCalculator)
-    in
     div [ class "wrapper" ]
         [ viewHeader
         , viewCalculator model
