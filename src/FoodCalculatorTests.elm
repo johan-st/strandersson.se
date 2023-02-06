@@ -4,7 +4,6 @@ import Expect exposing (Expectation)
 import FoodCalculator as FC
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
-import Test.Html.Event exposing (expect)
 
 
 suite : Test
