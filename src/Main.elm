@@ -98,7 +98,24 @@ type InputField
 
 inputsInit : FC.FoodCalculator -> Inputs
 inputsInit fc =
-    Inputs "" "" "" "" "" "" (String.fromInt <| FC.portions fc) ""
+    let
+        cookedWeight =
+            case FC.cookedWeight fc of
+                Nothing ->
+                    ""
+
+                Just int ->
+                    String.fromInt int
+    in
+    { name = ""
+    , calories = ""
+    , protein = ""
+    , fat = ""
+    , carbs = ""
+    , weight = ""
+    , portions = String.fromInt <| FC.portions fc
+    , cookedWeight = cookedWeight
+    }
 
 
 
