@@ -20,3 +20,13 @@ input {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  background-color: #222;
+  color: #555;
+  width: 100%;
+  text-align: center;
+  line-height: 30px;
+}

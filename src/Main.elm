@@ -24,7 +24,8 @@ main =
 
 
 type alias Model =
-    { foodCalculator : FC.FoodCalculator
+    { buildTime : String
+    , foodCalculator : FC.FoodCalculator
     , inputs : Inputs
     }
 
@@ -33,17 +34,19 @@ type alias Model =
 -}
 type alias Flags =
     { foodCalculator : Json.Encode.Value
+    , buildTime : String
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
-init flagsValue =
+init flags =
     let
         fcNull =
-            D.decodeValue (D.null True) flagsValue.foodCalculator
+            D.decodeValue (D.null True) flags.foodCalculator
     in
     if fcNull == Ok True then
-        ( { foodCalculator = FC.init
+        ( { buildTime = flags.buildTime
+          , foodCalculator = FC.init
           , inputs = inputsInit FC.init
           }
         , Cmd.none
@@ -52,18 +55,20 @@ init flagsValue =
     else
         let
             fcRes =
-                D.decodeValue FC.decoder flagsValue.foodCalculator
+                D.decodeValue FC.decoder flags.foodCalculator
         in
         case fcRes of
             Err _ ->
-                ( { foodCalculator = FC.init
+                ( { buildTime = flags.buildTime
+                  , foodCalculator = FC.init
                   , inputs = inputsInit FC.init
                   }
                 , Cmd.none
                 )
 
             Ok fc ->
-                ( { foodCalculator = fc
+                ( { buildTime = flags.buildTime
+                  , foodCalculator = fc
                   , inputs = inputsInit fc
                   }
                 , Cmd.none
@@ -217,6 +222,15 @@ view model =
         , viewAdd model.inputs
         , viewFoods <| FC.foods model.foodCalculator
         , viewResult <| FC.result model.foodCalculator
+        , viewFooter model.buildTime
+        ]
+
+
+viewFooter : String -> Html Msg
+viewFooter buildTime =
+    div [ class "footer" ]
+        [ text "Build: "
+        , text buildTime
         ]
 
 
