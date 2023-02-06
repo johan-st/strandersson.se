@@ -3,7 +3,7 @@ port module Main exposing (main)
 import Browser
 import FoodCalculator as FC
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, disabled, name, placeholder, type_, value)
+import Html.Attributes exposing (class, classList, disabled, for, id, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Decode as D
 import Json.Encode
@@ -221,90 +221,137 @@ updateInputs field value inputs =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text "Meal Calculator" ]
-        , viewInputs model.inputs
+    div [ class "wrapper" ]
+        [ viewHeader
+        , viewCalculator model
+        , viewFooter model.buildTime
+        ]
+
+
+viewHeader : Html Msg
+viewHeader =
+    div [ id "header" ]
+        [ h1 [] [ text "Food Calculator" ]
+        , p [] [ text "Calculate the calories, protein, fat and carbs of your food." ]
+        ]
+
+
+viewCalculator : Model -> Html Msg
+viewCalculator model =
+    div [ id "main" ]
+        [ viewInputs model.inputs
         , viewFoods <| FC.foods model.foodCalculator
         , viewResult <| FC.result model.foodCalculator
-        , viewFooter model.buildTime
         ]
 
 
 viewFooter : String -> Html Msg
 viewFooter build =
-    div [ class "footer" ]
+    div [ id "footer" ]
         [ text build ]
 
 
 viewInputs : Inputs -> Html Msg
 viewInputs i =
     div []
-        [ form [ onSubmit AddFood ]
-            [ input
-                [ type_ "text"
-                , placeholder "Name"
-                , onInput <| InputChanged Name
-                , classList [ ( "valid", inputValid Name i ) ]
-                , value i.name
+        [ form [ onSubmit AddFood, class "inputs-wrapper" ]
+            [ div [ class "input-wrapper" ]
+                [ label [ for "name" ] [ text "Name" ]
+                , input
+                    [ name "name"
+                    , id "name"
+                    , type_ "text"
+                    , placeholder "\"potatoes\""
+                    , onInput <| InputChanged Name
+                    , classList [ ( "valid", inputValid Name i ) ]
+                    , value i.name
+                    ]
+                    []
                 ]
-                []
-            , input
-                [ type_ "number"
-                , placeholder "Calories"
-                , onInput <| InputChanged Calories
-                , classList [ ( "valid", inputValid Calories i ) ]
-                , value i.calories
+            , div [ class "input-wrapper" ]
+                [ label [ for "calories" ] [ text "Calories" ]
+                , input
+                    [ name "calories"
+                    , id "calories"
+                    , type_ "text"
+                    , placeholder "kcal/100g"
+                    , onInput <| InputChanged Calories
+                    , classList [ ( "valid", inputValid Calories i ) ]
+                    , value i.calories
+                    ]
+                    []
                 ]
-                []
-            , input
-                [ type_ "number"
-                , placeholder "Protein"
-                , onInput <| InputChanged Protein
-                , classList [ ( "valid", inputValid Protein i ) ]
-                , value i.protein
+            , div [ class "input-wrapper" ]
+                [ label [ for "protein" ] [ text "Protein" ]
+                , input
+                    [ name "protein"
+                    , id "protein"
+                    , type_ "text"
+                    , placeholder "g/100g"
+                    , onInput <| InputChanged Protein
+                    , classList [ ( "valid", inputValid Protein i ) ]
+                    , value i.protein
+                    ]
+                    []
                 ]
-                []
-            , input
-                [ type_ "number"
-                , placeholder "Fat"
-                , onInput <| InputChanged Fat
-                , classList [ ( "valid", inputValid Fat i ) ]
-                , value i.fat
+            , div [ class "input-wrapper" ]
+                [ label [ for "fat" ] [ text "Fat" ]
+                , input
+                    [ name "fat"
+                    , id "fat"
+                    , type_ "text"
+                    , placeholder "g/100g"
+                    , onInput <| InputChanged Fat
+                    , classList [ ( "valid", inputValid Fat i ) ]
+                    , value i.fat
+                    ]
+                    []
                 ]
-                []
-            , input
-                [ type_ "number"
-                , placeholder "Carbs"
-                , onInput <| InputChanged Carbs
-                , classList [ ( "valid", inputValid Carbs i ) ]
-                , value i.carbs
+            , div [ class "input-wrapper" ]
+                [ label [ for "carbs" ] [ text "Carbs" ]
+                , input
+                    [ name "carbs"
+                    , id "carbs"
+                    , type_ "text"
+                    , placeholder "g/100g"
+                    , onInput <| InputChanged Carbs
+                    , classList [ ( "valid", inputValid Carbs i ) ]
+                    , value i.carbs
+                    ]
+                    []
                 ]
-                []
-            , input
-                [ type_ "number"
-                , placeholder "Weight"
-                , onInput <| InputChanged Weight
-                , classList [ ( "valid", inputValid Weight i ) ]
-                , value i.weight
+            , div [ class "input-wrapper" ]
+                [ label [ for "weight" ] [ text "Weight" ]
+                , input
+                    [ name "weight"
+                    , id "weight"
+                    , type_ "text"
+                    , placeholder "g"
+                    , onInput <| InputChanged Weight
+                    , classList [ ( "valid", inputValid Weight i ) ]
+                    , value i.weight
+                    ]
+                    []
                 ]
-                []
             , input
-                [ type_ "submit"
+                [ class "submit"
+                , type_ "submit"
                 , value "Add"
                 , disabled <| not <| allValid i
                 ]
                 []
             ]
-        , div []
-            [ text "Portions: "
-            , input
-                [ type_ "number"
-                , placeholder "Portions"
-                , onInput <| InputChanged Portions
-                , classList [ ( "valid", inputValid Portions i ) ]
-                , value i.portions
+        , div [ class "inputs-wrapper" ]
+            [ div [ class "input-wrapper" ]
+                [ label [ for "portions" ] [ text "number of portions" ]
+                , input
+                    [ type_ "number"
+                    , onInput <| InputChanged Portions
+                    , classList [ ( "valid", inputValid Portions i ) ]
+                    , value i.portions
+                    ]
+                    []
                 ]
-                []
             ]
         ]
 

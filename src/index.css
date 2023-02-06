@@ -15,13 +15,31 @@ input.valid {
 input {
   width: 100px;
 }
+#main,
+#header {
+  max-width: 800px;
+  margin: 0 auto;
+}
+/* labels above input */
+.inputs-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+}
 
+.submit {
+  width: 100%;
+  min-height: 2vw;
+}
 .interactable {
   cursor: pointer;
   text-decoration: underline;
 }
 
-.footer {
+#footer {
   position: fixed;
   bottom: 0;
   background-color: #222;
