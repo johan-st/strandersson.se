@@ -24,14 +24,12 @@ main =
 
 
 type alias Model =
-    { buildTime : String
+    { build : String
     , foodCalculator : FC.FoodCalculator
     , inputs : Inputs
     }
 
 
-{-| TODO: add versioning to flags
--}
 type alias Flags =
     { foodCalculator : Json.Encode.Value
     , build : String
@@ -45,7 +43,7 @@ init flags =
             D.decodeValue (D.null True) flags.foodCalculator
     in
     if fcNull == Ok True then
-        ( { buildTime = flags.build
+        ( { build = flags.build
           , foodCalculator = FC.init
           , inputs = inputsInit FC.init
           }
@@ -59,7 +57,7 @@ init flags =
         in
         case fcRes of
             Err _ ->
-                ( { buildTime = flags.build
+                ( { build = flags.build
                   , foodCalculator = FC.init
                   , inputs = inputsInit FC.init
                   }
@@ -67,7 +65,7 @@ init flags =
                 )
 
             Ok fc ->
-                ( { buildTime = flags.build
+                ( { build = flags.build
                   , foodCalculator = fc
                   , inputs = inputsInit fc
                   }
@@ -83,6 +81,7 @@ type alias Inputs =
     , carbs : String
     , weight : String
     , portions : String
+    , cookedWeight : String
     }
 
 
@@ -94,11 +93,12 @@ type InputField
     | Carbs
     | Weight
     | Portions
+    | CookedWeight
 
 
 inputsInit : FC.FoodCalculator -> Inputs
 inputsInit fc =
-    Inputs "" "" "" "" "" "" (String.fromInt <| FC.portions fc)
+    Inputs "" "" "" "" "" "" "" (String.fromInt <| FC.portions fc)
 
 
 
@@ -118,7 +118,7 @@ update msg model =
             updateModelWithInputs model field value
 
         AddFood ->
-            case inputsToNewFood model.inputs of
+            case inputsToFood model.inputs of
                 Just new ->
                     let
                         newModel =
@@ -202,6 +202,9 @@ updateInputs field value inputs =
 
                 Portions ->
                     { inputs | portions = value }
+
+                CookedWeight ->
+                    { inputs | cookedWeight = value }
     in
     case field of
         Name ->
@@ -224,7 +227,7 @@ view model =
     div [ class "wrapper" ]
         [ viewHeader
         , viewCalculator model
-        , viewFooter model.buildTime
+        , viewFooter model.build
         ]
 
 
@@ -253,106 +256,118 @@ viewFooter build =
 
 viewInputs : Inputs -> Html Msg
 viewInputs i =
+    let
+        inputsAdd =
+            [ { id = "name"
+              , label = "Name"
+              , placeholder = "\"potatoes\""
+              , value = i.name
+              , onInput = InputChanged Name
+              , valid = inputValid Name i
+              , type_ = "text"
+              }
+            , { id = "calories"
+              , label = "Calories"
+              , placeholder = "kcal/100g"
+              , value = i.calories
+              , onInput = InputChanged Calories
+              , valid = inputValid Calories i
+              , type_ = "text"
+              }
+            , { id = "protein"
+              , label = "Protein"
+              , placeholder = "g/100g"
+              , value = i.protein
+              , onInput = InputChanged Protein
+              , valid = inputValid Protein i
+              , type_ = "text"
+              }
+            , { id = "fat"
+              , label = "Fat"
+              , placeholder = "g/100g"
+              , value = i.fat
+              , onInput = InputChanged Fat
+              , valid = inputValid Fat i
+              , type_ = "text"
+              }
+            , { id = "carbs"
+              , label = "Carbs"
+              , placeholder = "g/100g"
+              , value = i.carbs
+              , onInput = InputChanged Carbs
+              , valid = inputValid Carbs i
+              , type_ = "text"
+              }
+            , { id = "weight"
+              , label = "Weight"
+              , placeholder = "g"
+              , value = i.weight
+              , onInput = InputChanged Weight
+              , valid = inputValid Weight i
+              , type_ = "text"
+              }
+            ]
+
+        inputsOthers =
+            [ { id = "portions"
+              , label = "Portions"
+              , placeholder = "number of portions"
+              , value = i.portions
+              , onInput = InputChanged Portions
+              , valid = inputValid Portions i
+              , type_ = "number"
+              }
+            , { id = "cookedWeight"
+              , label = "Cooked Weight"
+              , placeholder = "g"
+              , value = i.cookedWeight
+              , onInput = InputChanged CookedWeight
+              , valid = inputValid CookedWeight i
+              , type_ = "text"
+              }
+            ]
+    in
     div []
-        [ form [ onSubmit AddFood, class "inputs-wrapper" ]
-            [ div [ class "input-wrapper" ]
-                [ label [ for "name" ] [ text "Name" ]
-                , input
-                    [ name "name"
-                    , id "name"
-                    , type_ "text"
-                    , placeholder "\"potatoes\""
-                    , onInput <| InputChanged Name
-                    , classList [ ( "valid", inputValid Name i ) ]
-                    , value i.name
-                    ]
-                    []
-                ]
-            , div [ class "input-wrapper" ]
-                [ label [ for "calories" ] [ text "Calories" ]
-                , input
-                    [ name "calories"
-                    , id "calories"
-                    , type_ "text"
-                    , placeholder "kcal/100g"
-                    , onInput <| InputChanged Calories
-                    , classList [ ( "valid", inputValid Calories i ) ]
-                    , value i.calories
-                    ]
-                    []
-                ]
-            , div [ class "input-wrapper" ]
-                [ label [ for "protein" ] [ text "Protein" ]
-                , input
-                    [ name "protein"
-                    , id "protein"
-                    , type_ "text"
-                    , placeholder "g/100g"
-                    , onInput <| InputChanged Protein
-                    , classList [ ( "valid", inputValid Protein i ) ]
-                    , value i.protein
-                    ]
-                    []
-                ]
-            , div [ class "input-wrapper" ]
-                [ label [ for "fat" ] [ text "Fat" ]
-                , input
-                    [ name "fat"
-                    , id "fat"
-                    , type_ "text"
-                    , placeholder "g/100g"
-                    , onInput <| InputChanged Fat
-                    , classList [ ( "valid", inputValid Fat i ) ]
-                    , value i.fat
-                    ]
-                    []
-                ]
-            , div [ class "input-wrapper" ]
-                [ label [ for "carbs" ] [ text "Carbs" ]
-                , input
-                    [ name "carbs"
-                    , id "carbs"
-                    , type_ "text"
-                    , placeholder "g/100g"
-                    , onInput <| InputChanged Carbs
-                    , classList [ ( "valid", inputValid Carbs i ) ]
-                    , value i.carbs
-                    ]
-                    []
-                ]
-            , div [ class "input-wrapper" ]
-                [ label [ for "weight" ] [ text "Weight" ]
-                , input
-                    [ name "weight"
-                    , id "weight"
-                    , type_ "text"
-                    , placeholder "g"
-                    , onInput <| InputChanged Weight
-                    , classList [ ( "valid", inputValid Weight i ) ]
-                    , value i.weight
-                    ]
-                    []
-                ]
-            , input
-                [ class "submit"
-                , type_ "submit"
-                , value "Add"
-                , disabled <| not <| allValid i
-                ]
-                []
+        [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
+            List.map viewInput inputsAdd
+                ++ [ input
+                        [ class "submit"
+                        , type_ "submit"
+                        , value "Add"
+                        , disabled <| not <| allValid i
+                        ]
+                        []
+                   ]
+        , div [ class "inputs-wrapper" ] <|
+            List.map viewInput inputsOthers
+        ]
+
+
+type alias Input =
+    { id : String
+    , label : String
+    , placeholder : String
+    , value : String
+    , onInput : String -> Msg
+    , valid : Bool
+    , type_ : String
+    }
+
+
+viewInput : Input -> Html Msg
+viewInput i =
+    div [ class "input-wrapper" ]
+        [ label [ for i.id ] [ text i.label ]
+        , input
+            [ name i.id
+            , id i.id
+            , type_ i.type_
+            , placeholder i.placeholder
+            , onInput <| i.onInput
+            , classList [ ( "valid", i.valid ) ]
+            , value i.value
             ]
-        , div [ class "inputs-wrapper" ]
-            [ div [ class "input-wrapper" ]
-                [ label [ for "portions" ] [ text "number of portions" ]
-                , input
-                    [ type_ "number"
-                    , onInput <| InputChanged Portions
-                    , classList [ ( "valid", inputValid Portions i ) ]
-                    , value i.portions
-                    ]
-                    []
-                ]
-            ]
+            []
         ]
 
 
@@ -464,10 +479,15 @@ inputValid f i =
                 |> Maybe.map (\int -> int > 0)
                 |> Maybe.withDefault False
 
+        CookedWeight ->
+            String.toInt i.cookedWeight
+                |> Maybe.map (\int -> int > 0)
+                |> Maybe.withDefault False
+
 
 allValid : Inputs -> Bool
 allValid i =
-    case inputsToNewFood i of
+    case inputsToFood i of
         Just _ ->
             True
 
@@ -475,8 +495,8 @@ allValid i =
             False
 
 
-inputsToNewFood : Inputs -> Maybe FC.NewFood
-inputsToNewFood i =
+inputsToFood : Inputs -> Maybe FC.NewFood
+inputsToFood i =
     let
         mName =
             if inputValid Name i then
