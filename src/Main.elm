@@ -34,7 +34,7 @@ type alias Model =
 -}
 type alias Flags =
     { foodCalculator : Json.Encode.Value
-    , buildTime : String
+    , build : String
     }
 
 
@@ -45,7 +45,7 @@ init flags =
             D.decodeValue (D.null True) flags.foodCalculator
     in
     if fcNull == Ok True then
-        ( { buildTime = flags.buildTime
+        ( { buildTime = flags.build
           , foodCalculator = FC.init
           , inputs = inputsInit FC.init
           }
@@ -59,7 +59,7 @@ init flags =
         in
         case fcRes of
             Err _ ->
-                ( { buildTime = flags.buildTime
+                ( { buildTime = flags.build
                   , foodCalculator = FC.init
                   , inputs = inputsInit FC.init
                   }
@@ -67,7 +67,7 @@ init flags =
                 )
 
             Ok fc ->
-                ( { buildTime = flags.buildTime
+                ( { buildTime = flags.build
                   , foodCalculator = fc
                   , inputs = inputsInit fc
                   }
@@ -156,7 +156,11 @@ updateModelWithInputs model field value =
         newFC =
             case maybeNewPortions of
                 Just newPortions ->
-                    FC.setPortions newPortions model.foodCalculator
+                    if newPortions > 0 then
+                        FC.setPortions newPortions model.foodCalculator
+
+                    else
+                        model.foodCalculator
 
                 Nothing ->
                     model.foodCalculator
@@ -227,11 +231,9 @@ view model =
 
 
 viewFooter : String -> Html Msg
-viewFooter buildTime =
+viewFooter build =
     div [ class "footer" ]
-        [ text "Build: "
-        , text buildTime
-        ]
+        [ text build ]
 
 
 viewAdd : Inputs -> Html Msg

@@ -1,6 +1,7 @@
 import { Elm } from "./Main.elm";
 // build time from environment variable
 const buildTime = process.env.BUILD_TIME;
+const nodeEnv = process.env.NODE_ENV;
 
 
 // Get the data from localStorage, if it exists.
@@ -8,12 +9,13 @@ const buildTime = process.env.BUILD_TIME;
 const storedData = localStorage.getItem('FoodCalculator');
 const flags = {
     foodCalculator: storedData ? JSON.parse(storedData) : null,
-    buildTime: buildTime ? buildTime : "not set"
+    build: nodeEnv + " " + buildTime,
+
 
 }
 window.app = Elm.Main.init({
     node: document.querySelector("body"),
-    flags: flags
+    flags: flags,
 });
 
 // Listen for commands from the `localStorageSet` port.
