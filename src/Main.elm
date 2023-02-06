@@ -98,7 +98,7 @@ type InputField
 
 inputsInit : FC.FoodCalculator -> Inputs
 inputsInit fc =
-    Inputs "" "" "" "" "" "" "" (String.fromInt <| FC.portions fc)
+    Inputs "" "" "" "" "" "" (String.fromInt <| FC.portions fc) ""
 
 
 
@@ -179,47 +179,45 @@ updateModelWithInputs model field value =
 
 updateInputs : InputField -> String -> Inputs -> Inputs
 updateInputs field value inputs =
-    let
-        new =
-            case field of
-                Name ->
-                    { inputs | name = value }
-
-                Calories ->
-                    { inputs | calories = value }
-
-                Protein ->
-                    { inputs | protein = value }
-
-                Fat ->
-                    { inputs | fat = value }
-
-                Carbs ->
-                    { inputs | carbs = value }
-
-                Weight ->
-                    { inputs | weight = value }
-
-                Portions ->
-                    { inputs | portions = value }
-
-                CookedWeight ->
-                    { inputs | cookedWeight = value }
-    in
     case field of
         Name ->
-            new
+            { inputs | name = value }
 
-        _ ->
-            if inputValid field new then
-                new
+        Calories ->
+            { inputs | calories = value }
 
-            else
-                inputs
+        Protein ->
+            { inputs | protein = value }
+
+        Fat ->
+            { inputs | fat = value }
+
+        Carbs ->
+            { inputs | carbs = value }
+
+        Weight ->
+            { inputs | weight = value }
+
+        Portions ->
+            { inputs | portions = value }
+
+        CookedWeight ->
+            { inputs | cookedWeight = value }
 
 
 
 -- VIEW
+
+
+type alias Input =
+    { id : String
+    , label : String
+    , placeholder : String
+    , value : String
+    , onInput : String -> Msg
+    , valid : Bool
+    , type_ : String
+    }
 
 
 view : Model -> Html Msg
@@ -343,17 +341,6 @@ viewInputs i =
         ]
 
 
-type alias Input =
-    { id : String
-    , label : String
-    , placeholder : String
-    , value : String
-    , onInput : String -> Msg
-    , valid : Bool
-    , type_ : String
-    }
-
-
 viewInput : Input -> Html Msg
 viewInput i =
     div [ class "input-wrapper" ]
@@ -384,7 +371,7 @@ viewFoods fs =
                     , th [] [ text "Fat" ]
                     , th [] [ text "Carbs" ]
                     , th [] [ text "Weight" ]
-                    , th [] [ text "Remove" ]
+                    , th [] [ text "Actions" ]
                     ]
                 ]
             , tbody []
@@ -417,8 +404,7 @@ viewResult result =
                     , th [] [ text "Protein" ]
                     , th [] [ text "Fat" ]
                     , th [] [ text "Carbs" ]
-                    , th [] [ text "Weight" ]
-                    , th [] [ text "Total Weight" ]
+                    , th [] [ text "Portion Weight" ]
                     ]
                 ]
             , tbody []
@@ -428,7 +414,6 @@ viewResult result =
                     , td [] [ text (String.fromFloat result.fat) ]
                     , td [] [ text (String.fromFloat result.carbs) ]
                     , td [] [ text (String.fromInt result.portionWeight) ]
-                    , td [] [ text (String.fromInt result.totalWeight) ]
                     ]
                 ]
             ]
