@@ -223,7 +223,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Meal Calculator" ]
-        , viewAdd model.inputs
+        , viewInputs model.inputs
         , viewFoods <| FC.foods model.foodCalculator
         , viewResult <| FC.result model.foodCalculator
         , viewFooter model.buildTime
@@ -236,8 +236,8 @@ viewFooter build =
         [ text build ]
 
 
-viewAdd : Inputs -> Html Msg
-viewAdd i =
+viewInputs : Inputs -> Html Msg
+viewInputs i =
     div []
         [ form [ onSubmit AddFood ]
             [ input
