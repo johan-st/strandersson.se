@@ -353,17 +353,22 @@ viewInputs i =
     div []
         [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
             List.map viewInput inputsAdd
-                ++ [ input
-                        [ class "submit"
-                        , type_ "submit"
-                        , value "Add"
-                        , disabled <| not <| allValid i
-                        ]
-                        []
-                   ]
+                ++ viewSubmit (not <| allValid i)
         , div [ class "inputs-wrapper" ] <|
             List.map viewInput inputsOthers
         ]
+
+
+viewSubmit : Bool -> List (Html Msg)
+viewSubmit dis =
+    [ input
+        [ class "submit"
+        , type_ "submit"
+        , value "Add"
+        , disabled dis
+        ]
+        []
+    ]
 
 
 viewInput : Input -> Html Msg
