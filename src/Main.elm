@@ -191,7 +191,7 @@ updateModelWithInputs model field value =
                     model.foodCalculator
     in
     ( { model
-        | inputs = updateInputs field value (commaFloats model.inputs)
+        | inputs = updateInputs field value model.inputs
         , foodCalculator = newFC
       }
     , if field == Portions then
@@ -544,23 +544,28 @@ inputsToFood i =
                 Nothing
 
         mCalories =
-            String.toInt i.calories
+            i.calories
+                |> String.toInt
                 |> maybePositiveInt
 
         mProtein =
-            String.toFloat i.protein
+            i.protein
+                |> commaFloat
                 |> maybePositiveFloat
 
         mFat =
-            String.toFloat i.fat
+            i.fat
+                |> commaFloat
                 |> maybePositiveFloat
 
         mCarbs =
-            String.toFloat i.carbs
+            i.carbs
+                |> commaFloat
                 |> maybePositiveFloat
 
         mWeight =
-            String.toInt i.weight
+            i.weight
+                |> String.toInt
                 |> maybePositiveInt
     in
     case ( mName, mCalories, mProtein ) of
