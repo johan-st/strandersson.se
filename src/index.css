@@ -41,9 +41,41 @@ input {
 
 .interactable {
   cursor: pointer;
-  text-decoration: underline;
 }
 
+/* FOODS & RESULT TABLE */
+#foods td:hover {
+  color: red;
+  border-color: #e6e6e6;
+}
+#foods th:first-child,
+#foods td:first-child {
+  flex: 2;
+}
+table {
+  width: 100%;
+  border: 1px solid #59b;
+}
+thead > tr {
+  color: #e6e6e6;
+}
+tr {
+  display: flex;
+}
+td {
+  border: 1px dotted #59b;
+}
+th,
+td {
+  display: block;
+  flex: 1;
+  text-align: center;
+}
+td > input {
+  width: calc(100% - 20px);
+}
+
+/* FOOTER */
 #footer {
   position: fixed;
   bottom: 0;

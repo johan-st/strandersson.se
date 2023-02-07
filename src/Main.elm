@@ -26,7 +26,15 @@ main =
 type alias Model =
     { build : String
     , foodCalculator : FC.FoodCalculator
+    , edit : Maybe Edit
     , inputs : Inputs
+    }
+
+
+type alias Edit =
+    { id : Int
+    , field : InputField
+    , value : String
     }
 
 
@@ -45,6 +53,7 @@ init flags =
     if fcNull == Ok True then
         ( { build = flags.build
           , foodCalculator = FC.init
+          , edit = Nothing
           , inputs = inputsInit FC.init
           }
         , Cmd.none
@@ -59,6 +68,7 @@ init flags =
             Err _ ->
                 ( { build = flags.build
                   , foodCalculator = FC.init
+                  , edit = Nothing
                   , inputs = inputsInit FC.init
                   }
                 , Cmd.none
@@ -67,6 +77,7 @@ init flags =
             Ok fc ->
                 ( { build = flags.build
                   , foodCalculator = fc
+                  , edit = Nothing
                   , inputs = inputsInit fc
                   }
                 , Cmd.none
@@ -126,6 +137,9 @@ type Msg
     = InputChanged InputField String
     | AddFood
     | RemoveFood Int
+    | EditFood InputField FC.Food
+    | EditFoodInput InputField FC.Food String
+    | EditFoodDone Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,12 +165,111 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        EditFood field food ->
+            let
+                str =
+                    case field of
+                        Name ->
+                            food.name
+
+                        Calories ->
+                            String.fromInt food.calories
+
+                        Protein ->
+                            String.fromFloat food.protein
+
+                        Fat ->
+                            String.fromFloat food.fat
+
+                        Carbs ->
+                            String.fromFloat food.carbs
+
+                        Weight ->
+                            String.fromInt food.weight
+
+                        _ ->
+                            "not implemented"
+            in
+            ( { model
+                | edit = Just <| Edit food.id field str
+              }
+            , Cmd.none
+            )
+
+        EditFoodInput field food str ->
+            let
+                newEdit =
+                    Edit food.id field str
+
+                newFC =
+                    if inputValid field str then
+                        updateFood model.foodCalculator food field str
+
+                    else
+                        model.foodCalculator
+            in
+            ( { model
+                | foodCalculator = newFC
+                , edit = Just newEdit
+              }
+            , localStorageSet <| FC.encoder newFC
+            )
+
+        EditFoodDone valid ->
+            if valid then
+                ( { model
+                    | edit = Nothing
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
+
         RemoveFood index ->
             let
                 newModel =
                     { model | foodCalculator = FC.remove index model.foodCalculator }
             in
             ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
+
+
+updateFood : FC.FoodCalculator -> FC.Food -> InputField -> String -> FC.FoodCalculator
+updateFood fc food field str =
+    let
+        maybeInt =
+            String.toInt str
+
+        maybeFloat =
+            commaFloat str
+
+        newFood =
+            case ( field, maybeInt, maybeFloat ) of
+                ( Name, _, _ ) ->
+                    { food | name = str }
+
+                ( Calories, Just int, _ ) ->
+                    { food | calories = int }
+
+                ( Protein, _, Just float ) ->
+                    { food | protein = float }
+
+                ( Fat, _, Just float ) ->
+                    { food | fat = float }
+
+                ( Carbs, _, Just float ) ->
+                    { food | carbs = float }
+
+                ( Weight, Just int, _ ) ->
+                    { food | weight = int }
+
+                _ ->
+                    food
+
+        newFC =
+            FC.updateFood newFood fc
+    in
+    newFC
 
 
 updateModelWithInputs : Model -> InputField -> String -> ( Model, Cmd Msg )
@@ -266,7 +379,7 @@ viewCalculator : Model -> Html Msg
 viewCalculator model =
     div [ id "main" ]
         [ viewInputs model.inputs
-        , viewFoods <| FC.foods model.foodCalculator
+        , viewFoods (FC.foods model.foodCalculator) model.edit
         , viewResult <| FC.result model.foodCalculator
         ]
 
@@ -288,7 +401,7 @@ viewInputs i =
               , placeholder = "\"potatoes\""
               , value = i.name
               , onInput = InputChanged Name
-              , valid = inputValid Name i
+              , valid = inputValid Name i.name
               , type_ = "text"
               }
             , { id = "calories"
@@ -296,7 +409,7 @@ viewInputs i =
               , placeholder = "kcal/100g"
               , value = i.calories
               , onInput = InputChanged Calories
-              , valid = inputValid Calories i
+              , valid = inputValid Calories i.calories
               , type_ = "text"
               }
             , { id = "protein"
@@ -304,7 +417,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.protein
               , onInput = InputChanged Protein
-              , valid = inputValid Protein i
+              , valid = inputValid Protein i.protein
               , type_ = "text"
               }
             , { id = "fat"
@@ -312,7 +425,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.fat
               , onInput = InputChanged Fat
-              , valid = inputValid Fat i
+              , valid = inputValid Fat i.fat
               , type_ = "text"
               }
             , { id = "carbs"
@@ -320,7 +433,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.carbs
               , onInput = InputChanged Carbs
-              , valid = inputValid Carbs i
+              , valid = inputValid Carbs i.carbs
               , type_ = "text"
               }
             , { id = "weight"
@@ -328,7 +441,7 @@ viewInputs i =
               , placeholder = "g"
               , value = i.weight
               , onInput = InputChanged Weight
-              , valid = inputValid Weight i
+              , valid = inputValid Weight i.weight
               , type_ = "text"
               }
             ]
@@ -339,7 +452,7 @@ viewInputs i =
               , placeholder = "number of portions"
               , value = i.portions
               , onInput = InputChanged Portions
-              , valid = inputValid Portions i
+              , valid = inputValid Portions i.portions
               , type_ = "number"
               }
             , { id = "cookedWeight"
@@ -347,7 +460,7 @@ viewInputs i =
               , placeholder = "g"
               , value = i.cookedWeight
               , onInput = InputChanged CookedWeight
-              , valid = inputValid CookedWeight i
+              , valid = inputValid CookedWeight i.cookedWeight
               , type_ = "text"
               }
             ]
@@ -390,9 +503,9 @@ viewInput i =
         ]
 
 
-viewFoods : List FC.Food -> Html Msg
-viewFoods fs =
-    div []
+viewFoods : List FC.Food -> Maybe Edit -> Html Msg
+viewFoods fs edit =
+    div [ id "foods" ]
         [ h2 [] [ text "Foods" ]
         , table []
             [ thead []
@@ -407,22 +520,151 @@ viewFoods fs =
                     ]
                 ]
             , tbody []
-                (List.map viewFood fs)
+                (List.map (viewFood edit) fs)
             ]
         ]
 
 
-viewFood : FC.Food -> Html Msg
-viewFood food =
+viewFood : Maybe Edit -> FC.Food -> Html Msg
+viewFood mEdit food =
+    case mEdit of
+        Just edit ->
+            if food.id == edit.id then
+                viewFoodEdit food edit
+
+            else
+                viewFoodNormal food
+
+        _ ->
+            viewFoodNormal food
+
+
+viewFoodNormal : FC.Food -> Html Msg
+viewFoodNormal food =
     tr []
-        [ td [] [ text food.name ]
-        , td [] [ text (String.fromInt food.calories) ]
-        , td [] [ text (String.fromFloat food.protein) ]
-        , td [] [ text (String.fromFloat food.fat) ]
-        , td [] [ text (String.fromFloat food.carbs) ]
-        , td [] [ text (String.fromInt food.weight) ]
+        [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+        , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+        , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+        , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+        , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+        , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
         , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
         ]
+
+
+viewFoodEdit : FC.Food -> Edit -> Html Msg
+viewFoodEdit food edit =
+    case edit.field of
+        Name ->
+            let
+                valid =
+                    inputValid Name edit.value
+            in
+            tr []
+                [ td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Name food ] []
+                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        Calories ->
+            let
+                valid =
+                    inputValid Calories edit.value
+            in
+            tr []
+                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+                , td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Calories food ] []
+                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        Protein ->
+            let
+                valid =
+                    inputValid Protein edit.value
+            in
+            tr []
+                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+                , td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Protein food ] []
+                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        Fat ->
+            let
+                valid =
+                    inputValid Fat edit.value
+            in
+            tr []
+                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+                , td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Fat food ] []
+                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        Carbs ->
+            let
+                valid =
+                    inputValid Carbs edit.value
+            in
+            tr []
+                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+                , td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Carbs food ] []
+                    , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        Weight ->
+            let
+                valid =
+                    inputValid Weight edit.value
+            in
+            tr []
+                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
+                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
+                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
+                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
+                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
+                , td []
+                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Weight food ] []
+                    , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
+                    ]
+                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                ]
+
+        _ ->
+            Debug.todo "viewFood"
 
 
 viewResult : FC.FCResult -> Html Msg
@@ -456,54 +698,54 @@ viewResult result =
 -- HELPER FUNCTIONS
 
 
-inputValid : InputField -> Inputs -> Bool
-inputValid f i =
+inputValid : InputField -> String -> Bool
+inputValid f str =
     case f of
         Name ->
-            if String.length i.name < 3 then
+            if String.length str < 3 then
                 False
 
             else
                 True
 
         Calories ->
-            i.calories
+            str
                 |> String.toInt
                 |> Maybe.map (\int -> int >= 0)
                 |> Maybe.withDefault False
 
         Protein ->
-            i.protein
+            str
                 |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
         Fat ->
-            i.fat
+            str
                 |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
         Carbs ->
-            i.carbs
+            str
                 |> commaFloat
                 |> Maybe.map (\float -> float >= 0)
                 |> Maybe.withDefault False
 
         Weight ->
-            i.weight
+            str
                 |> String.toInt
                 |> Maybe.map (\int -> int >= 0)
                 |> Maybe.withDefault False
 
         Portions ->
-            i.portions
+            str
                 |> String.toInt
                 |> Maybe.map (\int -> int > 0)
                 |> Maybe.withDefault False
 
         CookedWeight ->
-            i.cookedWeight
+            str
                 |> String.toInt
                 |> Maybe.map (\int -> int > 0)
                 |> Maybe.withDefault False
@@ -539,7 +781,7 @@ inputsToFood : Inputs -> Maybe FC.NewFood
 inputsToFood i =
     let
         mName =
-            if inputValid Name i then
+            if inputValid Name i.name then
                 Just i.name
 
             else
