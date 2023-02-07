@@ -208,21 +208,29 @@ encode fc =
 
 
 encoder : FoodCalculator -> E.Value
-encoder (FoodCalculator internals) =
-    case internals.doneWeight of
-        Just weight ->
-            E.object
-                [ ( "foods", E.list encodeFood internals.foods )
-                , ( "doneWeight", E.int weight )
-                , ( "portions", E.int internals.portions )
-                ]
+encoder fc =
+    case fc of
+        FoodCalculator _ ->
+            encoderV1 fc
 
-        Nothing ->
-            E.object
-                [ ( "foods", E.list encodeFood internals.foods )
-                , ( "doneWeight", E.string "not set" )
-                , ( "portions", E.int internals.portions )
-                ]
+
+encoderV1 : FoodCalculator -> E.Value
+encoderV1 (FoodCalculator internals) =
+    let
+        doneWeight =
+            case internals.doneWeight of
+                Just weight ->
+                    E.int weight
+
+                Nothing ->
+                    E.string "not set"
+    in
+    E.object
+        [ ( "version", E.int 1 )
+        , ( "foods", E.list encodeFood internals.foods )
+        , ( "doneWeight", doneWeight )
+        , ( "portions", E.int internals.portions )
+        ]
 
 
 encodeFood : Food -> E.Value
@@ -253,6 +261,27 @@ decode str =
 
 decoder : D.Decoder FoodCalculator
 decoder =
+    D.field "version" D.int
+        |> D.andThen
+            (\version ->
+                case version of
+                    1 ->
+                        D.map fcToCurrent decoderV1
+
+                    _ ->
+                        D.fail "unknown version"
+            )
+
+
+fcToCurrent : FoodCalculator -> FoodCalculator
+fcToCurrent fc =
+    case fc of
+        FoodCalculator _ ->
+            fc
+
+
+decoderV1 : D.Decoder FoodCalculator
+decoderV1 =
     let
         latestId =
             D.field "foods" (D.list decodeFood) |> D.andThen (\x -> findLatestId x)
