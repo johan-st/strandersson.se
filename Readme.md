@@ -22,13 +22,13 @@ _A domain and collection of tools and things for our family._
 - storing used foodstuffs on a backend somewhere. 
 - user accounts to share lists between devices.
 - share lists by links
-- enable editing in of list
 - have a table of most common foodstuffs
 - adds?
 - make rough estimate of kcals based on macros as an automatic sanity check on inputs
 
 
 #### TODOs
+- enable editing in of list
 - make input feedback more clear.
 - add units to list
 - prettier "remove"
