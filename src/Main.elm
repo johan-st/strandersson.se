@@ -3,7 +3,7 @@ port module Main exposing (main)
 import Browser
 import FoodCalculator as FC
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, disabled, for, id, name, placeholder, type_, value)
+import Html.Attributes exposing (class, classList, disabled, for, href, id, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Decode as D
 import Json.Encode
@@ -274,7 +274,9 @@ viewCalculator model =
 viewFooter : String -> Html Msg
 viewFooter build =
     div [ id "footer" ]
-        [ text build ]
+        [ div [] [ text build ]
+        , a [ href "https://github.com/johan-st/strandersson.se" ] [ text "github" ]
+        ]
 
 
 viewInputs : Inputs -> Html Msg

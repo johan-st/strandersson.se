@@ -52,4 +52,10 @@ input {
   width: 100%;
   text-align: center;
   line-height: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#footer > * {
+  padding: 0 1rem;
 }
