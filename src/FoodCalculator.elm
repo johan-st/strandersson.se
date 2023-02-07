@@ -45,7 +45,7 @@ type alias NewFood =
 
 foods : FoodCalculator -> List Food
 foods (FoodCalculator internals) =
-    internals.foods
+    internals.foods |> List.sortBy .id
 
 
 add : NewFood -> FoodCalculator -> FoodCalculator
