@@ -123,12 +123,12 @@ suite =
                                 |> FC.portionsSet 2
 
                         decoded =
-                            case FC.decode (FC.encode newFC) of
+                            case FC.decode <| FC.encode newFC of
                                 Ok fc ->
                                     fc
 
-                                Err _ ->
-                                    Debug.log "got Err from decode" FC.init
+                                Err err ->
+                                    Debug.log (Debug.toString err) FC.init
                     in
                     Expect.equal
                         decoded
