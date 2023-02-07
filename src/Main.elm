@@ -664,7 +664,7 @@ viewFoodEdit food edit =
                 ]
 
         _ ->
-            Debug.todo "viewFood"
+            viewFoodNormal food
 
 
 viewResult : FC.FCResult -> Html Msg
