@@ -54,6 +54,41 @@ suite =
                     in
                     Expect.equalLists (FC.foods newFC) foods
             ]
+        , describe "update" <|
+            [ test "update a food" <|
+                \() ->
+                    let
+                        newFC =
+                            FC.init
+                                |> FC.add apple
+                                |> FC.add orange
+                                |> FC.add banana
+
+                        foods =
+                            FC.foods newFC
+
+                        updatedOrange =
+                            food 2 orange
+                                |> (\f -> { f | name = "Updated Orange" })
+
+                        updatedFC =
+                            FC.updateFood updatedOrange newFC
+
+                        expectedFoods =
+                            foods
+                                |> List.map
+                                    (\f ->
+                                        if f.id == updatedOrange.id then
+                                            updatedOrange
+
+                                        else
+                                            f
+                                    )
+                    in
+                    Expect.equalLists
+                        expectedFoods
+                        (FC.foods updatedFC)
+            ]
         , describe "setDoneWeight" <|
             [ test "get when no weight set returns Nothing" <|
                 \() ->

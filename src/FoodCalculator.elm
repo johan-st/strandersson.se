@@ -1,4 +1,4 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, foods, init, portions, portionsSet, remove, result)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, foods, init, portions, portionsSet, remove, result, updateFood)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -69,6 +69,23 @@ add newFood (FoodCalculator internals) =
             | foods = food :: internals.foods
             , doneWeight = internals.doneWeight
             , latestId = id
+        }
+
+
+updateFood : Food -> FoodCalculator -> FoodCalculator
+updateFood food (FoodCalculator internals) =
+    FoodCalculator
+        { internals
+            | foods =
+                internals.foods
+                    |> List.map
+                        (\f ->
+                            if f.id == food.id then
+                                food
+
+                            else
+                                f
+                        )
         }
 
 
