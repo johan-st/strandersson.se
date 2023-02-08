@@ -25,6 +25,7 @@ _A domain and collection of tools and things for our family._ ([link](https://st
 - have a table of most common foodstuffs
 - adds?
 - make rough estimate of kcals based on macros as an automatic sanity check on inputs
+- remake ui in elm-ui
 
 
 #### TODOs
