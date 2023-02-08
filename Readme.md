@@ -1,5 +1,5 @@
-  # StrAndersson.se
-_A domain and collection of tools and things for our family._
+  # strandersson.se
+_A domain and collection of tools and things for our family._ ([link](https://strandersson.se))
 
 
 ## Meal Calculator
