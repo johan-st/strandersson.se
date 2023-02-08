@@ -202,7 +202,7 @@ update msg model =
                     Edit food.id field str
 
                 newFC =
-                    if inputValid field str then
+                    if validInput field str then
                         updateFood model.foodCalculator food field str
 
                     else
@@ -401,7 +401,7 @@ viewInputs i =
               , placeholder = "\"potatoes\""
               , value = i.name
               , onInput = InputChanged Name
-              , valid = inputValid Name i.name
+              , valid = validInput Name i.name
               , type_ = "text"
               }
             , { id = "calories"
@@ -409,7 +409,7 @@ viewInputs i =
               , placeholder = "kcal/100g"
               , value = i.calories
               , onInput = InputChanged Calories
-              , valid = inputValid Calories i.calories
+              , valid = validInput Calories i.calories
               , type_ = "text"
               }
             , { id = "protein"
@@ -417,7 +417,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.protein
               , onInput = InputChanged Protein
-              , valid = inputValid Protein i.protein
+              , valid = validInput Protein i.protein
               , type_ = "text"
               }
             , { id = "fat"
@@ -425,7 +425,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.fat
               , onInput = InputChanged Fat
-              , valid = inputValid Fat i.fat
+              , valid = validInput Fat i.fat
               , type_ = "text"
               }
             , { id = "carbs"
@@ -433,7 +433,7 @@ viewInputs i =
               , placeholder = "g/100g"
               , value = i.carbs
               , onInput = InputChanged Carbs
-              , valid = inputValid Carbs i.carbs
+              , valid = validInput Carbs i.carbs
               , type_ = "text"
               }
             , { id = "weight"
@@ -441,7 +441,7 @@ viewInputs i =
               , placeholder = "g"
               , value = i.weight
               , onInput = InputChanged Weight
-              , valid = inputValid Weight i.weight
+              , valid = validInput Weight i.weight
               , type_ = "text"
               }
             ]
@@ -452,7 +452,7 @@ viewInputs i =
               , placeholder = "number of portions"
               , value = i.portions
               , onInput = InputChanged Portions
-              , valid = inputValid Portions i.portions
+              , valid = validInput Portions i.portions
               , type_ = "number"
               }
             , { id = "cookedWeight"
@@ -460,7 +460,7 @@ viewInputs i =
               , placeholder = "g"
               , value = i.cookedWeight
               , onInput = InputChanged CookedWeight
-              , valid = inputValid CookedWeight i.cookedWeight
+              , valid = validInput CookedWeight i.cookedWeight
               , type_ = "text"
               }
             ]
@@ -468,7 +468,7 @@ viewInputs i =
     div []
         [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
             List.map viewInput inputsAdd
-                ++ viewSubmit (not <| allValid i)
+                ++ viewSubmit (not <| validInputs i)
         , div [ class "inputs-wrapper" ] <|
             List.map viewInput inputsOthers
         ]
@@ -558,7 +558,7 @@ viewFoodEdit food edit =
         Name ->
             let
                 valid =
-                    inputValid Name edit.value
+                    validInput Name edit.value
             in
             tr []
                 [ td []
@@ -576,7 +576,7 @@ viewFoodEdit food edit =
         Calories ->
             let
                 valid =
-                    inputValid Calories edit.value
+                    validInput Calories edit.value
             in
             tr []
                 [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -594,7 +594,7 @@ viewFoodEdit food edit =
         Protein ->
             let
                 valid =
-                    inputValid Protein edit.value
+                    validInput Protein edit.value
             in
             tr []
                 [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -612,7 +612,7 @@ viewFoodEdit food edit =
         Fat ->
             let
                 valid =
-                    inputValid Fat edit.value
+                    validInput Fat edit.value
             in
             tr []
                 [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -630,7 +630,7 @@ viewFoodEdit food edit =
         Carbs ->
             let
                 valid =
-                    inputValid Carbs edit.value
+                    validInput Carbs edit.value
             in
             tr []
                 [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -648,7 +648,7 @@ viewFoodEdit food edit =
         Weight ->
             let
                 valid =
-                    inputValid Weight edit.value
+                    validInput Weight edit.value
             in
             tr []
                 [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -698,8 +698,10 @@ viewResult result =
 -- HELPER FUNCTIONS
 
 
-inputValid : InputField -> String -> Bool
-inputValid f str =
+{-| Validate string as input for given InputFIeld
+-}
+validInput : InputField -> String -> Bool
+validInput f str =
     case f of
         Name ->
             if String.length str < 3 then
@@ -751,23 +753,16 @@ inputValid f str =
                 |> Maybe.withDefault False
 
 
-allValid : Inputs -> Bool
-allValid i =
-    case inputsToFood (commaFloats i) of
-        Just _ ->
-            True
-
-        Nothing ->
-            False
-
-
-commaFloats : Inputs -> Inputs
-commaFloats i =
-    { i
-        | protein = String.replace "," "." i.protein
-        , fat = String.replace "," "." i.fat
-        , carbs = String.replace "," "." i.carbs
-    }
+validInputs : Inputs -> Bool
+validInputs i =
+    validInput Name i.name
+        && validInput Calories i.calories
+        && validInput Protein i.protein
+        && validInput Fat i.fat
+        && validInput Carbs i.carbs
+        && validInput Weight i.weight
+        && validInput Portions i.portions
+        && validInput CookedWeight i.cookedWeight
 
 
 commaFloat : String -> Maybe Float
@@ -781,36 +776,46 @@ inputsToFood : Inputs -> Maybe FC.NewFood
 inputsToFood i =
     let
         mName =
-            if inputValid Name i.name then
+            if validInput Name i.name then
                 Just i.name
 
             else
                 Nothing
 
         mCalories =
-            i.calories
-                |> String.toInt
-                |> maybePositiveInt
+            if validInput Calories i.calories then
+                String.toInt i.calories
+
+            else
+                Nothing
 
         mProtein =
-            i.protein
-                |> commaFloat
-                |> maybePositiveFloat
+            if validInput Protein i.protein then
+                commaFloat i.protein
+
+            else
+                Nothing
 
         mFat =
-            i.fat
-                |> commaFloat
-                |> maybePositiveFloat
+            if validInput Fat i.fat then
+                commaFloat i.fat
+
+            else
+                Nothing
 
         mCarbs =
-            i.carbs
-                |> commaFloat
-                |> maybePositiveFloat
+            if validInput Carbs i.carbs then
+                commaFloat i.carbs
+
+            else
+                Nothing
 
         mWeight =
-            i.weight
-                |> String.toInt
-                |> maybePositiveInt
+            if validInput Weight i.weight then
+                String.toInt i.weight
+
+            else
+                Nothing
     in
     case ( mName, mCalories, mProtein ) of
         ( Just name, Just calories, Just protein ) ->
@@ -830,32 +835,6 @@ inputsToFood i =
 
         _ ->
             Nothing
-
-
-maybePositiveInt : Maybe Int -> Maybe Int
-maybePositiveInt maybeInt =
-    Maybe.andThen
-        (\int ->
-            if int >= 0 then
-                Just int
-
-            else
-                Nothing
-        )
-        maybeInt
-
-
-maybePositiveFloat : Maybe Float -> Maybe Float
-maybePositiveFloat maybeFloat =
-    Maybe.andThen
-        (\float ->
-            if float >= 0 then
-                Just float
-
-            else
-                Nothing
-        )
-        maybeFloat
 
 
 
