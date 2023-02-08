@@ -378,9 +378,18 @@ viewHeader =
 viewCalculator : Model -> Html Msg
 viewCalculator model =
     div [ id "main" ]
-        [ viewInputs model.inputs
-        , viewFoods (FC.foods model.foodCalculator) model.edit
-        , viewResult <| FC.result model.foodCalculator
+        [ section [ id "add-food-form" ]
+            [ h2 [] [ text "Add Food" ]
+            , viewInputs model.inputs <| FC.result model.foodCalculator
+            ]
+        , section [ id "food-list" ]
+            [ h2 [] [ text "Food" ]
+            , viewFoods (FC.foods model.foodCalculator) model.edit
+            ]
+        , section [ id "results" ]
+            [ h2 [] [ text "Result" ]
+            , viewResult <| FC.result model.foodCalculator
+            ]
         ]
 
 
@@ -392,8 +401,8 @@ viewFooter build =
         ]
 
 
-viewInputs : Inputs -> Html Msg
-viewInputs i =
+viewInputs : Inputs -> FC.FCResult -> Html Msg
+viewInputs i res =
     let
         inputsAdd =
             [ { id = "name"
@@ -457,7 +466,7 @@ viewInputs i =
               }
             , { id = "cookedWeight"
               , label = "Cooked Weight"
-              , placeholder = "g"
+              , placeholder = String.fromInt res.totalWeight ++ "g"
               , value = i.cookedWeight
               , onInput = InputChanged CookedWeight
               , valid = validInput CookedWeight i.cookedWeight
@@ -474,6 +483,8 @@ viewInputs i =
         ]
 
 
+{-| Bool to disable submit button
+-}
 viewSubmit : Bool -> List (Html Msg)
 viewSubmit dis =
     [ input
@@ -505,23 +516,20 @@ viewInput i =
 
 viewFoods : List FC.Food -> Maybe Edit -> Html Msg
 viewFoods fs edit =
-    div [ id "foods" ]
-        [ h2 [] [ text "Foods" ]
-        , table []
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Name" ]
-                    , th [] [ text "Calories" ]
-                    , th [] [ text "Protein" ]
-                    , th [] [ text "Fat" ]
-                    , th [] [ text "Carbs" ]
-                    , th [] [ text "Weight" ]
-                    , th [] [ text "Actions" ]
-                    ]
+    table []
+        [ thead []
+            [ tr []
+                [ th [] [ text "Name" ]
+                , th [] [ text "Calories" ]
+                , th [] [ text "Protein" ]
+                , th [] [ text "Fat" ]
+                , th [] [ text "Carbs" ]
+                , th [] [ text "Weight" ]
+                , th [] [ text "Actions" ]
                 ]
-            , tbody []
-                (List.map (viewFood edit) fs)
             ]
+        , tbody []
+            (List.map (viewFood edit) fs)
         ]
 
 
@@ -669,26 +677,23 @@ viewFoodEdit food edit =
 
 viewResult : FC.FCResult -> Html Msg
 viewResult result =
-    div []
-        [ h2 [] [ text "Result" ]
-        , table []
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Calories" ]
-                    , th [] [ text "Protein" ]
-                    , th [] [ text "Fat" ]
-                    , th [] [ text "Carbs" ]
-                    , th [] [ text "Portion Weight" ]
-                    ]
+    table []
+        [ thead []
+            [ tr []
+                [ th [] [ text "Calories" ]
+                , th [] [ text "Protein" ]
+                , th [] [ text "Fat" ]
+                , th [] [ text "Carbs" ]
+                , th [] [ text "Portion Weight" ]
                 ]
-            , tbody []
-                [ tr []
-                    [ td [] [ text (String.fromInt result.calories) ]
-                    , td [] [ text (String.fromFloat result.protein) ]
-                    , td [] [ text (String.fromFloat result.fat) ]
-                    , td [] [ text (String.fromFloat result.carbs) ]
-                    , td [] [ text (String.fromInt result.portionWeight) ]
-                    ]
+            ]
+        , tbody []
+            [ tr []
+                [ td [] [ text (String.fromInt result.calories) ]
+                , td [] [ text (String.fromFloat result.protein) ]
+                , td [] [ text (String.fromFloat result.fat) ]
+                , td [] [ text (String.fromFloat result.carbs) ]
+                , td [] [ text (String.fromInt result.portionWeight) ]
                 ]
             ]
         ]

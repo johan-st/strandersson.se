@@ -44,12 +44,12 @@ input {
 }
 
 /* FOODS & RESULT TABLE */
-#foods td:hover {
+#food-list td:hover {
   color: red;
   border-color: #e6e6e6;
 }
-#foods th:first-child,
-#foods td:first-child {
+#food-list th:first-child,
+#food-list td:first-child {
   flex: 2;
 }
 table {
