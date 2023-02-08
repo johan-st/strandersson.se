@@ -556,7 +556,7 @@ viewFoodNormal food =
         , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
         , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
         , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-        , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+        , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
         ]
 
 
@@ -578,7 +578,7 @@ viewFoodEdit food edit =
                 , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
                 , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
                 , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         Calories ->
@@ -596,7 +596,7 @@ viewFoodEdit food edit =
                 , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
                 , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
                 , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         Protein ->
@@ -614,7 +614,7 @@ viewFoodEdit food edit =
                 , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
                 , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
                 , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         Fat ->
@@ -632,7 +632,7 @@ viewFoodEdit food edit =
                     ]
                 , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
                 , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         Carbs ->
@@ -650,7 +650,7 @@ viewFoodEdit food edit =
                     , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
                     ]
                 , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         Weight ->
@@ -668,7 +668,7 @@ viewFoodEdit food edit =
                     [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Weight food ] []
                     , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
                     ]
-                , td [ class "interactable", onClick <| RemoveFood food.id ] [ text "remove" ]
+                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
                 ]
 
         _ ->
