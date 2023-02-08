@@ -30,5 +30,7 @@ _A domain and collection of tools and things for our family._ ([link](https://st
 
 #### TODOs
 - make input feedback more clear.
+- click outside of edit input to close
+- fix width issue on narrow screens (e.g. phones)
 - add units to list
 - prettier "remove"
