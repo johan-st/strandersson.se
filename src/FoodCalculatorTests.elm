@@ -2,11 +2,10 @@ module FoodCalculatorTests exposing (..)
 
 -- import Expect exposing (Expectation)
 -- import Fuzz exposing (Fuzzer, int, list, string)
--- import Test exposing (..)
 
 import Expect
 import FoodCalculator as FC
-import Test
+import Test exposing (..)
 
 
 suite : Test
