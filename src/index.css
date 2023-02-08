@@ -20,7 +20,7 @@ input {
 
 #main,
 #header {
-  max-width: 800px;
+  max-width: 920;
   margin: 0 auto;
 }
 
@@ -90,4 +90,12 @@ td > input {
 
 #footer > * {
   padding: 0 1rem;
+}
+
+@media (max-width: 540px) {
+  #main,
+  #header {
+    max-width: 100%;
+    font-size: 11px;
+  }
 }
