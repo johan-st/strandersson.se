@@ -477,7 +477,7 @@ viewInputs i res =
     div []
         [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
             List.map viewInput inputsAdd
-                ++ viewSubmit (not <| validInputs i)
+                ++ viewSubmit (not <| validAddInputs i)
         , div [ class "inputs-wrapper" ] <|
             List.map viewInput inputsOthers
         ]
@@ -758,16 +758,14 @@ validInput f str =
                 |> Maybe.withDefault False
 
 
-validInputs : Inputs -> Bool
-validInputs i =
+validAddInputs : Inputs -> Bool
+validAddInputs i =
     validInput Name i.name
         && validInput Calories i.calories
         && validInput Protein i.protein
         && validInput Fat i.fat
         && validInput Carbs i.carbs
         && validInput Weight i.weight
-        && validInput Portions i.portions
-        && validInput CookedWeight i.cookedWeight
 
 
 commaFloat : String -> Maybe Float
