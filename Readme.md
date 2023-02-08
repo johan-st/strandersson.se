@@ -28,7 +28,6 @@ _A domain and collection of tools and things for our family._ ([link](https://st
 
 
 #### TODOs
-- enable editing in of list
 - make input feedback more clear.
 - add units to list
 - prettier "remove"
