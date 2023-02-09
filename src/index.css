@@ -1,7 +1,7 @@
 :root {
   --col-accented-muted: #4787a8;
   --col-accented: #fdfeff;
-  --col-warn: #f00;
+  --col-warn: #fa3b00;
   --col-background: #333;
   --col-text: #b5b5b5;
   --col-valid: #afa;
@@ -48,11 +48,17 @@ a:visited {
 .input-wrapper {
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+label {
+  margin-left: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .submit {
-  width: 100%;
-  min-height: 2vw;
+  margin: 0.5rem auto 1rem auto;
+  width: 200px;
 }
 
 .interactable {
@@ -74,6 +80,14 @@ a:visited {
 #food-list td:first-child {
   flex: 2;
 }
+
+#food-list tr:hover {
+  color: var(--col-accented);
+}
+#food-list tr:hover > td {
+  border-color: var(--col-accented);
+}
+
 table {
   width: 100%;
   border: 1px solid var(--col-accented-muted);
