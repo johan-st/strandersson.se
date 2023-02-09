@@ -208,7 +208,7 @@ init =
     FoodCalculator
         { foods = []
         , doneWeight = Nothing
-        , portions = 1
+        , portions = 4
         , latestId = 0
         }
 
