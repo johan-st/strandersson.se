@@ -307,7 +307,7 @@ updateModelWithInputs model field value =
         | inputs = updateInputs field value model.inputs
         , foodCalculator = newFC
       }
-    , if field == Portions then
+    , if field == Portions || field == CookedWeight then
         localStorageSet <| FC.encoder newFC
 
       else
