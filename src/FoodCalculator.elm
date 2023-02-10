@@ -1,4 +1,4 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, foods, init, portions, portionsSet, remove, result, updateFood)
+module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, estimatedKcal, foods, init, portions, portionsSet, remove, result, updateFood)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -213,9 +213,26 @@ init =
         }
 
 
+estimatedKcal : Food -> Int
+estimatedKcal food =
+    let
+        weight100s =
+            toFloat food.weight / 100
+
+        proteinKcal =
+            food.protein * 4
+
+        carbsKcal =
+            food.carbs * 4
+
+        fatkCal =
+            food.fat * 9
+    in
+    round <| weight100s * (proteinKcal + carbsKcal + fatkCal)
+
+
 
 -- ENCODE/DECODE
--- TODO: add version of encoding to encode & decode
 
 
 encode : FoodCalculator -> String

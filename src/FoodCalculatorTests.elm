@@ -1,10 +1,10 @@
 module FoodCalculatorTests exposing (..)
 
 -- import Expect exposing (Expectation)
--- import Fuzz exposing (Fuzzer, int, list, string)
 
 import Expect
 import FoodCalculator as FC
+import Fuzz exposing (Fuzzer, floatRange, int, intRange, niceFloat, string)
 import Test exposing (..)
 
 
@@ -118,6 +118,18 @@ suite =
                         (FC.cookedWeight newFC_weight)
                         (Just 300)
             ]
+        , describe "estimated kcal from macros in food" <|
+            [ fuzz fuzzFood "returns the estimated kcal from macros in food" <|
+                \f ->
+                    let
+                        -- source for kcals: FAQ on https://www.nal.usda.gov/programs/fnic
+                        expectedKcal =
+                            round <| ((f.protein * 4) + (f.fat * 9) + (f.carbs * 4)) * (toFloat f.weight / 100)
+                    in
+                    Expect.equal
+                        (FC.estimatedKcal f)
+                        expectedKcal
+            ]
         , describe "result" <|
             [ test "returns the total Macros for one (1) portion" <|
                 \() ->
@@ -176,6 +188,19 @@ suite =
 
 
 -- HELPERS
+-- TODO: consider handling "NAN" and "infinity" and very big and small ints.
+
+
+fuzzFood : Fuzzer FC.Food
+fuzzFood =
+    Fuzz.map7 FC.Food
+        int
+        string
+        int
+        (floatRange 0 1000000)
+        (floatRange 0 1000000)
+        (floatRange 0 1000000)
+        (intRange 0 1000000000)
 
 
 food : Int -> FC.NewFood -> FC.Food

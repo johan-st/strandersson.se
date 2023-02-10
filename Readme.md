@@ -24,11 +24,11 @@ _A domain and collection of tools and things for our family._ ([link](https://st
 - share lists by links
 - have a table of most common foodstuffs
 - adds?
-- make rough estimate of kcals based on macros as an automatic sanity check on inputs
 - remake ui in elm-ui
 
 
 #### TODOs
+- make rough estimate of kcals based on macros as an automatic sanity check on inputs
 - make input feedback more clear.
 - click outside of edit input to close
 - fix width issue on narrow screens (e.g. phones)
