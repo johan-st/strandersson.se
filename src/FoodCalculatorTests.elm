@@ -188,7 +188,7 @@ suite =
 
 
 -- HELPERS
--- TODO: consider handling "NAN" and "infinity" and very big and small ints.
+-- TODO: vanity thing: consider handling "NAN" and "infinity" and very big and small ints of weight.
 
 
 fuzzFood : Fuzzer FC.Food
