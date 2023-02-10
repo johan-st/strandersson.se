@@ -127,7 +127,7 @@ suite =
                             round <| ((f.protein * 4) + (f.fat * 9) + (f.carbs * 4)) * (toFloat f.weight / 100)
                     in
                     Expect.equal
-                        (FC.estimatedKcal f)
+                        (FC.estimatedKcalFood f)
                         expectedKcal
             ]
         , describe "result" <|

@@ -1,4 +1,25 @@
-module FoodCalculator exposing (FCResult, Food, FoodCalculator(..), NewFood, add, cookedWeight, cookedWeightSet, decode, decoder, encode, encoder, estimatedKcal, foods, init, portions, portionsSet, remove, result, updateFood)
+module FoodCalculator exposing
+    ( FCResult
+    , Food
+    , FoodCalculator(..)
+    , NewFood
+    , add
+    , cookedWeight
+    , cookedWeightSet
+    , decode
+    , decoder
+    , encode
+    , encoder
+    , estimatedKcal
+    , estimatedKcalFood
+    , foods
+    , init
+    , portions
+    , portionsSet
+    , remove
+    , result
+    , updateFood
+    )
 
 import Json.Decode as D
 import Json.Encode as E
@@ -213,22 +234,27 @@ init =
         }
 
 
-estimatedKcal : Food -> Int
-estimatedKcal food =
+estimatedKcal : Int -> Float -> Float -> Float -> Int
+estimatedKcal weight protein fat carbs =
     let
         weight100s =
-            toFloat food.weight / 100
+            toFloat weight / 100
 
         proteinKcal =
-            food.protein * 4
+            protein * 4
 
         carbsKcal =
-            food.carbs * 4
+            carbs * 4
 
         fatkCal =
-            food.fat * 9
+            fat * 9
     in
     round <| weight100s * (proteinKcal + carbsKcal + fatkCal)
+
+
+estimatedKcalFood : Food -> Int
+estimatedKcalFood f =
+    estimatedKcal f.weight f.protein f.fat f.carbs
 
 
 

@@ -355,6 +355,7 @@ type alias Input =
     , onInput : String -> Msg
     , valid : Bool
     , type_ : String
+    , subtext : Maybe String
     }
 
 
@@ -412,6 +413,7 @@ viewInputs i res =
               , onInput = InputChanged Name
               , valid = validInput Name i.name
               , type_ = "text"
+              , subtext = Nothing
               }
             , { id = "calories"
               , label = "Calories"
@@ -420,6 +422,7 @@ viewInputs i res =
               , onInput = InputChanged Calories
               , valid = validInput Calories i.calories
               , type_ = "text"
+              , subtext = Just <| viewSanityCheckString i
               }
             , { id = "protein"
               , label = "Protein"
@@ -428,6 +431,7 @@ viewInputs i res =
               , onInput = InputChanged Protein
               , valid = validInput Protein i.protein
               , type_ = "text"
+              , subtext = Nothing
               }
             , { id = "fat"
               , label = "Fat"
@@ -436,6 +440,7 @@ viewInputs i res =
               , onInput = InputChanged Fat
               , valid = validInput Fat i.fat
               , type_ = "text"
+              , subtext = Nothing
               }
             , { id = "carbs"
               , label = "Carbs"
@@ -444,6 +449,7 @@ viewInputs i res =
               , onInput = InputChanged Carbs
               , valid = validInput Carbs i.carbs
               , type_ = "text"
+              , subtext = Nothing
               }
             , { id = "weight"
               , label = "Weight"
@@ -452,6 +458,7 @@ viewInputs i res =
               , onInput = InputChanged Weight
               , valid = validInput Weight i.weight
               , type_ = "text"
+              , subtext = Nothing
               }
             ]
 
@@ -463,6 +470,7 @@ viewInputs i res =
               , onInput = InputChanged Portions
               , valid = validInput Portions i.portions
               , type_ = "number"
+              , subtext = Nothing
               }
             , { id = "cookedWeight"
               , label = "Cooked Weight"
@@ -471,6 +479,7 @@ viewInputs i res =
               , onInput = InputChanged CookedWeight
               , valid = validInput CookedWeight i.cookedWeight
               , type_ = "text"
+              , subtext = Nothing
               }
             ]
     in
@@ -511,7 +520,31 @@ viewInput i =
             , value i.value
             ]
             []
+        , case i.subtext of
+            Just s ->
+                p [ class "subtext" ] [ text s ]
+
+            Nothing ->
+                text ""
         ]
+
+
+viewSanityCheckString : Inputs -> String
+viewSanityCheckString i =
+    let
+        prot =
+            Maybe.withDefault 0 <| commaFloat i.protein
+
+        fat =
+            Maybe.withDefault 0 <| commaFloat i.fat
+
+        carbs =
+            Maybe.withDefault 0 <| commaFloat i.carbs
+
+        estimatedKcal =
+            FC.estimatedKcal 100 prot fat carbs
+    in
+    "~ " ++ String.fromInt estimatedKcal ++ " kcals/100g"
 
 
 viewFoods : List FC.Food -> Maybe Edit -> Html Msg

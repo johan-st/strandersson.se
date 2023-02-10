@@ -56,6 +56,11 @@ label {
   margin-top: 0.5rem;
 }
 
+.subtext {
+  font-size: 0.8em;
+  margin: 0 auto 0.5em;
+}
+
 .submit {
   margin: 0.5rem auto 1rem auto;
   width: 200px;
