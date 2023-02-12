@@ -4,7 +4,7 @@ module FoodCalculatorTests exposing (..)
 
 import Expect
 import FoodCalculator as FC
-import Fuzz exposing (Fuzzer, floatRange, int, intAtLeast, intRange, string)
+import Fuzz exposing (Fuzzer, floatRange, int, intAtLeast, string)
 import Test exposing (..)
 
 
