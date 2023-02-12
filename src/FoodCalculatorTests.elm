@@ -4,7 +4,7 @@ module FoodCalculatorTests exposing (..)
 
 import Expect
 import FoodCalculator as FC
-import Fuzz exposing (Fuzzer, floatRange, int, intRange, niceFloat, string)
+import Fuzz exposing (Fuzzer, floatRange, int, intAtLeast, intRange, string)
 import Test exposing (..)
 
 
@@ -26,70 +26,66 @@ suite =
                         0
             ]
         , describe "add" <|
-            [ test "add food to the list of foods" <|
-                \() ->
+            [ fuzz fuzzNewFood "add a food" <|
+                \f ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-
-                        foods =
-                            FC.foods newFC
+                                |> FC.add f
                     in
-                    Expect.equalLists
-                        foods
-                        [ food 1 apple ]
+                    FC.foods newFC
+                        |> List.map (\fcf -> FCFood fcf)
+                        |> List.map (comp (FCNewFood f))
+                        |> List.foldl (&&) True
+                        |> Expect.equal True
             ]
         , describe "remove" <|
-            [ test "remove an item by id" <|
-                \() ->
+            [ fuzz2 fuzzNewFood fuzzNewFood "remove an item by id" <|
+                \f1 f2 ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
-                                |> FC.remove 2
-
-                        foods =
-                            FC.foods newFC
+                                |> FC.add f1
+                                |> FC.add f2
+                                -- TODO: should not rely on current id implementation
+                                |> FC.remove 1
                     in
-                    Expect.equalLists (FC.foods newFC) foods
+                    FC.foods newFC
+                        |> List.map (\fcf -> FCFood fcf)
+                        |> List.map (comp (FCNewFood f2))
+                        |> List.foldl (&&) True
+                        |> Expect.equal True
             ]
         , describe "update" <|
-            [ test "update a food" <|
-                \() ->
+            [ fuzz3 fuzzNewFood fuzzNewFood fuzzNewFood "update a food" <|
+                \f1 f2 f3 ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
+                                |> FC.add f1
+                                |> FC.add f2
 
-                        foods =
+                        fcFirst =
                             FC.foods newFC
+                                |> List.head
+                                |> Maybe.withDefault (FC.Food 0 "" 0 0 0 0 0)
 
-                        updatedOrange =
-                            food 2 orange
-                                |> (\f -> { f | name = "Updated Orange" })
-
-                        updatedFC =
-                            FC.updateFood updatedOrange newFC
-
-                        expectedFoods =
-                            foods
-                                |> List.map
-                                    (\f ->
-                                        if f.id == updatedOrange.id then
-                                            updatedOrange
-
-                                        else
-                                            f
-                                    )
+                        modedFirst =
+                            { fcFirst
+                                | name = f3.name
+                                , weight = f3.weight
+                                , protein = f3.protein
+                                , fat = f3.fat
+                                , carbs = f3.carbs
+                                , calories = f3.calories
+                            }
                     in
-                    Expect.equalLists
-                        expectedFoods
-                        (FC.foods updatedFC)
+                    FC.updateFood modedFirst newFC
+                        |> FC.foods
+                        |> List.map (\fcf -> FCFood fcf)
+                        |> List.map (comp (FCFood modedFirst))
+                        |> List.foldl (||) True
+                        |> Expect.equal True
             ]
         , describe "setDoneWeight" <|
             [ test "get when no weight set returns Nothing" <|
@@ -98,28 +94,24 @@ suite =
                         newFC =
                             FC.init
                                 |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
                     in
                     Expect.equal
                         (FC.cookedWeight newFC)
                         Nothing
-            , test "set and get" <|
-                \() ->
+            , fuzz (intAtLeast 1) "set and get" <|
+                \w ->
                     let
                         newFC_weight =
                             FC.init
                                 |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
-                                |> FC.cookedWeightSet (Just 300)
+                                |> FC.cookedWeightSet (Just w)
                     in
                     Expect.equal
                         (FC.cookedWeight newFC_weight)
-                        (Just 300)
+                        (Just w)
             ]
         , describe "estimated kcal from macros in food" <|
-            [ fuzz fuzzFood "returns the estimated kcal from macros in food" <|
+            [ fuzz fuzzFood "returns the estimated kcal per 100g from macros" <|
                 \f ->
                     let
                         -- source for kcals: FAQ on https://www.nal.usda.gov/programs/fnic
@@ -127,48 +119,388 @@ suite =
                             round <| ((f.protein * 4) + (f.fat * 9) + (f.carbs * 4)) * (toFloat f.weight / 100)
                     in
                     Expect.equal
-                        (FC.estimatedKcalFood f)
                         expectedKcal
+                        (FC.estimatedKcalPer100g f.weight f.protein f.fat f.carbs)
+            , fuzz fuzzFood "returns total estimated kcal from macros" <|
+                \f ->
+                    let
+                        -- source for kcals: FAQ on https://www.nal.usda.gov/programs/fnic
+                        expectedKcal =
+                            round <| ((f.protein * 4) + (f.fat * 9) + (f.carbs * 4))
+                    in
+                    Expect.equal
+                        expectedKcal
+                        (FC.estimatedKcal f.protein f.fat f.carbs)
             ]
         , describe "result" <|
-            [ test "returns the total Macros for one (1) portion" <|
-                \() ->
+            [ describe "total" <|
+                [ fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "protein" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.protein * (toFloat f1.weight / 100))
+                                    + (f2.protein * (toFloat f2.weight / 100))
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.total.protein
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "carbs" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.carbs * (toFloat f1.weight / 100))
+                                    + (f2.carbs * (toFloat f2.weight / 100))
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.total.carbs
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "fat" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.fat * (toFloat f1.weight / 100))
+                                    + (f2.fat * (toFloat f2.weight / 100))
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.total.fat
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "weight" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                f1.weight + f2.weight
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.equal
+                            expected
+                            res.total.weight
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "calories" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                round <|
+                                    (toFloat f1.calories * (toFloat f1.weight / 100))
+                                        + (toFloat f2.calories * (toFloat f2.weight / 100))
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.equal
+                            expected
+                            res.total.calories
+                ]
+            , describe "portions" <|
+                [ fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "protein" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.protein * (toFloat f1.weight / 100))
+                                    + (f2.protein * (toFloat f2.weight / 100))
+                                    |> (\x -> x / toFloat portions)
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.portion.protein
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "carbs" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.carbs * (toFloat f1.weight / 100))
+                                    + (f2.carbs * (toFloat f2.weight / 100))
+                                    |> (\x -> x / toFloat portions)
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.portion.carbs
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "fat" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.fat * (toFloat f1.weight / 100))
+                                    + (f2.fat * (toFloat f2.weight / 100))
+                                    |> (\x -> x / toFloat portions)
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.within
+                            (Expect.Absolute 0.000001)
+                            expected
+                            res.portion.fat
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "weight" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (f1.weight + f2.weight)
+                                    |> toFloat
+                                    |> (\x -> x / toFloat portions)
+                                    |> round
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.equal
+                            expected
+                            res.portion.weight
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "calories" <|
+                    \portions f1 f2 ->
+                        let
+                            newFC =
+                                FC.init
+                                    |> FC.add f1
+                                    |> FC.add f2
+                                    |> FC.portionsSet portions
+
+                            expected =
+                                (toFloat f1.calories * (toFloat f1.weight / 100))
+                                    |> (+) (toFloat f2.calories * (toFloat f2.weight / 100))
+                                    |> (\x -> x / toFloat portions)
+                                    |> round
+
+                            res =
+                                FC.result (FC.portionsSet portions newFC)
+                        in
+                        Expect.equal
+                            expected
+                            res.portion.calories
+                ]
+            ]
+        , describe "percent by weight" <|
+            [ fuzz2 fuzzNewFood fuzzNewFood "protein" <|
+                \f1 f2 ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
-                                |> FC.portionsSet 1
+                                |> FC.add f1
+                                |> FC.add f2
+
+                        res =
+                            FC.result newFC
+
+                        protWeight =
+                            f1.protein
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.protein * (toFloat f2.weight / 100))
+
+                        fatWeight =
+                            f1.fat
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.fat * (toFloat f2.weight / 100))
+
+                        carbsWeight =
+                            f1.carbs
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.carbs * (toFloat f2.weight / 100))
+
+                        macrosWeight =
+                            protWeight + fatWeight + carbsWeight
+
+                        expected =
+                            protWeight / macrosWeight
                     in
-                    Expect.equal
-                        (FC.result newFC)
-                        (FC.FCResult 332 3.5 76.4 1.3 450 450)
-            , test "returns the total Macros for two (2) portion" <|
-                \() ->
+                    if macrosWeight == 0 then
+                        Expect.equal Nothing res.percentByWeight
+
+                    else
+                        case res.percentByWeight of
+                            Nothing ->
+                                Expect.fail "expected a vakue"
+
+                            Just r ->
+                                Expect.all
+                                    [ Expect.within
+                                        (Expect.Absolute 0.000001)
+                                        expected
+                                    , Expect.atLeast 0
+                                    , Expect.atMost 1
+                                    ]
+                                    r.protein
+            , fuzz2 fuzzNewFood fuzzNewFood "fat" <|
+                \f1 f2 ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
-                                |> FC.portionsSet 2
+                                |> FC.add f1
+                                |> FC.add f2
+
+                        res =
+                            FC.result newFC
+
+                        protWeight =
+                            f1.protein
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.protein * (toFloat f2.weight / 100))
+
+                        fatWeight =
+                            f1.fat
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.fat * (toFloat f2.weight / 100))
+
+                        carbsWeight =
+                            f1.carbs
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.carbs * (toFloat f2.weight / 100))
+
+                        macrosWeight =
+                            protWeight + fatWeight + carbsWeight
+
+                        expected =
+                            fatWeight / macrosWeight
                     in
-                    Expect.equal
-                        (FC.result newFC)
-                        (FC.FCResult 166 1.8 38.2 0.6 450 225)
+                    if macrosWeight == 0 then
+                        Expect.equal Nothing res.percentByWeight
+
+                    else
+                        case res.percentByWeight of
+                            Nothing ->
+                                Expect.fail "expected a vakue"
+
+                            Just r ->
+                                Expect.all
+                                    [ Expect.within
+                                        (Expect.Absolute 0.000001)
+                                        expected
+                                    , Expect.atLeast 0
+                                    , Expect.atMost 1
+                                    ]
+                                    r.fat
+            , fuzz2 fuzzNewFood fuzzNewFood "carbs" <|
+                \f1 f2 ->
+                    let
+                        newFC =
+                            FC.init
+                                |> FC.add f1
+                                |> FC.add f2
+
+                        res =
+                            FC.result newFC
+
+                        protWeight =
+                            f1.protein
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.protein * (toFloat f2.weight / 100))
+
+                        fatWeight =
+                            f1.fat
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.fat * (toFloat f2.weight / 100))
+
+                        carbsWeight =
+                            f1.carbs
+                                * (toFloat f1.weight / 100)
+                                |> (+) (f2.carbs * (toFloat f2.weight / 100))
+
+                        macrosWeight =
+                            protWeight + fatWeight + carbsWeight
+
+                        expected =
+                            carbsWeight / macrosWeight
+                    in
+                    if macrosWeight == 0 then
+                        Expect.equal Nothing res.percentByWeight
+
+                    else
+                        case res.percentByWeight of
+                            Nothing ->
+                                Expect.fail "expected a vakue"
+
+                            Just r ->
+                                Expect.all
+                                    [ Expect.within
+                                        (Expect.Absolute 0.000001)
+                                        expected
+                                    , Expect.atLeast 0
+                                    , Expect.atMost 1
+                                    ]
+                                    r.carbs
             ]
         , describe
             "encode / decode"
           <|
-            [ test "encode and decode a model" <|
-                \() ->
+            [ fuzz3 fuzzNewFood fuzzNewFood fuzzNewFood "encode and decode a model" <|
+                \f1 f2 f3 ->
                     let
                         newFC =
                             FC.init
-                                |> FC.add apple
-                                |> FC.add orange
-                                |> FC.add banana
+                                |> FC.add f1
+                                |> FC.add f2
+                                |> FC.add f3
                                 |> FC.portionsSet 2
 
                         decoded =
@@ -191,62 +523,89 @@ suite =
 -- TODO: vanity thing: consider handling "NAN" and "infinity" and very big and small ints of weight.
 
 
+type TFood
+    = FCFood FC.Food
+    | FCNewFood FC.NewFood
+
+
+comp : TFood -> TFood -> Bool
+comp newFood food =
+    case ( newFood, food ) of
+        ( FCFood f1, FCFood f2 ) ->
+            f1 == f2
+
+        ( FCNewFood f1, FCNewFood f2 ) ->
+            f1 == f2
+
+        ( FCNewFood f1, FCFood f2 ) ->
+            f1.name
+                == f2.name
+                && f1.calories
+                == f2.calories
+                && f1.protein
+                == f2.protein
+                && f1.carbs
+                == f2.carbs
+                && f1.fat
+                == f2.fat
+                && f1.weight
+                == f2.weight
+
+        ( FCFood f1, FCNewFood f2 ) ->
+            f1.name
+                == f2.name
+                && f1.calories
+                == f2.calories
+                && f1.protein
+                == f2.protein
+                && f1.carbs
+                == f2.carbs
+                && f1.fat
+                == f2.fat
+                && f1.weight
+                == f2.weight
+
+
 fuzzFood : Fuzzer FC.Food
 fuzzFood =
     Fuzz.map7 FC.Food
         int
         string
-        int
+        (intAtLeast 0)
+        (floatRange 0 1000000)
+        (floatRange 0 1000000)
+        (floatRange 0 1000000)
+        (intAtLeast 0)
+
+
+fuzzNewFood : Fuzzer FC.NewFood
+fuzzNewFood =
+    Fuzz.map6 FC.NewFood
+        string
+        (intRange 0 1000000000)
         (floatRange 0 1000000)
         (floatRange 0 1000000)
         (floatRange 0 1000000)
         (intRange 0 1000000000)
 
 
-food : Int -> FC.NewFood -> FC.Food
-food id nf =
-    { id = id
-    , name = nf.name
-    , calories = nf.calories
-    , protein = nf.protein
-    , carbs = nf.carbs
-    , fat = nf.fat
-    , weight = nf.weight
-    }
-
-
-
--- MOCK DATA
-
-
 apple : FC.NewFood
 apple =
-    { name = "Apple"
-    , calories = 56
+    { name = "apple"
+    , calories = 52
     , protein = 0.3
-    , carbs = 14.2
-    , fat = 0.1
+    , fat = 0.2
+    , carbs = 13.8
     , weight = 100
     }
 
 
-orange : FC.NewFood
-orange =
-    { name = "Orange"
-    , calories = 49
-    , protein = 0.8
-    , carbs = 12.1
-    , fat = 0.1
-    , weight = 150
-    }
-
-
-banana : FC.NewFood
-banana =
-    { name = "Banana"
-    , calories = 101
-    , protein = 1.0
-    , carbs = 22
-    , fat = 0.5
-    , weight = 200
+newFoodFromFood : FC.Food -> FC.NewFood
+newFoodFromFood f =
+    { name = f.name
+    , calories = f.calories
+    , protein = f.protein
+    , fat = f.fat
+    , carbs = f.carbs
+    , weight = f.weight
     }

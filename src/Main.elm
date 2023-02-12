@@ -474,7 +474,7 @@ viewInputs i res =
               }
             , { id = "cookedWeight"
               , label = "Cooked Weight"
-              , placeholder = String.fromInt res.totalWeight ++ "g"
+              , placeholder = String.fromInt res.total.weight ++ "g"
               , value = i.cookedWeight
               , onInput = InputChanged CookedWeight
               , valid = validInput CookedWeight i.cookedWeight
@@ -542,7 +542,7 @@ viewSanityCheckString i =
             Maybe.withDefault 0 <| commaFloat i.carbs
 
         estimatedKcal =
-            FC.estimatedKcal 100 prot fat carbs
+            FC.estimatedKcalPer100g 100 prot fat carbs
     in
     "~ " ++ String.fromInt estimatedKcal ++ " kcals/100g"
 
@@ -710,6 +710,34 @@ viewFoodEdit food edit =
 
 viewResult : FC.FCResult -> Html Msg
 viewResult result =
+    let
+        estimate =
+            "~ " ++ String.fromInt result.estimatedKcal ++ " kcal (from macros)"
+
+        protPercent =
+            case result.percentByWeight of
+                Just percentByWeight ->
+                    toPercent percentByWeight.protein ++ " %"
+
+                Nothing ->
+                    "N/A"
+
+        fatPercent =
+            case result.percentByWeight of
+                Just percentByWeight ->
+                    toPercent percentByWeight.fat ++ " %"
+
+                Nothing ->
+                    "N/A"
+
+        carbsPercent =
+            case result.percentByWeight of
+                Just percentByWeight ->
+                    toPercent percentByWeight.carbs ++ " %"
+
+                Nothing ->
+                    "N/A"
+    in
     table []
         [ thead []
             [ tr []
@@ -722,11 +750,18 @@ viewResult result =
             ]
         , tbody []
             [ tr []
-                [ td [] [ text (String.fromInt result.calories) ]
-                , td [] [ text (String.fromFloat result.protein) ]
-                , td [] [ text (String.fromFloat result.fat) ]
-                , td [] [ text (String.fromFloat result.carbs) ]
-                , td [] [ text (String.fromInt result.portionWeight) ]
+                [ td [] [ text <| String.fromInt result.portion.calories ++ " kcal" ]
+                , td [] [ text <| String.fromFloat result.portion.protein ++ " g" ]
+                , td [] [ text <| String.fromFloat result.portion.fat ++ " g" ]
+                , td [] [ text <| String.fromFloat result.portion.carbs ++ " g" ]
+                , td [] [ text <| String.fromInt result.portion.weight ++ " g" ]
+                ]
+            , tr []
+                [ td [] [ text estimate ]
+                , td [] [ text protPercent ]
+                , td [] [ text fatPercent ]
+                , td [] [ text carbsPercent ]
+                , td [] [ text "-" ]
                 ]
             ]
         ]
@@ -734,6 +769,16 @@ viewResult result =
 
 
 -- HELPER FUNCTIONS
+
+
+toPercent : Float -> String
+toPercent value =
+    value
+        |> (*) 1000
+        |> round
+        |> toFloat
+        |> (\f -> f / 10)
+        |> String.fromFloat
 
 
 {-| Validate string as input for given InputFIeld

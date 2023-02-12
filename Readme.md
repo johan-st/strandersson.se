@@ -31,9 +31,8 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 ### TODOs
 
+#### Bugs
 #### Features
-- show percentage for macros per weight
-- show percentage for macros per kcal
 - highlight food if kcal estimate missmatch the given value
 - tooltip for kcal estimate
 #### Interaction
@@ -48,6 +47,8 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - add units to list
 - prettier "remove"
 - find a layout for phone
+#### on-ice
+- show percentage for macros per kcal (troublesome)
 
 ____________
 ____________

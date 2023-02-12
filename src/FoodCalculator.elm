@@ -11,7 +11,7 @@ module FoodCalculator exposing
     , encode
     , encoder
     , estimatedKcal
-    , estimatedKcalFood
+    , estimatedKcalPer100g
     , foods
     , init
     , portions
@@ -61,6 +61,36 @@ type alias NewFood =
     , carbs : Float
     , fat : Float
     , weight : Int
+    }
+
+
+type alias FCResult =
+    { total : FCResultPartial
+    , portion : FCResultPartial
+    , percentByWeight : Maybe FCResultPercent
+    , estimatedKcal : Int
+    }
+
+
+type alias FCResultPartial =
+    { calories : Int
+    , protein : Float
+    , carbs : Float
+    , fat : Float
+    , weight : Int
+    }
+
+
+type alias FCResultPercent =
+    { protein : Float
+    , fat : Float
+    , carbs : Float
+    }
+
+
+type alias FCError =
+    { from : String
+    , error : D.Error
     }
 
 
@@ -159,68 +189,56 @@ result (FoodCalculator internals) =
                         |> List.map .weight
                         |> List.sum
 
-        portionWeight =
-            round (toFloat totalWeight / toFloat internals.portions)
-
         totalCalories =
             internals.foods
                 |> List.map (\food -> toFloat food.calories * (toFloat food.weight / 100))
                 |> List.sum
-                |> (\x -> x / toFloat internals.portions)
-                |> round
 
         totalProtein =
             internals.foods
                 |> List.map (\food -> food.protein * (toFloat food.weight / 100))
                 |> List.sum
-                |> (\x -> x / toFloat internals.portions)
-                |> (*) 10
-                |> round
-                |> toFloat
-                |> (\x -> x / 10)
 
         totalCarbs =
             internals.foods
                 |> List.map (\food -> food.carbs * (toFloat food.weight / 100))
                 |> List.sum
-                |> (\x -> x / toFloat internals.portions)
-                |> (*) 10
-                |> round
-                |> toFloat
-                |> (\x -> x / 10)
 
         totalFat =
             internals.foods
                 |> List.map (\food -> food.fat * (toFloat food.weight / 100))
                 |> List.sum
-                |> (\x -> x / toFloat internals.portions)
-                |> (*) 10
-                |> round
-                |> toFloat
-                |> (\x -> x / 10)
+
+        weightMacros =
+            totalProtein + totalCarbs + totalFat
+
+        percentByWeight =
+            if weightMacros == 0 then
+                Nothing
+
+            else
+                Just
+                    { protein = ratioOf weightMacros totalProtein
+                    , fat = ratioOf weightMacros totalFat
+                    , carbs = ratioOf weightMacros totalCarbs
+                    }
     in
-    { calories = totalCalories
-    , protein = totalProtein
-    , carbs = totalCarbs
-    , fat = totalFat
-    , totalWeight = totalWeight
-    , portionWeight = portionWeight
-    }
-
-
-type alias FCResult =
-    { calories : Int
-    , protein : Float
-    , carbs : Float
-    , fat : Float
-    , totalWeight : Int
-    , portionWeight : Int
-    }
-
-
-type alias FCError =
-    { from : String
-    , error : D.Error
+    { total =
+        { calories = totalCalories |> round
+        , protein = totalProtein
+        , carbs = totalCarbs
+        , fat = totalFat
+        , weight = totalWeight
+        }
+    , portion =
+        { calories = totalCalories / toFloat internals.portions |> round
+        , protein = totalProtein / toFloat internals.portions
+        , carbs = totalCarbs / toFloat internals.portions
+        , fat = totalFat / toFloat internals.portions
+        , weight = toFloat totalWeight / toFloat internals.portions |> round
+        }
+    , percentByWeight = percentByWeight
+    , estimatedKcal = estimatedKcal totalProtein totalFat totalCarbs
     }
 
 
@@ -234,27 +252,58 @@ init =
         }
 
 
-estimatedKcal : Int -> Float -> Float -> Float -> Int
-estimatedKcal weight protein fat carbs =
+estimatedKcalPer100g : Int -> Float -> Float -> Float -> Int
+estimatedKcalPer100g weight protein fat carbs =
     let
-        weight100s =
+        weightIn100s =
             toFloat weight / 100
-
-        proteinKcal =
-            protein * 4
-
-        carbsKcal =
-            carbs * 4
-
-        fatkCal =
-            fat * 9
     in
-    round <| weight100s * (proteinKcal + carbsKcal + fatkCal)
+    proteinGramsToKcal protein
+        |> (+) (fatGramsToKcal fat)
+        |> (+) (carbsGramsToKcal carbs)
+        |> (*) weightIn100s
+        |> round
 
 
-estimatedKcalFood : Food -> Int
-estimatedKcalFood f =
-    estimatedKcal f.weight f.protein f.fat f.carbs
+estimatedKcal : Float -> Float -> Float -> Int
+estimatedKcal protein fat carbs =
+    round <|
+        proteinGramsToKcal protein
+            + fatGramsToKcal fat
+            + carbsGramsToKcal carbs
+
+
+proteinGramsToKcal : Float -> Float
+proteinGramsToKcal grams =
+    grams * 4
+
+
+fatGramsToKcal : Float -> Float
+fatGramsToKcal grams =
+    grams * 9
+
+
+carbsGramsToKcal : Float -> Float
+carbsGramsToKcal grams =
+    grams * 4
+
+
+
+-- HELPERS
+
+
+{-| TODO: rename to appropriate name
+-}
+ratioOf : Float -> Float -> Float
+ratioOf whole part =
+    if part == 0 then
+        0
+
+    else if whole == 0 then
+        1
+
+    else
+        part / whole
 
 
 
