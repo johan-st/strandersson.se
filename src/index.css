@@ -86,10 +86,10 @@ label {
   flex: 2;
 }
 
-#food-list tr:hover {
+#food-list tbody > tr:hover {
   color: var(--col-accented);
 }
-#food-list tr:hover > td {
+#food-list tbody tr:hover > td {
   border-color: var(--col-accented);
 }
 
