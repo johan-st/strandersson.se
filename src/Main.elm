@@ -751,9 +751,9 @@ viewResult result =
         , tbody []
             [ tr []
                 [ td [] [ text <| String.fromInt result.portion.calories ++ " kcal" ]
-                , td [] [ text <| String.fromFloat result.portion.protein ++ " g" ]
-                , td [] [ text <| String.fromFloat result.portion.fat ++ " g" ]
-                , td [] [ text <| String.fromFloat result.portion.carbs ++ " g" ]
+                , td [] [ text <| roundToString result.portion.protein ++ " g" ]
+                , td [] [ text <| roundToString result.portion.fat ++ " g" ]
+                , td [] [ text <| roundToString result.portion.carbs ++ " g" ]
                 , td [] [ text <| String.fromInt result.portion.weight ++ " g" ]
                 ]
             , tr []
@@ -769,6 +769,16 @@ viewResult result =
 
 
 -- HELPER FUNCTIONS
+
+
+roundToString : Float -> String
+roundToString value =
+    value
+        |> (*) 10
+        |> round
+        |> toFloat
+        |> (\f -> f / 10)
+        |> String.fromFloat
 
 
 toPercent : Float -> String
