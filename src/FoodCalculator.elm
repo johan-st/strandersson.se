@@ -68,7 +68,6 @@ type alias FCResult =
     { total : FCResultPartial
     , portion : FCResultPartial
     , percentByWeight : Maybe FCResultPercent
-    , estimatedKcal : Int
     }
 
 
@@ -78,6 +77,7 @@ type alias FCResultPartial =
     , carbs : Float
     , fat : Float
     , weight : Int
+    , estimatedKcal : Int
     }
 
 
@@ -222,6 +222,12 @@ result (FoodCalculator internals) =
                     , fat = ratioOf weightMacros totalFat
                     , carbs = ratioOf weightMacros totalCarbs
                     }
+
+        kcalEstTotal =
+            estimatedKcal totalProtein totalFat totalCarbs
+
+        kcalEstPortion =
+            toFloat kcalEstTotal / toFloat internals.portions |> round
     in
     { total =
         { calories = totalCalories |> round
@@ -229,6 +235,7 @@ result (FoodCalculator internals) =
         , carbs = totalCarbs
         , fat = totalFat
         , weight = totalWeight
+        , estimatedKcal = kcalEstTotal
         }
     , portion =
         { calories = totalCalories / toFloat internals.portions |> round
@@ -236,9 +243,9 @@ result (FoodCalculator internals) =
         , carbs = totalCarbs / toFloat internals.portions
         , fat = totalFat / toFloat internals.portions
         , weight = toFloat totalWeight / toFloat internals.portions |> round
+        , estimatedKcal = kcalEstPortion
         }
     , percentByWeight = percentByWeight
-    , estimatedKcal = estimatedKcal totalProtein totalFat totalCarbs
     }
 
 

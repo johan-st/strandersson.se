@@ -712,7 +712,7 @@ viewResult : FC.FCResult -> Html Msg
 viewResult result =
     let
         estimate =
-            "~ " ++ String.fromInt result.estimatedKcal ++ " kcal (from macros)"
+            "~ " ++ String.fromInt result.portion.estimatedKcal ++ " kcal (from macros)"
 
         protPercent =
             case result.percentByWeight of

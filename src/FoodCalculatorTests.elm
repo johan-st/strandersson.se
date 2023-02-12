@@ -232,6 +232,41 @@ suite =
                         Expect.equal
                             expected
                             res.total.calories
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "estimated kcal" <|
+                    \portions f1 f2 ->
+                        let
+                            -- estimatedKcal is validate elsewhere
+                            f1Est =
+                                FC.estimatedKcal
+                                    (f1.protein * (toFloat f1.weight / 100))
+                                    (f1.fat * (toFloat f1.weight / 100))
+                                    (f1.carbs * (toFloat f1.weight / 100))
+
+                            f2Est =
+                                FC.estimatedKcal
+                                    (f2.protein * (toFloat f2.weight / 100))
+                                    (f2.fat * (toFloat f2.weight / 100))
+                                    (f2.carbs * (toFloat f2.weight / 100))
+
+                            want =
+                                f1Est + f2Est
+
+                            got =
+                                FC.result
+                                    (FC.init
+                                        |> FC.add f1
+                                        |> FC.add f2
+                                        |> FC.portionsSet portions
+                                    )
+                                    |> .total
+                                    |> .estimatedKcal
+                        in
+                        -- TODO: hunt down rounding issue
+                        Expect.all
+                            [ Expect.atLeast <| want - 1
+                            , Expect.atMost <| want + 1
+                            ]
+                            got
                 ]
             , describe "portions" <|
                 [ fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "protein" <|
@@ -339,6 +374,44 @@ suite =
                         Expect.equal
                             expected
                             res.portion.calories
+                , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "estimated kcal" <|
+                    \portions f1 f2 ->
+                        let
+                            f1Est =
+                                FC.estimatedKcal
+                                    (f1.protein * (toFloat f1.weight / 100))
+                                    (f1.fat * (toFloat f1.weight / 100))
+                                    (f1.carbs * (toFloat f1.weight / 100))
+                                    |> (\x -> toFloat x / toFloat portions)
+                                    |> round
+
+                            f2Est =
+                                FC.estimatedKcal
+                                    (f2.protein * (toFloat f2.weight / 100))
+                                    (f2.fat * (toFloat f2.weight / 100))
+                                    (f2.carbs * (toFloat f2.weight / 100))
+                                    |> (\x -> toFloat x / toFloat portions)
+                                    |> round
+
+                            want =
+                                f1Est + f2Est
+
+                            got =
+                                FC.result
+                                    (FC.init
+                                        |> FC.add f1
+                                        |> FC.add f2
+                                        |> FC.portionsSet portions
+                                    )
+                                    |> .portion
+                                    |> .estimatedKcal
+                        in
+                        -- TODO: hunt down rounding issue
+                        Expect.all
+                            [ Expect.atLeast <| want - 1
+                            , Expect.atMost <| want + 1
+                            ]
+                            got
                 ]
             ]
         , describe "percent by weight" <|
@@ -582,11 +655,11 @@ fuzzNewFood : Fuzzer FC.NewFood
 fuzzNewFood =
     Fuzz.map6 FC.NewFood
         string
-        (intRange 0 1000000000)
+        (intAtLeast 0)
         (floatRange 0 1000000)
         (floatRange 0 1000000)
         (floatRange 0 1000000)
-        (intRange 0 1000000000)
+        (intAtLeast 0)
 
 
 apple : FC.NewFood
