@@ -7,6 +7,9 @@
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
     "start": "set BUILD_TIME=%DATE% %TIME% && parcel src/index.html && set BUILD_TIME= ",
     "build": "set BUILD_TIME=%DATE% %TIME% && parcel build src/index.html && set BUILD_TIME=",
+    "build:noEnv": "parcel build src/index.html",
+    "docker:build": "set BUILD_TIME=%DATE% %TIME% && docker build --build-arg=BUILD_TIME -t johanst/strandersson.se  .  && set BUILD_TIME=",
+    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se",
     "report": "parcel build src/index.html --reporter @parcel/reporter-bundle-analyzer"
   },
   "repository": {
@@ -24,6 +27,7 @@
     "@parcel/reporter-bundle-analyzer": "^2.8.3",
     "@parcel/transformer-elm": "^2.8.3",
     "elm": "^0.19.1-5",
-    "parcel": "^2.8.3"
+    "parcel": "^2.8.3",
+    "elm-test": "^0.19.1-revision11"
   }
 }
