@@ -395,10 +395,11 @@ viewCalculator model =
 
 
 viewFooter : String -> Html Msg
-viewFooter build =
+viewFooter buildTag =
     div [ id "footer" ]
-        [ div [] [ text build ]
+        [ div [] [ text buildTag ]
         , a [ href "https://github.com/johan-st/strandersson.se" ] [ text "github" ]
+        , a [ href "https://www.livsmedelsverket.se/" ] [ text "data från livsmedelsverket" ]
         ]
 
 
@@ -422,7 +423,7 @@ viewInputs i res =
               , onInput = InputChanged Calories
               , valid = validInput Calories i.calories
               , type_ = "text"
-              , subtext = Just <| viewSanityCheckString i
+              , subtext = Just <| sanityCheckString i
               }
             , { id = "protein"
               , label = "Protein"
@@ -529,8 +530,8 @@ viewInput i =
         ]
 
 
-viewSanityCheckString : Inputs -> String
-viewSanityCheckString i =
+sanityCheckString : Inputs -> String
+sanityCheckString i =
     let
         prot =
             Maybe.withDefault 0 <| commaFloat i.protein
@@ -542,7 +543,7 @@ viewSanityCheckString i =
             Maybe.withDefault 0 <| commaFloat i.carbs
 
         estimatedKcal =
-            FC.estimatedKcalPer100g 100 prot fat carbs
+            FC.estimatedKcal prot fat carbs
     in
     "~ " ++ String.fromInt estimatedKcal ++ " kcals/100g"
 
