@@ -5,9 +5,9 @@
   "scripts": {
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
-    "start": "set BUILD_TAG=%DATE% %TIME% && parcel src/index.html && set BUILD_TAG= ",
-    "build": "set BUILD_TAG=%DATE% %TIME% && parcel build src/index.html && set BUILD_TAG=",
-    "build:noEnv": "parcel build src/index.html",
+    "start": "set BUILD_TAG=%DATE% %TIME% && parcel && set BUILD_TAG= ",
+    "build": "set BUILD_TAG=%DATE% %TIME% && parcel build --no-source-maps && set BUILD_TAG=",
+    "build:noEnv": "parcel build",
     "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t johanst/strandersson.se  ../  && set BUILD_TIME=",
     "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se",
     "report": "parcel build src/index.html --reporter @parcel/reporter-bundle-analyzer"
@@ -29,5 +29,10 @@
     "elm": "^0.19.1-5",
     "parcel": "^2.8.3",
     "elm-test": "^0.19.1-revision11"
+  },
+  "targets": {
+    "frontend": {
+      "source": "src/index.html"
+    }
   }
 }
