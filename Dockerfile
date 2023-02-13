@@ -26,8 +26,8 @@ COPY src ./src
 RUN npm test
 
 # assign build time to environment variable
-ARG BUILD_TIME 
-ENV BUILD_TIME=${BUILD_TIME:-unknown}
+ARG BUILD_TAG 
+ENV BUILD_TAG=${BUILD_TAG:-unknown}
 # build
 RUN npm run build:noEnv
 
