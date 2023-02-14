@@ -9,7 +9,7 @@
     "build": "set BUILD_TAG=%DATE% %TIME% && parcel build --no-source-maps && set BUILD_TAG=",
     "build:noEnv": "parcel build",
     "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t johanst/strandersson.se  ../  && set BUILD_TIME=",
-    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se",
+    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se"
   },
   "repository": {
     "type": "git",
