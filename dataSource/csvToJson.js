@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const filename = 'LivsmedelsDB.csv'
+const filename = 'livsmedelsDB.csv'
 
 const data = fs.readFileSync(path.join(__dirname, filename), 'utf8');
 
@@ -40,5 +40,13 @@ for (let i = 0; i < columns.length; i++) {
 }
 
 const json = { version: 1, livsmedel: livsmedel }
+// create folders if they doesn't exist
+if (!fs.existsSync(path.join(__dirname, '../static'))) {
+    fs.mkdirSync(path.join(__dirname, '../static'));
+    // if (!fs.existsSync(path.join(__dirname, '../static/data'))) {
+    // fs.mkdirSync(path.join(__dirname, '../static/data'));
+    // }
+}
 // save json
-fs.writeFileSync(path.join(__dirname, 'LivsmedelsDB.json'), JSON.stringify(json, null, 2), 'utf8')
+fs.writeFileSync(path.join(__dirname, '../static/livsmedelsDB.json'), JSON.stringify(json, null, 2), 'utf8')
+// fs.writeFileSync(path.join(__dirname, '../static/data/livsmedelsDB.json'), JSON.stringify(json, null, 2), 'utf8')
