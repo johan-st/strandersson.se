@@ -5,8 +5,10 @@ import FoodCalculator as FC
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, disabled, for, href, id, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
 import Json.Decode as D
 import Json.Encode
+import Livsmedel exposing (Livsmedel)
 
 
 main : Program Flags Model Msg
@@ -28,6 +30,7 @@ type alias Model =
     , foodCalculator : FC.FoodCalculator
     , edit : Maybe Edit
     , inputs : Inputs
+    , foodData : List Livsmedel
     }
 
 
@@ -42,46 +45,6 @@ type alias Flags =
     { foodCalculator : Json.Encode.Value
     , build : String
     }
-
-
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    let
-        fcNull =
-            D.decodeValue (D.null True) flags.foodCalculator
-    in
-    if fcNull == Ok True then
-        ( { build = flags.build
-          , foodCalculator = FC.init
-          , edit = Nothing
-          , inputs = inputsInit FC.init
-          }
-        , Cmd.none
-        )
-
-    else
-        let
-            fcRes =
-                D.decodeValue FC.decoder flags.foodCalculator
-        in
-        case fcRes of
-            Err _ ->
-                ( { build = flags.build
-                  , foodCalculator = FC.init
-                  , edit = Nothing
-                  , inputs = inputsInit FC.init
-                  }
-                , Cmd.none
-                )
-
-            Ok fc ->
-                ( { build = flags.build
-                  , foodCalculator = fc
-                  , edit = Nothing
-                  , inputs = inputsInit fc
-                  }
-                , Cmd.none
-                )
 
 
 type alias Inputs =
@@ -105,6 +68,55 @@ type InputField
     | Weight
     | Portions
     | CookedWeight
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        fcNull =
+            D.decodeValue (D.null True) flags.foodCalculator
+
+        cmd =
+            Http.get
+                { url = "/livsmedelsDB.json"
+                , expect = Http.expectJson GotFoodData Livsmedel.decoder
+                }
+    in
+    if fcNull == Ok True then
+        ( { build = flags.build
+          , foodCalculator = FC.init
+          , edit = Nothing
+          , inputs = inputsInit FC.init
+          , foodData = []
+          }
+        , cmd
+        )
+
+    else
+        let
+            fcRes =
+                D.decodeValue FC.decoder flags.foodCalculator
+        in
+        case fcRes of
+            Err _ ->
+                ( { build = flags.build
+                  , foodCalculator = FC.init
+                  , edit = Nothing
+                  , inputs = inputsInit FC.init
+                  , foodData = []
+                  }
+                , cmd
+                )
+
+            Ok fc ->
+                ( { build = flags.build
+                  , foodCalculator = fc
+                  , edit = Nothing
+                  , inputs = inputsInit fc
+                  , foodData = []
+                  }
+                , cmd
+                )
 
 
 inputsInit : FC.FoodCalculator -> Inputs
@@ -134,7 +146,8 @@ inputsInit fc =
 
 
 type Msg
-    = InputChanged InputField String
+    = GotFoodData (Result Http.Error (List Livsmedel))
+    | InputChanged InputField String
     | AddFood
     | RemoveFood Int
     | EditFood InputField FC.Food
@@ -145,6 +158,17 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotFoodData (Ok livsmedel) ->
+            ( { model
+                | foodData = livsmedel
+              }
+            , Cmd.none
+            )
+
+        GotFoodData (Err err) ->
+            -- TODO: handle error
+            Debug.todo <| Debug.toString err
+
         InputChanged field value ->
             updateModelWithInputs model field value
 
