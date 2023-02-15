@@ -1,6 +1,6 @@
 import { Elm } from "./Main.elm";
 // build time from environment variable
-const buildTime = process.env.BUILD_TIME;
+const buildTime = process.env.BUILD_TAG;
 const nodeEnv = process.env.NODE_ENV;
 
 
