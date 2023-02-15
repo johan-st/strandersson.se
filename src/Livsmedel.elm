@@ -14,16 +14,66 @@ type alias Livsmedel =
     }
 
 
+{-| lower limit is the minimum numver of chaacters needed to attempt search
+-}
 filter : String -> List Livsmedel -> List Livsmedel
 filter query list =
-    plainFilter query list
+    let
+        rootquery =
+            root query
+    in
+    if String.length rootquery < 2 then
+        []
+
+    else
+        list
+            |> filterOnFirst 3 rootquery
+            |> filterFuzz rootquery
 
 
-{-| TODO: replace with fuzzy search. candidate dependency added
+filterOnFirst : Int -> String -> List Livsmedel -> List Livsmedel
+filterOnFirst numberOfChars query list =
+    -- first two chars must match
+    let
+        short =
+            String.left numberOfChars query
+
+        res =
+            list
+                |> List.filter (\item -> String.contains (root short) (root item.namn))
+    in
+    res
+
+
+filterFuzz : String -> List Livsmedel -> List Livsmedel
+filterFuzz query list =
+    let
+        simpleMatch config separators needle hay =
+            Fuzzy.match config separators needle hay
+    in
+    list
+        |> List.sortBy
+            (\item ->
+                simpleMatch [] [] query (item.namn |> root)
+                    |> .score
+            )
+
+
+
+-- HEPLERS
+
+
+{-| trim whitespace and convert to lower case
 -}
-plainFilter : String -> List Livsmedel -> List Livsmedel
-plainFilter query list =
-    List.filter (\item -> String.contains (String.toLower query) (String.toLower item.namn)) list
+root : String -> String
+root str =
+    str
+        |> String.trim
+        |> String.toLower
+
+
+
+-- DECODER
 
 
 decoder : Decoder (List Livsmedel)

@@ -32,6 +32,7 @@ type alias Model =
     , inputs : Inputs
     , foodData : List Livsmedel
     , search : String
+    , searchResults : List Livsmedel
     }
 
 
@@ -90,6 +91,7 @@ init flags =
           , inputs = inputsInit FC.init
           , foodData = []
           , search = ""
+          , searchResults = []
           }
         , cmd
         )
@@ -107,6 +109,7 @@ init flags =
                   , inputs = inputsInit FC.init
                   , foodData = []
                   , search = ""
+                  , searchResults = []
                   }
                 , cmd
                 )
@@ -118,6 +121,7 @@ init flags =
                   , inputs = inputsInit fc
                   , foodData = []
                   , search = ""
+                  , searchResults = []
                   }
                 , cmd
                 )
@@ -264,7 +268,7 @@ update msg model =
             ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
 
         SearchInput str ->
-            ( { model | search = str }, Cmd.none )
+            ( { model | search = str, searchResults = Livsmedel.filter str model.foodData }, Cmd.none )
 
         AddFoodFromSearch livsmedel ->
             let
@@ -283,16 +287,6 @@ update msg model =
                     }
             in
             ( newModel, Cmd.none )
-
-
-
--- let
---     newModel =
---         { model
---             | foodCalculator = FC.add (livsmedelToFood livsmedel) model.foodCalculator
---         }
--- in
--- ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
 
 
 updateFood : FC.FoodCalculator -> FC.Food -> InputField -> String -> FC.FoodCalculator
@@ -425,34 +419,36 @@ view model =
     div [ class "wrapper" ]
         [ viewHeader
         , viewCalculator model
-        , viewSearch model.foodData model.search
+        , viewSearch model.searchResults model.search
         , viewFooter model.build
         ]
 
 
 viewSearch : List Livsmedel -> String -> Html Msg
-viewSearch foodData searchTerm =
+viewSearch searchResults searchTerm =
     div [ id "search" ]
         [ h2 [] [ text "Search (prototype)" ]
-        , p [ class "warning" ] [ text "- Search is still under development -" ]
-        , input [ id "search-input", placeholder "Search for food", value searchTerm, onInput SearchInput ] []
-        , viewSearchResults foodData searchTerm
+        , p [ class "warning" ]
+            [ text "- Search is still under development -" ]
+        , viewInput
+            { id = "search-input"
+            , label = "Search"
+            , placeholder = "enter at least 2 characters"
+            , value = searchTerm
+            , onInput = SearchInput
+            , valid = String.length searchTerm >= 2
+            , type_ = "text"
+            , subtext = Just <| "Search results: " ++ String.fromInt (List.length searchResults)
+            }
+        , viewSearchResults searchResults
         ]
 
 
-viewSearchResults : List Livsmedel -> String -> Html Msg
-viewSearchResults foodData searchTerm =
-    let
-        shownLivsmedel =
-            if String.length searchTerm < 3 then
-                []
-
-            else
-                Livsmedel.filter searchTerm foodData
-    in
+viewSearchResults : List Livsmedel -> Html Msg
+viewSearchResults searchResults =
     div [ id "search-results" ]
         [ ul []
-            (List.map viewSearchResult shownLivsmedel)
+            (List.map viewSearchResult (List.take 10 searchResults))
         ]
 
 
