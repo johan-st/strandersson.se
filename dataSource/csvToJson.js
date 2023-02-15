@@ -26,6 +26,11 @@ columns.shift()
 columns.shift()
 columns.shift()
 
+// remove last line if empty
+if (columns[columns.length - 1].length === 1 && columns[columns.length - 1][0] === '') {
+    columns.pop()
+}
+
 // parse into json
 let livsmedel = []
 for (let i = 0; i < columns.length; i++) {
