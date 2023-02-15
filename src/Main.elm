@@ -31,6 +31,7 @@ type alias Model =
     , edit : Maybe Edit
     , inputs : Inputs
     , foodData : List Livsmedel
+    , search : String
     }
 
 
@@ -88,6 +89,7 @@ init flags =
           , edit = Nothing
           , inputs = inputsInit FC.init
           , foodData = []
+          , search = ""
           }
         , cmd
         )
@@ -104,6 +106,7 @@ init flags =
                   , edit = Nothing
                   , inputs = inputsInit FC.init
                   , foodData = []
+                  , search = ""
                   }
                 , cmd
                 )
@@ -114,6 +117,7 @@ init flags =
                   , edit = Nothing
                   , inputs = inputsInit fc
                   , foodData = []
+                  , search = ""
                   }
                 , cmd
                 )
@@ -153,6 +157,8 @@ type Msg
     | EditFood InputField FC.Food
     | EditFoodInput InputField FC.Food String
     | EditFoodDone Bool
+    | SearchInput String
+    | AddFoodFromSearch Livsmedel
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -167,7 +173,7 @@ update msg model =
 
         GotFoodData (Err err) ->
             -- TODO: handle error
-            Debug.todo <| Debug.toString err
+            ( model, Cmd.none )
 
         InputChanged field value ->
             updateModelWithInputs model field value
@@ -256,6 +262,37 @@ update msg model =
                     { model | foodCalculator = FC.remove index model.foodCalculator }
             in
             ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
+
+        SearchInput str ->
+            ( { model | search = str }, Cmd.none )
+
+        AddFoodFromSearch livsmedel ->
+            let
+                newFood =
+                    { name = livsmedel.namn
+                    , calories = round <| livsmedel.energi
+                    , protein = livsmedel.protein
+                    , fat = livsmedel.fett
+                    , carbs = livsmedel.kolhydrater
+                    , weight = 100
+                    }
+
+                newModel =
+                    { model
+                        | foodCalculator = FC.add newFood model.foodCalculator
+                    }
+            in
+            ( newModel, Cmd.none )
+
+
+
+-- let
+--     newModel =
+--         { model
+--             | foodCalculator = FC.add (livsmedelToFood livsmedel) model.foodCalculator
+--         }
+-- in
+-- ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
 
 
 updateFood : FC.FoodCalculator -> FC.Food -> InputField -> String -> FC.FoodCalculator
@@ -388,7 +425,42 @@ view model =
     div [ class "wrapper" ]
         [ viewHeader
         , viewCalculator model
+        , viewSearch model.foodData model.search
         , viewFooter model.build
+        ]
+
+
+viewSearch : List Livsmedel -> String -> Html Msg
+viewSearch foodData searchTerm =
+    div [ id "search" ]
+        [ h2 [] [ text "Search (prototype)" ]
+        , p [ class "warning" ] [ text "- Search is still under development -" ]
+        , input [ id "search-input", placeholder "Search for food", value searchTerm, onInput SearchInput ] []
+        , viewSearchResults foodData searchTerm
+        ]
+
+
+viewSearchResults : List Livsmedel -> String -> Html Msg
+viewSearchResults foodData searchTerm =
+    let
+        shownLivsmedel =
+            if String.isEmpty searchTerm then
+                []
+
+            else
+                Livsmedel.filter searchTerm foodData
+    in
+    div [ id "search-results" ]
+        [ ul []
+            (List.map viewSearchResult shownLivsmedel)
+        ]
+
+
+viewSearchResult : Livsmedel -> Html Msg
+viewSearchResult food =
+    li []
+        [ text food.namn
+        , button [ onClick <| AddFoodFromSearch food ] [ text "Add" ]
         ]
 
 

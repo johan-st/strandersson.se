@@ -1,7 +1,7 @@
 module Livsmedel exposing (Livsmedel, decoder, filter)
 
+import Fuzzy
 import Json.Decode as D exposing (Decoder)
-import Simple.Fuzzy
 
 
 type alias Livsmedel =
@@ -16,10 +16,14 @@ type alias Livsmedel =
 
 filter : String -> List Livsmedel -> List Livsmedel
 filter query list =
-    Simple.Fuzzy.filter
-        (\lm -> lm.namn |> Simple.Fuzzy.root)
-        (query |> Simple.Fuzzy.root)
-        list
+    plainFilter query list
+
+
+{-| TODO: replace with fuzzy search. candidate dependency added
+-}
+plainFilter : String -> List Livsmedel -> List Livsmedel
+plainFilter query list =
+    List.filter (\item -> String.contains (String.toLower query) (String.toLower item.namn)) list
 
 
 decoder : Decoder (List Livsmedel)
