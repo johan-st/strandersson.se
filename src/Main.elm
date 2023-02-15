@@ -171,7 +171,7 @@ update msg model =
             , Cmd.none
             )
 
-        GotFoodData (Err err) ->
+        GotFoodData (Err _) ->
             -- TODO: handle error
             ( model, Cmd.none )
 
@@ -444,7 +444,7 @@ viewSearchResults : List Livsmedel -> String -> Html Msg
 viewSearchResults foodData searchTerm =
     let
         shownLivsmedel =
-            if String.isEmpty searchTerm then
+            if String.length searchTerm < 3 then
                 []
 
             else
