@@ -1,6 +1,6 @@
 import { Elm } from "./Main.elm";
 // build time from environment variable
-const buildTime = process.env.BUILD_TAG;
+const buildTag = process.env.BUILD_TAG;
 const nodeEnv = process.env.NODE_ENV;
 
 
@@ -9,7 +9,7 @@ const nodeEnv = process.env.NODE_ENV;
 const storedData = localStorage.getItem('FoodCalculator');
 const flags = {
     foodCalculator: storedData ? JSON.parse(storedData) : null,
-    build: nodeEnv + " " + buildTime,
+    build: nodeEnv + " - " + buildTag,
 
 
 }
