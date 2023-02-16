@@ -1,7 +1,7 @@
-module FoodCalculator exposing
-    ( FCResult
-    , Food
-    , FoodCalculator(..)
+module MealCalculator exposing
+    ( Food
+    , MCResult
+    , MealCalculator(..)
     , NewFood
     , add
     , cookedWeight
@@ -25,8 +25,8 @@ import Json.Decode as D
 import Json.Encode as E
 
 
-type FoodCalculator
-    = FoodCalculator Internals
+type MealCalculator
+    = MealCalculator Internals
 
 
 type alias Internals =
@@ -64,14 +64,14 @@ type alias NewFood =
     }
 
 
-type alias FCResult =
-    { total : FCResultPartial
-    , portion : FCResultPartial
-    , percentByWeight : Maybe FCResultPercent
+type alias MCResult =
+    { total : MCResultPartial
+    , portion : MCResultPartial
+    , percentByWeight : Maybe MCResultPercent
     }
 
 
-type alias FCResultPartial =
+type alias MCResultPartial =
     { calories : Int
     , protein : Float
     , carbs : Float
@@ -81,26 +81,26 @@ type alias FCResultPartial =
     }
 
 
-type alias FCResultPercent =
+type alias MCResultPercent =
     { protein : Float
     , fat : Float
     , carbs : Float
     }
 
 
-type alias FCError =
+type alias MCError =
     { from : String
     , error : D.Error
     }
 
 
-foods : FoodCalculator -> List Food
-foods (FoodCalculator internals) =
+foods : MealCalculator -> List Food
+foods (MealCalculator internals) =
     internals.foods |> List.sortBy .id
 
 
-add : NewFood -> FoodCalculator -> FoodCalculator
-add newFood (FoodCalculator internals) =
+add : NewFood -> MealCalculator -> MealCalculator
+add newFood (MealCalculator internals) =
     let
         id =
             internals.latestId + 1
@@ -115,7 +115,7 @@ add newFood (FoodCalculator internals) =
             , weight = newFood.weight
             }
     in
-    FoodCalculator
+    MealCalculator
         { internals
             | foods = food :: internals.foods
             , doneWeight = internals.doneWeight
@@ -123,9 +123,9 @@ add newFood (FoodCalculator internals) =
         }
 
 
-updateFood : Food -> FoodCalculator -> FoodCalculator
-updateFood food (FoodCalculator internals) =
-    FoodCalculator
+updateFood : Food -> MealCalculator -> MealCalculator
+updateFood food (MealCalculator internals) =
+    MealCalculator
         { internals
             | foods =
                 internals.foods
@@ -140,9 +140,9 @@ updateFood food (FoodCalculator internals) =
         }
 
 
-remove : Int -> FoodCalculator -> FoodCalculator
-remove id (FoodCalculator internals) =
-    FoodCalculator
+remove : Int -> MealCalculator -> MealCalculator
+remove id (MealCalculator internals) =
+    MealCalculator
         { internals
             | foods =
                 internals.foods
@@ -150,34 +150,34 @@ remove id (FoodCalculator internals) =
         }
 
 
-portionsSet : Int -> FoodCalculator -> FoodCalculator
-portionsSet ports (FoodCalculator internals) =
-    FoodCalculator
+portionsSet : Int -> MealCalculator -> MealCalculator
+portionsSet ports (MealCalculator internals) =
+    MealCalculator
         { internals
             | portions = ports
         }
 
 
-portions : FoodCalculator -> Int
-portions (FoodCalculator internals) =
+portions : MealCalculator -> Int
+portions (MealCalculator internals) =
     internals.portions
 
 
-cookedWeightSet : Maybe Int -> FoodCalculator -> FoodCalculator
-cookedWeightSet weight (FoodCalculator internals) =
-    FoodCalculator
+cookedWeightSet : Maybe Int -> MealCalculator -> MealCalculator
+cookedWeightSet weight (MealCalculator internals) =
+    MealCalculator
         { internals
             | doneWeight = weight
         }
 
 
-cookedWeight : FoodCalculator -> Maybe Int
-cookedWeight (FoodCalculator internals) =
+cookedWeight : MealCalculator -> Maybe Int
+cookedWeight (MealCalculator internals) =
     internals.doneWeight
 
 
-result : FoodCalculator -> FCResult
-result (FoodCalculator internals) =
+result : MealCalculator -> MCResult
+result (MealCalculator internals) =
     let
         totalWeight =
             case internals.doneWeight of
@@ -249,9 +249,9 @@ result (FoodCalculator internals) =
     }
 
 
-init : FoodCalculator
+init : MealCalculator
 init =
-    FoodCalculator
+    MealCalculator
         { foods = []
         , doneWeight = Nothing
         , portions = 4
@@ -317,21 +317,21 @@ ratioOf whole part =
 -- ENCODE/DECODE
 
 
-encode : FoodCalculator -> String
+encode : MealCalculator -> String
 encode fc =
     E.encode 0 <|
         encoder fc
 
 
-encoder : FoodCalculator -> E.Value
+encoder : MealCalculator -> E.Value
 encoder fc =
     case fc of
-        FoodCalculator _ ->
+        MealCalculator _ ->
             encoderV1 fc
 
 
-encoderV1 : FoodCalculator -> E.Value
-encoderV1 (FoodCalculator internals) =
+encoderV1 : MealCalculator -> E.Value
+encoderV1 (MealCalculator internals) =
     let
         doneWeight =
             case internals.doneWeight of
@@ -365,7 +365,7 @@ encodeFood food =
 {-| Decode a FoodCalculator from a JSON string
 TODO: handle error?
 -}
-decode : String -> Result FCError FoodCalculator
+decode : String -> Result MCError MealCalculator
 decode str =
     case D.decodeString decoder str of
         Ok fc ->
@@ -375,7 +375,7 @@ decode str =
             Err { from = "decode", error = err }
 
 
-decoder : D.Decoder FoodCalculator
+decoder : D.Decoder MealCalculator
 decoder =
     D.field "version" D.int
         |> D.andThen
@@ -389,14 +389,14 @@ decoder =
             )
 
 
-fcToCurrent : FoodCalculator -> FoodCalculator
+fcToCurrent : MealCalculator -> MealCalculator
 fcToCurrent fc =
     case fc of
-        FoodCalculator _ ->
+        MealCalculator _ ->
             fc
 
 
-decoderV1 : D.Decoder FoodCalculator
+decoderV1 : D.Decoder MealCalculator
 decoderV1 =
     let
         latestId =
@@ -409,7 +409,7 @@ decoderV1 =
                 (D.field "portions" D.int)
                 latestId
     in
-    D.map FoodCalculator internals
+    D.map MealCalculator internals
 
 
 decodeFood : D.Decoder Food

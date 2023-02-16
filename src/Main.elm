@@ -1,7 +1,6 @@
 port module Main exposing (main)
 
 import Browser
-import FoodCalculator as FC
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, disabled, for, href, id, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -9,6 +8,7 @@ import Http
 import Json.Decode as D
 import Json.Encode
 import Livsmedel exposing (Livsmedel)
+import MealCalculator as MC
 
 
 main : Program Flags Model Msg
@@ -27,12 +27,20 @@ main =
 
 type alias Model =
     { build : String
-    , foodCalculator : FC.FoodCalculator
+    , currentMealCalculator : MC.MealCalculator
+    , savedMealCalculators : List MCSave
     , edit : Maybe Edit
     , inputs : Inputs
     , foodData : List Livsmedel
     , search : String
     , searchResults : List Livsmedel
+    }
+
+
+type alias MCSave =
+    { id : Int
+    , name : String
+    , foodCalculator : MC.MealCalculator
     }
 
 
@@ -86,9 +94,10 @@ init flags =
     in
     if fcNull == Ok True then
         ( { build = flags.build
-          , foodCalculator = FC.init
+          , currentMealCalculator = MC.init
+          , savedMealCalculators = []
           , edit = Nothing
-          , inputs = inputsInit FC.init
+          , inputs = inputsInit MC.init
           , foodData = []
           , search = ""
           , searchResults = []
@@ -99,14 +108,15 @@ init flags =
     else
         let
             fcRes =
-                D.decodeValue FC.decoder flags.foodCalculator
+                D.decodeValue MC.decoder flags.foodCalculator
         in
         case fcRes of
             Err _ ->
                 ( { build = flags.build
-                  , foodCalculator = FC.init
+                  , currentMealCalculator = MC.init
+                  , savedMealCalculators = []
                   , edit = Nothing
-                  , inputs = inputsInit FC.init
+                  , inputs = inputsInit MC.init
                   , foodData = []
                   , search = ""
                   , searchResults = []
@@ -116,7 +126,8 @@ init flags =
 
             Ok fc ->
                 ( { build = flags.build
-                  , foodCalculator = fc
+                  , currentMealCalculator = fc
+                  , savedMealCalculators = []
                   , edit = Nothing
                   , inputs = inputsInit fc
                   , foodData = []
@@ -127,11 +138,11 @@ init flags =
                 )
 
 
-inputsInit : FC.FoodCalculator -> Inputs
+inputsInit : MC.MealCalculator -> Inputs
 inputsInit fc =
     let
         cookedWeight =
-            case FC.cookedWeight fc of
+            case MC.cookedWeight fc of
                 Nothing ->
                     ""
 
@@ -144,7 +155,7 @@ inputsInit fc =
     , fat = ""
     , carbs = ""
     , weight = ""
-    , portions = String.fromInt <| FC.portions fc
+    , portions = String.fromInt <| MC.portions fc
     , cookedWeight = cookedWeight
     }
 
@@ -158,8 +169,8 @@ type Msg
     | InputChanged InputField String
     | AddFood
     | RemoveFood Int
-    | EditFood InputField FC.Food
-    | EditFoodInput InputField FC.Food String
+    | EditFood InputField MC.Food
+    | EditFoodInput InputField MC.Food String
     | EditFoodDone Bool
     | SearchInput String
     | AddFoodFromSearch Livsmedel
@@ -188,12 +199,12 @@ update msg model =
                     let
                         newModel =
                             { model
-                                | foodCalculator = FC.add new model.foodCalculator
-                                , inputs = inputsInit model.foodCalculator
+                                | currentMealCalculator = MC.add new model.currentMealCalculator
+                                , inputs = inputsInit model.currentMealCalculator
                             }
                     in
                     ( newModel
-                    , localStorageSet <| FC.encoder newModel.foodCalculator
+                    , localStorageSet <| MC.encoder newModel.currentMealCalculator
                     )
 
                 Nothing ->
@@ -235,18 +246,18 @@ update msg model =
                 newEdit =
                     Edit food.id field str
 
-                newFC =
+                newMC =
                     if validInput field str then
-                        updateFood model.foodCalculator food field str
+                        updateFood model.currentMealCalculator food field str
 
                     else
-                        model.foodCalculator
+                        model.currentMealCalculator
             in
             ( { model
-                | foodCalculator = newFC
+                | currentMealCalculator = newMC
                 , edit = Just newEdit
               }
-            , localStorageSet <| FC.encoder newFC
+            , localStorageSet <| MC.encoder newMC
             )
 
         EditFoodDone valid ->
@@ -263,9 +274,9 @@ update msg model =
         RemoveFood index ->
             let
                 newModel =
-                    { model | foodCalculator = FC.remove index model.foodCalculator }
+                    { model | currentMealCalculator = MC.remove index model.currentMealCalculator }
             in
-            ( newModel, localStorageSet <| FC.encoder newModel.foodCalculator )
+            ( newModel, localStorageSet <| MC.encoder newModel.currentMealCalculator )
 
         SearchInput str ->
             ( { model | search = str, searchResults = Livsmedel.filter str model.foodData }, Cmd.none )
@@ -283,13 +294,13 @@ update msg model =
 
                 newModel =
                     { model
-                        | foodCalculator = FC.add newFood model.foodCalculator
+                        | currentMealCalculator = MC.add newFood model.currentMealCalculator
                     }
             in
             ( newModel, Cmd.none )
 
 
-updateFood : FC.FoodCalculator -> FC.Food -> InputField -> String -> FC.FoodCalculator
+updateFood : MC.MealCalculator -> MC.Food -> InputField -> String -> MC.MealCalculator
 updateFood fc food field str =
     let
         maybeInt =
@@ -321,10 +332,10 @@ updateFood fc food field str =
                 _ ->
                     food
 
-        newFC =
-            FC.updateFood newFood fc
+        newMC =
+            MC.updateFood newFood fc
     in
-    newFC
+    newMC
 
 
 updateModelWithInputs : Model -> InputField -> String -> ( Model, Cmd Msg )
@@ -333,37 +344,37 @@ updateModelWithInputs model field value =
         maybeInt =
             String.toInt value
 
-        newFC =
+        newMC =
             case ( field, maybeInt ) of
                 ( Portions, Just int ) ->
                     if int > 0 then
-                        FC.portionsSet int model.foodCalculator
+                        MC.portionsSet int model.currentMealCalculator
 
                     else
-                        model.foodCalculator
+                        model.currentMealCalculator
 
                 ( CookedWeight, Just int ) ->
                     if int > 0 then
-                        FC.cookedWeightSet maybeInt model.foodCalculator
+                        MC.cookedWeightSet maybeInt model.currentMealCalculator
 
                     else if int <= 0 then
-                        FC.cookedWeightSet Nothing model.foodCalculator
+                        MC.cookedWeightSet Nothing model.currentMealCalculator
 
                     else
-                        model.foodCalculator
+                        model.currentMealCalculator
 
                 ( CookedWeight, Nothing ) ->
-                    FC.cookedWeightSet Nothing model.foodCalculator
+                    MC.cookedWeightSet Nothing model.currentMealCalculator
 
                 _ ->
-                    model.foodCalculator
+                    model.currentMealCalculator
     in
     ( { model
         | inputs = updateInputs field value model.inputs
-        , foodCalculator = newFC
+        , currentMealCalculator = newMC
       }
     , if field == Portions || field == CookedWeight then
-        localStorageSet <| FC.encoder newFC
+        localStorageSet <| MC.encoder newMC
 
       else
         Cmd.none
@@ -473,15 +484,15 @@ viewCalculator model =
     div [ id "main" ]
         [ section [ id "add-food-form" ]
             [ h2 [] [ text "Add Food" ]
-            , viewInputs model.inputs <| FC.result model.foodCalculator
+            , viewInputs model.inputs <| MC.result model.currentMealCalculator
             ]
         , section [ id "food-list" ]
             [ h2 [] [ text "Food" ]
-            , viewFoods (FC.foods model.foodCalculator) model.edit
+            , viewFoods (MC.foods model.currentMealCalculator) model.edit
             ]
         , section [ id "results" ]
             [ h2 [] [ text "Result" ]
-            , viewResult <| FC.result model.foodCalculator
+            , viewResult <| MC.result model.currentMealCalculator
             ]
         ]
 
@@ -495,7 +506,7 @@ viewFooter buildTag =
         ]
 
 
-viewInputs : Inputs -> FC.FCResult -> Html Msg
+viewInputs : Inputs -> MC.MCResult -> Html Msg
 viewInputs i res =
     let
         inputsAdd =
@@ -635,12 +646,12 @@ sanityCheckString i =
             Maybe.withDefault 0 <| commaFloat i.carbs
 
         estimatedKcal =
-            FC.estimatedKcal prot fat carbs
+            MC.estimatedKcal prot fat carbs
     in
     "~ " ++ String.fromInt estimatedKcal ++ " kcals/100g"
 
 
-viewFoods : List FC.Food -> Maybe Edit -> Html Msg
+viewFoods : List MC.Food -> Maybe Edit -> Html Msg
 viewFoods fs edit =
     table []
         [ thead []
@@ -659,7 +670,7 @@ viewFoods fs edit =
         ]
 
 
-viewFood : Maybe Edit -> FC.Food -> Html Msg
+viewFood : Maybe Edit -> MC.Food -> Html Msg
 viewFood mEdit food =
     case mEdit of
         Just edit ->
@@ -673,7 +684,7 @@ viewFood mEdit food =
             viewFoodNormal food
 
 
-viewFoodNormal : FC.Food -> Html Msg
+viewFoodNormal : MC.Food -> Html Msg
 viewFoodNormal food =
     tr []
         [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
@@ -686,7 +697,7 @@ viewFoodNormal food =
         ]
 
 
-viewFoodEdit : FC.Food -> Edit -> Html Msg
+viewFoodEdit : MC.Food -> Edit -> Html Msg
 viewFoodEdit food edit =
     case edit.field of
         Name ->
@@ -801,7 +812,7 @@ viewFoodEdit food edit =
             viewFoodNormal food
 
 
-viewResult : FC.FCResult -> Html Msg
+viewResult : MC.MCResult -> Html Msg
 viewResult result =
     let
         estimate =
@@ -956,7 +967,7 @@ commaFloat s =
         |> String.toFloat
 
 
-inputsToFood : Inputs -> Maybe FC.NewFood
+inputsToFood : Inputs -> Maybe MC.NewFood
 inputsToFood i =
     let
         mName =

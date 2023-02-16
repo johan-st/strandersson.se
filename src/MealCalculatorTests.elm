@@ -1,25 +1,25 @@
-module FoodCalculatorTests exposing (..)
+module MealCalculatorTests exposing (..)
 
 -- import Expect exposing (Expectation)
 
 import Expect
-import FoodCalculator as FC
 import Fuzz exposing (Fuzzer, floatRange, int, intAtLeast, string)
+import MealCalculator as MC
 import Test exposing (..)
 
 
 suite : Test
 suite =
-    describe "FoodCalculator" <|
+    describe "MealCalculator" <|
         [ describe "init" <|
             [ test "returns a model with an empty list of foods" <|
                 \() ->
                     let
-                        newFC =
-                            FC.init
+                        newMC =
+                            MC.init
 
                         foods =
-                            FC.foods newFC
+                            MC.foods newMC
                     in
                     Expect.equal
                         (List.length foods)
@@ -29,13 +29,13 @@ suite =
             [ fuzz fuzzNewFood "add a food" <|
                 \f ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f
+                        newMC =
+                            MC.init
+                                |> MC.add f
                     in
-                    FC.foods newFC
-                        |> List.map (\fcf -> FCFood fcf)
-                        |> List.map (comp (FCNewFood f))
+                    MC.foods newMC
+                        |> List.map (\fcf -> MCFood fcf)
+                        |> List.map (comp (MCNewFood f))
                         |> List.foldl (&&) True
                         |> Expect.equal True
             ]
@@ -43,16 +43,16 @@ suite =
             [ fuzz2 fuzzNewFood fuzzNewFood "remove an item by id" <|
                 \f1 f2 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
                                 -- TODO: should not rely on current id implementation
-                                |> FC.remove 1
+                                |> MC.remove 1
                     in
-                    FC.foods newFC
-                        |> List.map (\fcf -> FCFood fcf)
-                        |> List.map (comp (FCNewFood f2))
+                    MC.foods newMC
+                        |> List.map (\fcf -> MCFood fcf)
+                        |> List.map (comp (MCNewFood f2))
                         |> List.foldl (&&) True
                         |> Expect.equal True
             ]
@@ -60,15 +60,15 @@ suite =
             [ fuzz3 fuzzNewFood fuzzNewFood fuzzNewFood "update a food" <|
                 \f1 f2 f3 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
 
                         fcFirst =
-                            FC.foods newFC
+                            MC.foods newMC
                                 |> List.head
-                                |> Maybe.withDefault (FC.Food 0 "" 0 0 0 0 0)
+                                |> Maybe.withDefault (MC.Food 0 "" 0 0 0 0 0)
 
                         modedFirst =
                             { fcFirst
@@ -80,10 +80,10 @@ suite =
                                 , calories = f3.calories
                             }
                     in
-                    FC.updateFood modedFirst newFC
-                        |> FC.foods
-                        |> List.map (\fcf -> FCFood fcf)
-                        |> List.map (comp (FCFood modedFirst))
+                    MC.updateFood modedFirst newMC
+                        |> MC.foods
+                        |> List.map (\fcf -> MCFood fcf)
+                        |> List.map (comp (MCFood modedFirst))
                         |> List.foldl (||) True
                         |> Expect.equal True
             ]
@@ -91,23 +91,23 @@ suite =
             [ test "get when no weight set returns Nothing" <|
                 \() ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add apple
+                        newMC =
+                            MC.init
+                                |> MC.add apple
                     in
                     Expect.equal
-                        (FC.cookedWeight newFC)
+                        (MC.cookedWeight newMC)
                         Nothing
             , fuzz (intAtLeast 1) "set and get" <|
                 \w ->
                     let
-                        newFC_weight =
-                            FC.init
-                                |> FC.add apple
-                                |> FC.cookedWeightSet (Just w)
+                        newMC_weight =
+                            MC.init
+                                |> MC.add apple
+                                |> MC.cookedWeightSet (Just w)
                     in
                     Expect.equal
-                        (FC.cookedWeight newFC_weight)
+                        (MC.cookedWeight newMC_weight)
                         (Just w)
             ]
         , describe "estimated kcal from macros in food" <|
@@ -120,7 +120,7 @@ suite =
                     in
                     Expect.equal
                         expectedKcal
-                        (FC.estimatedKcalPer100g f.weight f.protein f.fat f.carbs)
+                        (MC.estimatedKcalPer100g f.weight f.protein f.fat f.carbs)
             , fuzz fuzzFood "returns total estimated kcal from macros" <|
                 \f ->
                     let
@@ -130,25 +130,25 @@ suite =
                     in
                     Expect.equal
                         expectedKcal
-                        (FC.estimatedKcal f.protein f.fat f.carbs)
+                        (MC.estimatedKcal f.protein f.fat f.carbs)
             ]
         , describe "result" <|
             [ describe "total" <|
                 [ fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "protein" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.protein * (toFloat f1.weight / 100))
                                     + (f2.protein * (toFloat f2.weight / 100))
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -157,18 +157,18 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "carbs" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.carbs * (toFloat f1.weight / 100))
                                     + (f2.carbs * (toFloat f2.weight / 100))
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -177,18 +177,18 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "fat" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.fat * (toFloat f1.weight / 100))
                                     + (f2.fat * (toFloat f2.weight / 100))
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -197,17 +197,17 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "weight" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 f1.weight + f2.weight
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.equal
                             expected
@@ -215,11 +215,11 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "calories" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 round <|
@@ -227,7 +227,7 @@ suite =
                                         + (toFloat f2.calories * (toFloat f2.weight / 100))
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.equal
                             expected
@@ -237,13 +237,13 @@ suite =
                         let
                             -- estimatedKcal is validate elsewhere
                             f1Est =
-                                FC.estimatedKcal
+                                MC.estimatedKcal
                                     (f1.protein * (toFloat f1.weight / 100))
                                     (f1.fat * (toFloat f1.weight / 100))
                                     (f1.carbs * (toFloat f1.weight / 100))
 
                             f2Est =
-                                FC.estimatedKcal
+                                MC.estimatedKcal
                                     (f2.protein * (toFloat f2.weight / 100))
                                     (f2.fat * (toFloat f2.weight / 100))
                                     (f2.carbs * (toFloat f2.weight / 100))
@@ -252,11 +252,11 @@ suite =
                                 f1Est + f2Est
 
                             got =
-                                FC.result
-                                    (FC.init
-                                        |> FC.add f1
-                                        |> FC.add f2
-                                        |> FC.portionsSet portions
+                                MC.result
+                                    (MC.init
+                                        |> MC.add f1
+                                        |> MC.add f2
+                                        |> MC.portionsSet portions
                                     )
                                     |> .total
                                     |> .estimatedKcal
@@ -272,11 +272,11 @@ suite =
                 [ fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "protein" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.protein * (toFloat f1.weight / 100))
@@ -284,7 +284,7 @@ suite =
                                     |> (\x -> x / toFloat portions)
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -293,11 +293,11 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "carbs" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.carbs * (toFloat f1.weight / 100))
@@ -305,7 +305,7 @@ suite =
                                     |> (\x -> x / toFloat portions)
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -314,11 +314,11 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "fat" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.fat * (toFloat f1.weight / 100))
@@ -326,7 +326,7 @@ suite =
                                     |> (\x -> x / toFloat portions)
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.within
                             (Expect.Absolute 0.000001)
@@ -335,11 +335,11 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "weight" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (f1.weight + f2.weight)
@@ -348,7 +348,7 @@ suite =
                                     |> round
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.equal
                             expected
@@ -356,11 +356,11 @@ suite =
                 , fuzz3 (intAtLeast 1) fuzzNewFood fuzzNewFood "calories" <|
                     \portions f1 f2 ->
                         let
-                            newFC =
-                                FC.init
-                                    |> FC.add f1
-                                    |> FC.add f2
-                                    |> FC.portionsSet portions
+                            newMC =
+                                MC.init
+                                    |> MC.add f1
+                                    |> MC.add f2
+                                    |> MC.portionsSet portions
 
                             expected =
                                 (toFloat f1.calories * (toFloat f1.weight / 100))
@@ -369,7 +369,7 @@ suite =
                                     |> round
 
                             res =
-                                FC.result (FC.portionsSet portions newFC)
+                                MC.result (MC.portionsSet portions newMC)
                         in
                         Expect.equal
                             expected
@@ -378,7 +378,7 @@ suite =
                     \portions f1 f2 ->
                         let
                             f1Est =
-                                FC.estimatedKcal
+                                MC.estimatedKcal
                                     (f1.protein * (toFloat f1.weight / 100))
                                     (f1.fat * (toFloat f1.weight / 100))
                                     (f1.carbs * (toFloat f1.weight / 100))
@@ -386,7 +386,7 @@ suite =
                                     |> round
 
                             f2Est =
-                                FC.estimatedKcal
+                                MC.estimatedKcal
                                     (f2.protein * (toFloat f2.weight / 100))
                                     (f2.fat * (toFloat f2.weight / 100))
                                     (f2.carbs * (toFloat f2.weight / 100))
@@ -397,11 +397,11 @@ suite =
                                 f1Est + f2Est
 
                             got =
-                                FC.result
-                                    (FC.init
-                                        |> FC.add f1
-                                        |> FC.add f2
-                                        |> FC.portionsSet portions
+                                MC.result
+                                    (MC.init
+                                        |> MC.add f1
+                                        |> MC.add f2
+                                        |> MC.portionsSet portions
                                     )
                                     |> .portion
                                     |> .estimatedKcal
@@ -418,13 +418,13 @@ suite =
             [ fuzz2 fuzzNewFood fuzzNewFood "protein" <|
                 \f1 f2 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
 
                         res =
-                            FC.result newFC
+                            MC.result newMC
 
                         protWeight =
                             f1.protein
@@ -467,13 +467,13 @@ suite =
             , fuzz2 fuzzNewFood fuzzNewFood "fat" <|
                 \f1 f2 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
 
                         res =
-                            FC.result newFC
+                            MC.result newMC
 
                         protWeight =
                             f1.protein
@@ -516,13 +516,13 @@ suite =
             , fuzz2 fuzzNewFood fuzzNewFood "carbs" <|
                 \f1 f2 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
 
                         res =
-                            FC.result newFC
+                            MC.result newMC
 
                         protWeight =
                             f1.protein
@@ -569,24 +569,24 @@ suite =
             [ fuzz3 fuzzNewFood fuzzNewFood fuzzNewFood "encode and decode a model" <|
                 \f1 f2 f3 ->
                     let
-                        newFC =
-                            FC.init
-                                |> FC.add f1
-                                |> FC.add f2
-                                |> FC.add f3
-                                |> FC.portionsSet 2
+                        newMC =
+                            MC.init
+                                |> MC.add f1
+                                |> MC.add f2
+                                |> MC.add f3
+                                |> MC.portionsSet 2
 
                         decoded =
-                            case FC.decode <| FC.encode newFC of
+                            case MC.decode <| MC.encode newMC of
                                 Ok fc ->
                                     fc
 
                                 Err err ->
-                                    Debug.log (Debug.toString err) FC.init
+                                    Debug.log (Debug.toString err) MC.init
                     in
                     Expect.equal
                         decoded
-                        newFC
+                        newMC
             ]
         ]
 
@@ -597,20 +597,20 @@ suite =
 
 
 type TFood
-    = FCFood FC.Food
-    | FCNewFood FC.NewFood
+    = MCFood MC.Food
+    | MCNewFood MC.NewFood
 
 
 comp : TFood -> TFood -> Bool
 comp newFood food =
     case ( newFood, food ) of
-        ( FCFood f1, FCFood f2 ) ->
+        ( MCFood f1, MCFood f2 ) ->
             f1 == f2
 
-        ( FCNewFood f1, FCNewFood f2 ) ->
+        ( MCNewFood f1, MCNewFood f2 ) ->
             f1 == f2
 
-        ( FCNewFood f1, FCFood f2 ) ->
+        ( MCNewFood f1, MCFood f2 ) ->
             f1.name
                 == f2.name
                 && f1.calories
@@ -624,7 +624,7 @@ comp newFood food =
                 && f1.weight
                 == f2.weight
 
-        ( FCFood f1, FCNewFood f2 ) ->
+        ( MCFood f1, MCNewFood f2 ) ->
             f1.name
                 == f2.name
                 && f1.calories
@@ -639,9 +639,9 @@ comp newFood food =
                 == f2.weight
 
 
-fuzzFood : Fuzzer FC.Food
+fuzzFood : Fuzzer MC.Food
 fuzzFood =
-    Fuzz.map7 FC.Food
+    Fuzz.map7 MC.Food
         int
         string
         (intAtLeast 0)
@@ -651,9 +651,9 @@ fuzzFood =
         (intAtLeast 0)
 
 
-fuzzNewFood : Fuzzer FC.NewFood
+fuzzNewFood : Fuzzer MC.NewFood
 fuzzNewFood =
-    Fuzz.map6 FC.NewFood
+    Fuzz.map6 MC.NewFood
         string
         (intAtLeast 0)
         (floatRange 0 1000000)
@@ -662,7 +662,7 @@ fuzzNewFood =
         (intAtLeast 0)
 
 
-apple : FC.NewFood
+apple : MC.NewFood
 apple =
     { name = "apple"
     , calories = 52
@@ -673,7 +673,7 @@ apple =
     }
 
 
-newFoodFromFood : FC.Food -> FC.NewFood
+newFoodFromFood : MC.Food -> MC.NewFood
 newFoodFromFood f =
     { name = f.name
     , calories = f.calories
