@@ -23,14 +23,12 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 ## Future
 ### Ideas
-- on-page search and retrieval of product. (maybe _livsmedelsverket_ has an API I can use)
 - storing used foodstuffs on a backend somewhere. 
 - user accounts to share lists between devices.
 - share lists by links
-- have a table of most common foodstuffs
 - have adds and make money (maybe even a whole SEK)
 - remake ui in elm-ui
-
+- make it a pwa
 
 ### TODOs
 
@@ -38,9 +36,12 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 #### Features
 - highlight food if kcal estimate missmatch the given value
 - tooltip for kcal estimate
+- Save and restore several meals
 #### Interaction
-- click outside of edit input to close
 - have kcal estimate as placeholder in input, move it below when input is focused or there is a value
+- click outside of edit input to close
+- have search work of name field
+- hide manual add when search is active
 - focus input when edit is invoked
 - close edit on enter
 - next edit field on tab
