@@ -410,6 +410,183 @@ updateInputs field value inputs =
 
 
 
+-- HELPER FUNCTIONS
+
+
+roundToString : Float -> String
+roundToString value =
+    value
+        |> (*) 10
+        |> round
+        |> toFloat
+        |> (\f -> f / 10)
+        |> String.fromFloat
+
+
+toPercent : Float -> String
+toPercent value =
+    value
+        |> (*) 1000
+        |> round
+        |> toFloat
+        |> (\f -> f / 10)
+        |> String.fromFloat
+
+
+{-| Validate string as input for given InputFIeld
+-}
+validInput : InputField -> String -> Bool
+validInput f str =
+    case f of
+        Name ->
+            if String.length str < 3 then
+                False
+
+            else
+                True
+
+        Calories ->
+            str
+                |> String.toInt
+                |> Maybe.map (\int -> int >= 0)
+                |> Maybe.withDefault False
+
+        Protein ->
+            str
+                |> commaFloat
+                |> Maybe.map (\float -> float >= 0)
+                |> Maybe.withDefault False
+
+        Fat ->
+            str
+                |> commaFloat
+                |> Maybe.map (\float -> float >= 0)
+                |> Maybe.withDefault False
+
+        Carbs ->
+            str
+                |> commaFloat
+                |> Maybe.map (\float -> float >= 0)
+                |> Maybe.withDefault False
+
+        Weight ->
+            str
+                |> String.toInt
+                |> Maybe.map (\int -> int >= 0)
+                |> Maybe.withDefault False
+
+        Portions ->
+            str
+                |> String.toInt
+                |> Maybe.map (\int -> int > 0)
+                |> Maybe.withDefault False
+
+        CookedWeight ->
+            str
+                |> String.toInt
+                |> Maybe.map (\int -> int > 0)
+                |> Maybe.withDefault False
+
+
+validAddInputs : Inputs -> Bool
+validAddInputs i =
+    validInput Name i.name
+        && validInput Calories i.calories
+        && validInput Protein i.protein
+        && validInput Fat i.fat
+        && validInput Carbs i.carbs
+        && validInput Weight i.weight
+
+
+commaFloat : String -> Maybe Float
+commaFloat s =
+    s
+        |> String.replace "," "."
+        |> String.toFloat
+
+
+inputsToFood : Inputs -> Maybe MC.NewFood
+inputsToFood i =
+    let
+        mName =
+            if validInput Name i.name then
+                Just i.name
+
+            else
+                Nothing
+
+        mCalories =
+            if validInput Calories i.calories then
+                String.toInt i.calories
+
+            else
+                Nothing
+
+        mProtein =
+            if validInput Protein i.protein then
+                commaFloat i.protein
+
+            else
+                Nothing
+
+        mFat =
+            if validInput Fat i.fat then
+                commaFloat i.fat
+
+            else
+                Nothing
+
+        mCarbs =
+            if validInput Carbs i.carbs then
+                commaFloat i.carbs
+
+            else
+                Nothing
+
+        mWeight =
+            if validInput Weight i.weight then
+                String.toInt i.weight
+
+            else
+                Nothing
+    in
+    case ( mName, mCalories, mProtein ) of
+        ( Just name, Just calories, Just protein ) ->
+            case ( mFat, mCarbs, mWeight ) of
+                ( Just fat, Just carbs, Just weight ) ->
+                    Just
+                        { name = name
+                        , calories = calories
+                        , protein = protein
+                        , fat = fat
+                        , carbs = carbs
+                        , weight = weight
+                        }
+
+                _ ->
+                    Nothing
+
+        _ ->
+            Nothing
+
+
+
+-- PORTS
+
+
+port localStorageSet : Json.Encode.Value -> Cmd msg
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+
 -- VIEW
 
 
@@ -500,8 +677,8 @@ viewCalculator model =
 viewFooter : String -> Html Msg
 viewFooter buildTag =
     div [ id "footer" ]
-        [ div [] [ text buildTag ]
-        , a [ href "https://github.com/johan-st/strandersson.se" ] [ text "github" ]
+        [ a [ href "https://github.com/johan-st/strandersson.se" ] [ text "johan-st@github" ]
+        , div [] [ text buildTag ]
         , a [ href "https://www.livsmedelsverket.se/" ] [ text "data från livsmedelsverket" ]
         ]
 
@@ -511,8 +688,8 @@ viewInputs i res =
     let
         inputsAdd =
             [ { id = "name"
-              , label = "Name"
-              , placeholder = "\"potatoes\""
+              , label = "Namn"
+              , placeholder = "\"potatis\""
               , value = i.name
               , onInput = InputChanged Name
               , valid = validInput Name i.name
@@ -520,7 +697,7 @@ viewInputs i res =
               , subtext = Nothing
               }
             , { id = "calories"
-              , label = "Calories"
+              , label = "Kalorier"
               , placeholder = "kcal/100g"
               , value = i.calories
               , onInput = InputChanged Calories
@@ -538,7 +715,7 @@ viewInputs i res =
               , subtext = Nothing
               }
             , { id = "fat"
-              , label = "Fat"
+              , label = "Fett"
               , placeholder = "g/100g"
               , value = i.fat
               , onInput = InputChanged Fat
@@ -547,7 +724,7 @@ viewInputs i res =
               , subtext = Nothing
               }
             , { id = "carbs"
-              , label = "Carbs"
+              , label = "Kolhydrater"
               , placeholder = "g/100g"
               , value = i.carbs
               , onInput = InputChanged Carbs
@@ -556,7 +733,7 @@ viewInputs i res =
               , subtext = Nothing
               }
             , { id = "weight"
-              , label = "Weight"
+              , label = "Vikt"
               , placeholder = "g"
               , value = i.weight
               , onInput = InputChanged Weight
@@ -869,180 +1046,3 @@ viewResult result =
                 ]
             ]
         ]
-
-
-
--- HELPER FUNCTIONS
-
-
-roundToString : Float -> String
-roundToString value =
-    value
-        |> (*) 10
-        |> round
-        |> toFloat
-        |> (\f -> f / 10)
-        |> String.fromFloat
-
-
-toPercent : Float -> String
-toPercent value =
-    value
-        |> (*) 1000
-        |> round
-        |> toFloat
-        |> (\f -> f / 10)
-        |> String.fromFloat
-
-
-{-| Validate string as input for given InputFIeld
--}
-validInput : InputField -> String -> Bool
-validInput f str =
-    case f of
-        Name ->
-            if String.length str < 3 then
-                False
-
-            else
-                True
-
-        Calories ->
-            str
-                |> String.toInt
-                |> Maybe.map (\int -> int >= 0)
-                |> Maybe.withDefault False
-
-        Protein ->
-            str
-                |> commaFloat
-                |> Maybe.map (\float -> float >= 0)
-                |> Maybe.withDefault False
-
-        Fat ->
-            str
-                |> commaFloat
-                |> Maybe.map (\float -> float >= 0)
-                |> Maybe.withDefault False
-
-        Carbs ->
-            str
-                |> commaFloat
-                |> Maybe.map (\float -> float >= 0)
-                |> Maybe.withDefault False
-
-        Weight ->
-            str
-                |> String.toInt
-                |> Maybe.map (\int -> int >= 0)
-                |> Maybe.withDefault False
-
-        Portions ->
-            str
-                |> String.toInt
-                |> Maybe.map (\int -> int > 0)
-                |> Maybe.withDefault False
-
-        CookedWeight ->
-            str
-                |> String.toInt
-                |> Maybe.map (\int -> int > 0)
-                |> Maybe.withDefault False
-
-
-validAddInputs : Inputs -> Bool
-validAddInputs i =
-    validInput Name i.name
-        && validInput Calories i.calories
-        && validInput Protein i.protein
-        && validInput Fat i.fat
-        && validInput Carbs i.carbs
-        && validInput Weight i.weight
-
-
-commaFloat : String -> Maybe Float
-commaFloat s =
-    s
-        |> String.replace "," "."
-        |> String.toFloat
-
-
-inputsToFood : Inputs -> Maybe MC.NewFood
-inputsToFood i =
-    let
-        mName =
-            if validInput Name i.name then
-                Just i.name
-
-            else
-                Nothing
-
-        mCalories =
-            if validInput Calories i.calories then
-                String.toInt i.calories
-
-            else
-                Nothing
-
-        mProtein =
-            if validInput Protein i.protein then
-                commaFloat i.protein
-
-            else
-                Nothing
-
-        mFat =
-            if validInput Fat i.fat then
-                commaFloat i.fat
-
-            else
-                Nothing
-
-        mCarbs =
-            if validInput Carbs i.carbs then
-                commaFloat i.carbs
-
-            else
-                Nothing
-
-        mWeight =
-            if validInput Weight i.weight then
-                String.toInt i.weight
-
-            else
-                Nothing
-    in
-    case ( mName, mCalories, mProtein ) of
-        ( Just name, Just calories, Just protein ) ->
-            case ( mFat, mCarbs, mWeight ) of
-                ( Just fat, Just carbs, Just weight ) ->
-                    Just
-                        { name = name
-                        , calories = calories
-                        , protein = protein
-                        , fat = fat
-                        , carbs = carbs
-                        , weight = weight
-                        }
-
-                _ ->
-                    Nothing
-
-        _ ->
-            Nothing
-
-
-
--- PORTS
-
-
-port localStorageSet : Json.Encode.Value -> Cmd msg
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
