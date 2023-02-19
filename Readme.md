@@ -4,8 +4,18 @@ _A domain and collection of tools and things for our family._ ([link](https://st
 I have decided to take inspiration from [this structure](https://github.com/madasebrof/elm-taco-donut) and use it as a step-off point for this project.
 
 Johan Strand: [jst.dev](https://jst.dev)
+
+# App
+This is an Elm app. I am trying out a new structure for this project. I have decided to use [this structure](https://github.com/madasebrof/elm-taco-donut). It is quite a departure from the usual Elm app. I am hoping to learn something new and get a better understanding of how to structure Elm apps.
+
 ____________
 ____________
+# Home
+
+a placeholder with some links.
+
+____________
+
 # Meal Calculator
 a tool for myself when cooking. Makes it easier to calculate macros (protein, carbs and fat) and kcal for my lunchboxes
  
