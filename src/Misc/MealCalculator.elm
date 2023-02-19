@@ -1,4 +1,4 @@
-module MealCalculator exposing
+module Misc.MealCalculator exposing
     ( Food
     , MCResult
     , MealCalculator(..)

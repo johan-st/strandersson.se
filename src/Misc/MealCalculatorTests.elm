@@ -1,10 +1,10 @@
-module MealCalculatorTests exposing (..)
+module Misc.MealCalculatorTests exposing (..)
 
 -- import Expect exposing (Expectation)
 
 import Expect
 import Fuzz exposing (Fuzzer, floatRange, int, intAtLeast, string)
-import MealCalculator as MC
+import Misc.MealCalculator as MC
 import Test exposing (..)
 
 
