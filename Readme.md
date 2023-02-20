@@ -1,19 +1,29 @@
 # strandersson.se
 _A domain and collection of tools and things for our family._ ([link](https://strandersson.se))
 
+I have decided to take inspiration from [this structure](https://github.com/madasebrof/elm-taco-donut) and use it as a step-off point for this project.
+
 Johan Strand: [jst.dev](https://jst.dev)
+
+# App
+This is an Elm app. I am trying out a new structure for this project. I have decided to use [this structure](https://github.com/madasebrof/elm-taco-donut). It is quite a departure from the usual Elm app. I am hoping to learn something new and get a better understanding of how to structure Elm apps.
+
 ____________
 ____________
+# Home
+
+a placeholder with some links.
+
+____________
+
 # Meal Calculator
 a tool for myself when cooking. Makes it easier to calculate macros (protein, carbs and fat) and kcal for my lunchboxes
-
  
 ## NOTE!
 The food data is fetched after load from a json file. This data is from _livsmedelsverket_. I have not included the file in this repo. If you want to run this locally you will have to fetch the data yourself from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `livsmedelsDB.csv` and place it in the `dataSource` folder. Now run `node ./dataSource/csvToJson.js` to convert the csv to json. This will create the static folder and place the json file in it. Filename is `livsmedelsDB.csv` 
 
 ## Development Process
 As the nature of this is a hobby-project and a help for myself I decided to start small with the minimum that would help me and build from there. 
-
 
 ### Language
 I chose to build this tool in a delightful little language called Elm. It is a functional language made for web-apps. It compiles to JavaScript, is fully compatible with all browsers that matters, is very fast and quite small. The functional nature and the type system near guarantee no runtime exceptions. 

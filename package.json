@@ -25,6 +25,7 @@
   "devDependencies": {
     "@parcel/transformer-elm": "^2.8.3",
     "elm": "^0.19.1-5",
+    "elm-format": "^0.8.5",
     "elm-test": "^0.19.1-revision11",
     "parcel": "^2.8.3",
     "parcel-reporter-static-files-copy": "^1.5.0"
