@@ -1,8 +1,15 @@
 module A_Model exposing (..)
 
 import B_Message exposing (..)
+import Browser.Navigation as Nav
 import C_Data exposing (..)
-import Misc.MealCalculator as MC exposing (MealCalculator(..))
+import Misc.MealCalculator exposing (MealCalculator(..))
+
+
+type Route
+    = HomeRoute
+    | MealRoute
+    | NotFoundRoute
 
 
 type alias Model =
@@ -16,6 +23,7 @@ type alias Model =
     -- we'd stil be fine!
     ------------------------------------------------------
     { build : String
+    , key : Nav.Key
     , route : Route
     , mealCalcModel : ModelMealCalculator
     }
@@ -28,22 +36,22 @@ type alias Model =
 type alias ModelMealCalculator =
     { currentMealCalculator : MealCalculator
     , savedMealCalculators : List MealCalculator
-    , edit : Maybe Edit
-    , inputs : Inputs
+    , edit : Maybe MealEdit
+    , inputs : MealInputs
     , foodData : List Livsmedel
     , search : String
     , searchResults : List Livsmedel
     }
 
 
-type alias Edit =
+type alias MealEdit =
     { id : Int
     , field : InputField
     , value : String
     }
 
 
-type alias Inputs =
+type alias MealInputs =
     { name : String
     , calories : String
     , protein : String

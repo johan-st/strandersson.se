@@ -4,15 +4,54 @@ import A_Model exposing (..)
 import B_Message exposing (..)
 import Browser exposing (Document)
 import C_Data exposing (..)
+import E_Init exposing (Flags)
 import Html
-import Views.Page.MealCalculator as MealCalculator
+import View.Footer as Footer
+import View.Header as Header
+import View.Page.Home as PageHome
+import View.Page.MealCalculator as PageMealCalculator
+import View.Page.NotFound404 as NotFound404
 
 
 view : Model -> Document Msg
 view model =
-    { title = "Strandersson.se"
-    , body = [ Html.map Meal (MealCalculator.view model.mealCalcModel) ]
+    { title = docTitle model.route
+    , body =
+        [ Header.view model
+        , pageViewer model
+        , Footer.view model
+        ]
     }
+
+
+docTitle : Route -> String
+docTitle route =
+    let
+        base =
+            "Strandesson.se | "
+    in
+    case route of
+        HomeRoute ->
+            base ++ "Home"
+
+        MealRoute ->
+            base ++ "Meal Calculator"
+
+        NotFoundRoute ->
+            base ++ "404"
+
+
+pageViewer : Model -> Html.Html Msg
+pageViewer model =
+    case model.route of
+        HomeRoute ->
+            PageHome.view
+
+        MealRoute ->
+            Html.map Meal <| PageMealCalculator.view model.mealCalcModel
+
+        NotFoundRoute ->
+            NotFound404.view
 
 
 

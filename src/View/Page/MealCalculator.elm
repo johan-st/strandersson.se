@@ -1,4 +1,4 @@
-module Views.Page.MealCalculator exposing (view)
+module View.Page.MealCalculator exposing (view)
 
 import A_Model exposing (..)
 import B_Message exposing (..)
@@ -109,7 +109,7 @@ viewCalculator model =
 --         ]
 
 
-viewInputs : Inputs -> MC.MCResult -> Html MealMsg
+viewInputs : MealInputs -> MC.MCResult -> Html MealMsg
 viewInputs i res =
     let
         inputsAdd =
@@ -236,7 +236,7 @@ viewInput i =
         ]
 
 
-sanityCheckString : Inputs -> String
+sanityCheckString : MealInputs -> String
 sanityCheckString i =
     let
         prot =
@@ -254,7 +254,7 @@ sanityCheckString i =
     "~ " ++ String.fromInt estKcal ++ " kcals/100g"
 
 
-viewFoods : List MC.Food -> Maybe Edit -> Html MealMsg
+viewFoods : List MC.Food -> Maybe MealEdit -> Html MealMsg
 viewFoods fs edit =
     table []
         [ thead []
@@ -273,7 +273,7 @@ viewFoods fs edit =
         ]
 
 
-viewFood : Maybe Edit -> MC.Food -> Html MealMsg
+viewFood : Maybe MealEdit -> MC.Food -> Html MealMsg
 viewFood mEdit food =
     case mEdit of
         Just edit ->
@@ -300,7 +300,7 @@ viewFoodNormal food =
         ]
 
 
-viewFoodEdit : MC.Food -> Edit -> Html MealMsg
+viewFoodEdit : MC.Food -> MealEdit -> Html MealMsg
 viewFoodEdit food edit =
     case edit.field of
         Name ->
@@ -579,7 +579,7 @@ carbsGramsToKcal grams =
     grams * 4
 
 
-validAddInputs : Inputs -> Bool
+validAddInputs : MealInputs -> Bool
 validAddInputs i =
     validInput Name i.name
         && validInput Calories i.calories
