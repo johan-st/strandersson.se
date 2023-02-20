@@ -8,8 +8,10 @@
     "start": "set BUILD_TAG=%DATE% %TIME% && parcel && set BUILD_TAG= ",
     "build": "set BUILD_TAG=%DATE% %TIME% && parcel build --no-source-maps && set BUILD_TAG=",
     "build:noEnv": "parcel build",
-    "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t johanst/strandersson.se  ../  && set BUILD_TIME=",
-    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se"
+    "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t strandersson  .  && set BUILD_TIME=",
+    "docker:start": "docker run --rm -it -p 80:80 strandersson",
+    "docker:tag": "docker tag strandersson registry.digitalocean.com/johan-st/strandersson",
+    "docker:push": "docker push registry.digitalocean.com/johan-st/strandersson"
   },
   "repository": {
     "type": "git",

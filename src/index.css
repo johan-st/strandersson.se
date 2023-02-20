@@ -30,9 +30,9 @@ body {
   object-position: center;
 }
 
-#header > nav {
-  display: none;
-}
+/* #header > nav { */
+/* display: none; */
+/* } */
 #header > nav.open {
   display: grid;
   grid-template-rows: 1fr;

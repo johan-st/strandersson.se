@@ -1,0 +1,3 @@
+# NOTE!
+
+The food data is fetched after load from a json file. This data is from _livsmedelsverket_. I have not included the file in this repo. If you want to run this locally you will have to fetch the data yourself from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `livsmedelsDB.csv` and place it in the `dataSource` folder. Now run `node ./dataSource/csvToJson.js` to convert the csv to json. This will create the static folder and place the json file in it. Filename is `livsmedelsDB.csv`

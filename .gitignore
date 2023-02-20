@@ -13,3 +13,6 @@ dist
 # data from livsmedelsverket
 livsmedelsDB.csv
 livsmedelsDB.json
+
+# secret files
+.secret*

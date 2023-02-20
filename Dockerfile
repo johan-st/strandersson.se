@@ -1,4 +1,6 @@
+# --------------
 # BUILD AND TEST
+# --------------
 FROM debian:bullseye-slim as build
 
 # install node and npm (apt has an old version of node, so we use the node source )
@@ -19,7 +21,10 @@ RUN npm ci
 # and elm.json (elm package file)
 COPY elm.json ./
 
-#copy source files
+# copy static files
+COPY static ./static
+
+# copy source files
 COPY src ./src
 
 # test
@@ -28,15 +33,31 @@ RUN npm test
 # assign build time to environment variable
 ARG BUILD_TAG 
 ENV BUILD_TAG=${BUILD_TAG:-unknown}
+
 # build
 RUN npm run build:noEnv
 
+# Workaround for issue where static files where not moved on build
+RUN mv ./static/* ./dist/
+
+
+
+# ----------
 # PRODUCTION
+# ----------
 FROM nginx:1.23.3-alpine-slim as webserver
 
+# copy nginx main config
+COPY nginx/nginx.conf /etc/nginx/
+
+# Remove default configuration.
+RUN rm -r /etc/nginx/conf.d
+
+# add our own conf.d with specifics for strandersson.se
+COPY nginx/conf.d/ /etc/nginx/conf.d/
+
+# last layer because it's most likely to change.
 # copy build files
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-
-# letting nginx run with default config
 
 
