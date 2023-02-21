@@ -150,3 +150,34 @@ a:focus {
       1fr 1fr 1fr;
   }
 }
+
+/* --------------- */
+/* MEAL CALCULATOR */
+/* --------------- */
+
+#mealCalculator {
+  display: grid;
+  margin: 0 auto;
+  max-width: 95vw;
+  width: 100%;
+  grid-template:
+    "addFood" auto
+    "foodList" auto
+    "results" auto/
+    1fr;
+
+  grid-gap: 1rem;
+}
+
+#mealCalculator .addFood {
+  grid-area: addFood;
+  display: grid;
+}
+
+#mealCalculator .addManual {
+  display: none;
+}
+
+#mealCalculator .addManual--open {
+  display: grid;
+}

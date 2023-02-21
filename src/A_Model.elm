@@ -42,10 +42,11 @@ type MenuState
 type alias ModelMealCalculator =
     { currentMealCalculator : MealCalculator
     , savedMealCalculators : List MealCalculator
+    , addManual : MenuState
     , edit : Maybe MealEdit
     , inputs : MealInputs
     , foodData : List Livsmedel
-    , search : String
+    , searchTerm : String
     , searchResults : List Livsmedel
     }
 

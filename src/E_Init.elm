@@ -65,11 +65,12 @@ init flags url key =
                   , menuState = Closed
                   , mealCalcModel =
                         { currentMealCalculator = mc
+                        , addManual = Closed
                         , savedMealCalculators = []
                         , edit = Nothing
                         , inputs = initMealcalculatorInputs mc
                         , foodData = []
-                        , search = ""
+                        , searchTerm = ""
                         , searchResults = []
                         }
                   }
@@ -85,11 +86,12 @@ initBlank flags url key cmd =
       , menuState = Closed
       , mealCalcModel =
             { currentMealCalculator = MC.init
+            , addManual = Closed
             , savedMealCalculators = []
             , edit = Nothing
             , inputs = initMealcalculatorInputs MC.init
             , foodData = []
-            , search = ""
+            , searchTerm = ""
             , searchResults = []
             }
       }

@@ -28,20 +28,36 @@ type alias Input =
 
 view : ModelMealCalculator -> Html MealMsg
 view model =
-    div [ class "wrapper" ]
-        [ viewHeader
-        , viewCalculator model
-        , viewSearch model.searchResults model.search
+    div [ id "mealCalculator" ]
+        [ viewAddFood model
+        , viewFoodList model
 
-        -- , viewFooter model.build
+        -- , viewResult model
+        ]
+
+
+viewAddFood : ModelMealCalculator -> Html MealMsg
+viewAddFood model =
+    div [ class "addFood" ]
+        [ h2 [] [ text "Add Food" ]
+        , viewSearch model.searchResults model.searchTerm
+        , viewManualInputs model
+        , viewInputsExtras model <| result model.currentMealCalculator
+        ]
+
+
+viewFoodList : ModelMealCalculator -> Html MealMsg
+viewFoodList model =
+    section [ class "foodList" ]
+        [ h2 [] [ text "Food" ]
+        , viewFoods (foods model.currentMealCalculator) model.edit
         ]
 
 
 viewSearch : List Livsmedel -> String -> Html MealMsg
 viewSearch searchResults searchTerm =
     div [ id "search" ]
-        [ h2 [] [ text "Search (prototype)" ]
-        , p [ class "warning" ]
+        [ p [ class "warning" ]
             [ text "- Search is still under development -" ]
         , viewInput
             { id = "search-input"
@@ -73,20 +89,12 @@ viewSearchResult food =
         ]
 
 
-viewHeader : Html MealMsg
-viewHeader =
-    div [ id "header" ]
-        [ h1 [] [ text "Food Calculator" ]
-        , p [] [ text "Calculate the calories, protein, fat and carbs of your food." ]
-        ]
-
-
 viewCalculator : ModelMealCalculator -> Html MealMsg
 viewCalculator model =
     div [ id "main" ]
         [ section [ id "add-food-form" ]
             [ h2 [] [ text "Add Food" ]
-            , viewInputs model.inputs <| result model.currentMealCalculator
+            , viewManualInputs model
             ]
         , section [ id "food-list" ]
             [ h2 [] [ text "Food" ]
@@ -109,9 +117,43 @@ viewCalculator model =
 --         ]
 
 
-viewInputs : MealInputs -> MC.MCResult -> Html MealMsg
-viewInputs i res =
+viewInputsExtras : ModelMealCalculator -> MC.MCResult -> Html MealMsg
+viewInputsExtras model res =
     let
+        i =
+            model.inputs
+
+        inputsOthers =
+            [ { id = "portions"
+              , label = "Portions"
+              , placeholder = "number of portions"
+              , value = i.portions
+              , onInput = InputChanged Portions
+              , valid = validInput Portions i.portions
+              , type_ = "number"
+              , subtext = Nothing
+              }
+            , { id = "cookedWeight"
+              , label = "Cooked Weight"
+              , placeholder = String.fromInt res.total.weight ++ "g"
+              , value = i.cookedWeight
+              , onInput = InputChanged CookedWeight
+              , valid = validInput CookedWeight i.cookedWeight
+              , type_ = "text"
+              , subtext = Nothing
+              }
+            ]
+    in
+    div [ class "inputs-wrapper" ] <|
+        List.map viewInput inputsOthers
+
+
+viewManualInputs : ModelMealCalculator -> Html MealMsg
+viewManualInputs model =
+    let
+        i =
+            model.inputs
+
         inputsAdd =
             [ { id = "name"
               , label = "Namn"
@@ -168,34 +210,14 @@ viewInputs i res =
               , subtext = Nothing
               }
             ]
-
-        inputsOthers =
-            [ { id = "portions"
-              , label = "Portions"
-              , placeholder = "number of portions"
-              , value = i.portions
-              , onInput = InputChanged Portions
-              , valid = validInput Portions i.portions
-              , type_ = "number"
-              , subtext = Nothing
-              }
-            , { id = "cookedWeight"
-              , label = "Cooked Weight"
-              , placeholder = String.fromInt res.total.weight ++ "g"
-              , value = i.cookedWeight
-              , onInput = InputChanged CookedWeight
-              , valid = validInput CookedWeight i.cookedWeight
-              , type_ = "text"
-              , subtext = Nothing
-              }
-            ]
     in
     div []
-        [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
-            List.map viewInput inputsAdd
-                ++ viewSubmit (not <| validAddInputs i)
-        , div [ class "inputs-wrapper" ] <|
-            List.map viewInput inputsOthers
+        [ button [ onClick ToggleAddManual ] [ text "add manualy" ]
+        , div [ classList [ ( "addManual", True ), ( "addManual--open", model.addManual == Open ) ] ]
+            [ form [ onSubmit AddFood, class "inputs-wrapper" ] <|
+                List.map viewInput inputsAdd
+                    ++ viewSubmit (not <| validAddInputs i)
+            ]
         ]
 
 
@@ -256,7 +278,7 @@ sanityCheckString i =
 
 viewFoods : List MC.Food -> Maybe MealEdit -> Html MealMsg
 viewFoods fs edit =
-    table []
+    table [ class "foodsTable" ]
         [ thead []
             [ tr []
                 [ th [] [ text "Name" ]

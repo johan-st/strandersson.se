@@ -37,6 +37,7 @@ type MealMsg
     | EditFoodDone Bool
     | SearchInput String
     | AddFoodFromSearch Livsmedel
+    | ToggleAddManual
 
 
 mealMap : MealMsg -> Msg

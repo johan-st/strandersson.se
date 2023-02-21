@@ -217,7 +217,7 @@ updateMeal msg model =
             ( newModel, localStorageSet <| MC.encoder newModel.currentMealCalculator )
 
         SearchInput str ->
-            ( { model | search = str, searchResults = filter str model.foodData }, Cmd.none )
+            ( { model | searchTerm = str, searchResults = filter str model.foodData }, Cmd.none )
 
         AddFoodFromSearch livsmedel ->
             let
@@ -233,9 +233,19 @@ updateMeal msg model =
                 newModel =
                     { model
                         | currentMealCalculator = MC.add newFood model.currentMealCalculator
+                        , searchTerm = ""
+                        , searchResults = []
                     }
             in
             ( newModel, Cmd.none )
+
+        ToggleAddManual ->
+            case model.addManual of
+                Open ->
+                    ( { model | addManual = Closed }, Cmd.none )
+
+                Closed ->
+                    ( { model | addManual = Open }, Cmd.none )
 
 
 updateFood : MC.MealCalculator -> MC.Food -> InputField -> String -> MC.MealCalculator
