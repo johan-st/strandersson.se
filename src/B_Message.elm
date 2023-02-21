@@ -14,6 +14,8 @@ import Url
 type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url.Url
+      -- menu
+    | ToggleMenu
       -- | TimeChange Time
     | NoOp
     | Meal MealMsg

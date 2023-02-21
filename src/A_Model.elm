@@ -25,8 +25,14 @@ type alias Model =
     { build : String
     , key : Nav.Key
     , route : Route
+    , menuState : MenuState
     , mealCalcModel : ModelMealCalculator
     }
+
+
+type MenuState
+    = Open
+    | Closed
 
 
 

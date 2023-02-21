@@ -4,7 +4,6 @@ import A_Model exposing (..)
 import B_Message exposing (..)
 import Browser exposing (Document)
 import C_Data exposing (..)
-import E_Init exposing (Flags)
 import Html
 import View.Footer as Footer
 import View.Header as Header
