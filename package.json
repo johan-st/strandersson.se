@@ -11,7 +11,8 @@
     "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t strandersson  .  && set BUILD_TIME=",
     "docker:start": "docker run --rm -it -p 80:80 strandersson",
     "docker:tag": "docker tag strandersson registry.digitalocean.com/johan-st/strandersson",
-    "docker:push": "docker push registry.digitalocean.com/johan-st/strandersson"
+    "docker:push": "docker push registry.digitalocean.com/johan-st/strandersson",
+    "deploy:do": "npm run docker:build && npm run docker:tag && npm run docker:push"
   },
   "repository": {
     "type": "git",
