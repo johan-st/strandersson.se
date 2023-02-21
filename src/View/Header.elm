@@ -18,19 +18,40 @@ view model =
                 "Menu"
     in
     div [ id "header" ]
-        [ div [ class "header__logo" ]
-            [ a [ href "/" ] [ text "Strandesson" ]
+        [ div [ class "logo" ]
+            [ a [ href "/", class "logo__link" ] [ text "Strandesson" ]
             ]
-        , div [ class "header__menu-toggle", onClick ToggleMenu ]
+        , div [ class "nav__toggle", onClick ToggleMenu ]
             [ text menuText ]
-        , nav [ classList [ ( "header__nav", True ), ( "header__nav--open", model.menuState == Open ) ] ]
+        , nav
+            [ classList
+                [ ( "nav", True )
+                , ( "nav--open", model.menuState == Open )
+                ]
+            ]
             [ navLink HomeRoute "/" "Home" model
             , navLink MealRoute "/meal" "Meal Calculator" model
-            , navLink NotFoundRoute "/contact" "404" model
+
+            -- , navLink NotFoundRoute "/contact" "404" model
             ]
         ]
 
 
 navLink : Route -> String -> String -> Model -> Html Msg
 navLink route hrefStr name model =
-    a [ classList [ ( "current", model.route == route ) ], href hrefStr ] [ text name ]
+    let
+        textName =
+            if model.route == route then
+                "- " ++ name ++ " -"
+
+            else
+                name
+    in
+    a
+        [ classList
+            [ ( "nav__link", True )
+            , ( "nav__link--current", model.route == route )
+            ]
+        , href hrefStr
+        ]
+        [ text textName ]
