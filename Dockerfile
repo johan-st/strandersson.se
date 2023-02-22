@@ -30,12 +30,8 @@ COPY src ./src
 # test
 RUN npm test
 
-# assign build time to environment variable
-ARG BUILD_TAG 
-ENV BUILD_TAG=${BUILD_TAG:-unknown}
-
 # build
-RUN npm run build:noEnv
+RUN npm run build
 
 # Workaround for issue where static files where not moved on build
 RUN mv ./static/* ./dist/
