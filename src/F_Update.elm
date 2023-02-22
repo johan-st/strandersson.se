@@ -31,7 +31,7 @@ update msg model =
                 Internal url ->
                     ( { model
                         | route = routeParser url
-                        , menuState = Closed
+                        , topNav = Closed
                       }
                     , Nav.pushUrl model.key (Url.toString url)
                     )
@@ -42,18 +42,18 @@ update msg model =
         UrlChanged url ->
             ( { model
                 | route = routeParser url
-                , menuState = Closed
+                , topNav = Closed
               }
             , Cmd.none
             )
 
         ToggleMenu ->
-            case model.menuState of
+            case model.topNav of
                 Open ->
-                    ( { model | menuState = Closed }, Cmd.none )
+                    ( { model | topNav = Closed }, Cmd.none )
 
                 Closed ->
-                    ( { model | menuState = Open }, Cmd.none )
+                    ( { model | topNav = Open }, Cmd.none )
 
         Meal mealMsg ->
             let

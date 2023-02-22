@@ -11,7 +11,7 @@ view : Model -> Html Msg
 view model =
     let
         menuText =
-            if model.menuState == Open then
+            if model.topNav == Open then
                 "Close"
 
             else
@@ -19,14 +19,14 @@ view model =
     in
     div [ id "header" ]
         [ div [ class "logo" ]
-            [ a [ href "/", class "logo__link" ] [ text "Strandesson" ]
+            [ a [ href "/", class "logo__link" ] [ text "Strandersson" ]
             ]
         , div [ class "nav__toggle", onClick ToggleMenu ]
             [ text menuText ]
         , nav
             [ classList
                 [ ( "nav", True )
-                , ( "nav--open", model.menuState == Open )
+                , ( "nav--open", model.topNav == Open )
                 ]
             ]
             [ navLink HomeRoute "/" "Home" model

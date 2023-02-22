@@ -25,7 +25,7 @@ type alias Model =
     { build : String
     , key : Nav.Key
     , route : Route
-    , menuState : MenuState
+    , topNav : MenuState
     , mealCalcModel : ModelMealCalculator
     }
 

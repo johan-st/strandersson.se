@@ -35,6 +35,7 @@ a:active {
 }
 a:focus {
   outline: 0.2em solid var(--col-warning);
+  border: none;
 }
 
 /* ------ */
@@ -117,12 +118,16 @@ a:focus {
   color: var(--col-text-muted);
   display: grid;
   font-size: 0.8rem;
+  line-height: 2;
   text-align: center;
   grid-template:
-    "madeBy madeBy" auto
-    "buldTag source" auto/
+    "madeBy source" 2em
+    "buildTag buildTag" 2em /
     1fr 1fr;
-  padding: 1rem 0.5rem 0.5rem;
+}
+#footer > * {
+  border-top: 1px solid var(--col-text-muted);
+  color: var(--col-text-muted);
 }
 #footer a {
   color: var(--col-accented-muted);
@@ -136,8 +141,7 @@ a:focus {
 }
 
 #footer .buildTag {
-  grid-area: buldTag;
-  color: var(--col-text-muted);
+  grid-area: buildTag;
 }
 
 #footer .sourceCode {
@@ -146,7 +150,7 @@ a:focus {
 @media screen and (min-width: 36rem) {
   #footer {
     grid-template:
-      "buldTag madeBy source" auto/
+      "madeBy buildTag source" 2em/
       1fr 1fr 1fr;
   }
 }

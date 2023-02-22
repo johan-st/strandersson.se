@@ -6,7 +6,7 @@ const nodeEnv = process.env.NODE_ENV;
 // decide what tag to show in the footer
 let build = "";
 if (nodeEnv == "production") {
-    build = "buildt:" + buildTag
+    build = buildTag
 } else {
     build = " <DEV>:" + buildTag
 }
