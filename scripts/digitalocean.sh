@@ -1,5 +1,5 @@
-# echo "BUILDING: strandersson" 
-# docker build --build-arg=BUILD_TAG -t strandersson  .
+echo "BUILDING: strandersson" 
+docker build --build-arg=BUILD_TAG -t strandersson  .
 
 echo "TAGGING: registry.digitalocean.com/johan-st/strandersson"
 docker tag strandersson registry.digitalocean.com/johan-st/strandersson
