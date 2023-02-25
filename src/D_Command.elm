@@ -27,7 +27,7 @@ import Json.Encode
 getLivsmedel : Cmd Msg
 getLivsmedel =
     Http.get
-        { url = "/livsmedelsDB.json"
+        { url = "/LivsmedelsDB.json"
         , expect = Http.expectJson (Meal << GotFoodData) decoderListLivsmedel
         }
 
