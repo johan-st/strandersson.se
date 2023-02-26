@@ -31,7 +31,7 @@ type MealMsg
     = GotFoodData (Result Http.Error (List Livsmedel))
     | InputChanged InputField String
     | AddFood
-    | RemoveFood Int
+    | RemoveFood MC.Food
     | EditFood InputField MC.Food
     | EditFoodInput InputField MC.Food String
     | EditFoodDone Bool

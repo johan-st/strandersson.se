@@ -30,9 +30,8 @@ view : ModelMealCalculator -> Html MealMsg
 view model =
     div [ id "mealCalculator" ]
         [ viewAddFood model
-        , viewFoodList model
-
-        -- , viewResult model
+        , viewFoods (foods model.currentMealCalculator) model.edit
+        , viewResult <| MC.result model.currentMealCalculator
         ]
 
 
@@ -43,14 +42,6 @@ viewAddFood model =
         , viewSearch model.searchResults model.searchTerm
         , viewManualInputs model
         , viewInputsExtras model <| result model.currentMealCalculator
-        ]
-
-
-viewFoodList : ModelMealCalculator -> Html MealMsg
-viewFoodList model =
-    section [ class "foodList" ]
-        [ h2 [] [ text "Food" ]
-        , viewFoods (foods model.currentMealCalculator) model.edit
         ]
 
 
@@ -87,34 +78,6 @@ viewSearchResult food =
         [ text food.namn
         , button [ onClick <| AddFoodFromSearch food ] [ text "Add" ]
         ]
-
-
-viewCalculator : ModelMealCalculator -> Html MealMsg
-viewCalculator model =
-    div [ id "main" ]
-        [ section [ id "add-food-form" ]
-            [ h2 [] [ text "Add Food" ]
-            , viewManualInputs model
-            ]
-        , section [ id "food-list" ]
-            [ h2 [] [ text "Food" ]
-            , viewFoods (foods model.currentMealCalculator) model.edit
-            ]
-        , section [ id "results" ]
-            [ h2 [] [ text "Result" ]
-            , viewResult <| result model.currentMealCalculator
-            ]
-        ]
-
-
-
--- viewFooter : String -> Html MealMsg
--- viewFooter buildTag =
---     div [ id "footer" ]
---         [ a [ href "https://github.com/johan-st/strandersson.se" ] [ text "johan-st@github" ]
---         , div [] [ text buildTag ]
---         , a [ href "https://www.livsmedelsverket.se/" ] [ text "data från livsmedelsverket" ]
---         ]
 
 
 viewInputsExtras : ModelMealCalculator -> MC.MCResult -> Html MealMsg
@@ -278,20 +241,24 @@ sanityCheckString i =
 
 viewFoods : List MC.Food -> Maybe MealEdit -> Html MealMsg
 viewFoods fs edit =
-    table [ class "foodsTable" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Name" ]
-                , th [] [ text "Calories" ]
-                , th [] [ text "Protein" ]
-                , th [] [ text "Fat" ]
-                , th [] [ text "Carbs" ]
-                , th [] [ text "Weight" ]
-                , th [] [ text "Actions" ]
-                ]
+    ul [ class "foodList" ] <|
+        viewFoodListHeader
+            :: List.map (viewFood edit) fs
+
+
+viewFoodListHeader : Html MealMsg
+viewFoodListHeader =
+    li []
+        [ div [ class "foodList__info" ] [ text "Mängd i g. Kalorier i kcal/100g. Övriga i g/100g" ]
+        , div [ class "food food--header" ]
+            [ div [ class "food__name" ] [ text "Namn" ]
+            , div [ class "food__weight" ] [ text "Mängd" ]
+            , div [ class "food__protein" ] [ text "Protein" ]
+            , div [ class "food__fat" ] [ text "Fett" ]
+            , div [ class "food__carbs" ] [ text "Kolhydrater" ]
+            , div [ class "food__calories" ] [ text "Kalorier" ]
+            , div [ class "food__delete" ] [ text "ta bort" ]
             ]
-        , tbody []
-            (List.map (viewFood edit) fs)
         ]
 
 
@@ -311,14 +278,14 @@ viewFood mEdit food =
 
 viewFoodNormal : MC.Food -> Html MealMsg
 viewFoodNormal food =
-    tr []
-        [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-        , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-        , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-        , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-        , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-        , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-        , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
+    li [ class "food" ]
+        [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+        , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+        , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+        , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+        , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+        , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+        , div [ class "food__delete interactable", onClick <| RemoveFood food ] [ text "ta bort" ]
         ]
 
 
@@ -330,89 +297,14 @@ viewFoodEdit food edit =
                 valid =
                     validInput Name edit.value
             in
-            tr []
-                [ td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Name food ] []
-                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
-                ]
-
-        Calories ->
-            let
-                valid =
-                    validInput Calories edit.value
-            in
-            tr []
-                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-                , td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Calories food ] []
-                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
-                ]
-
-        Protein ->
-            let
-                valid =
-                    validInput Protein edit.value
-            in
-            tr []
-                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-                , td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Protein food ] []
-                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
-                ]
-
-        Fat ->
-            let
-                valid =
-                    validInput Fat edit.value
-            in
-            tr []
-                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-                , td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Fat food ] []
-                    , div [ classList [ ( "interactable", valid ), ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
-                ]
-
-        Carbs ->
-            let
-                valid =
-                    validInput Carbs edit.value
-            in
-            tr []
-                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-                , td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Carbs food ] []
-                    , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", onClick <| EditFood Weight food ] [ text (String.fromInt food.weight) ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
+            li [ class "food" ]
+                [ input [ class "food__name", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Name food ] [ text <| food.name ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+                , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+                , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+                , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
                 ]
 
         Weight ->
@@ -420,17 +312,74 @@ viewFoodEdit food edit =
                 valid =
                     validInput Weight edit.value
             in
-            tr []
-                [ td [ class "interactable", onClick <| EditFood Name food ] [ text food.name ]
-                , td [ class "interactable", onClick <| EditFood Calories food ] [ text (String.fromInt food.calories) ]
-                , td [ class "interactable", onClick <| EditFood Protein food ] [ text (String.fromFloat food.protein) ]
-                , td [ class "interactable", onClick <| EditFood Fat food ] [ text (String.fromFloat food.fat) ]
-                , td [ class "interactable", onClick <| EditFood Carbs food ] [ text (String.fromFloat food.carbs) ]
-                , td []
-                    [ input [ classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Weight food ] []
-                    , div [ classList [ ( "interactable", valid ) ], onClick <| EditFoodDone valid ] [ text "done" ]
-                    ]
-                , td [ class "interactable", class "danger", onClick <| RemoveFood food.id ] [ text "remove" ]
+            li [ class "food" ]
+                [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+                , input [ class "food__weight", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Weight food ] [ text <| food.name ]
+                , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+                , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+                , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+                , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
+                ]
+
+        Protein ->
+            let
+                valid =
+                    validInput Protein edit.value
+            in
+            li [ class "food" ]
+                [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , input [ class "food__protein", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Protein food ] [ text <| food.name ]
+                , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+                , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+                , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
+                ]
+
+        Fat ->
+            let
+                valid =
+                    validInput Fat edit.value
+            in
+            li [ class "food" ]
+                [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+                , input [ class "food__fat", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Fat food ] [ text <| food.name ]
+                , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+                , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
+                ]
+
+        Carbs ->
+            let
+                valid =
+                    validInput Carbs edit.value
+            in
+            li [ class "food" ]
+                [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+                , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+                , input [ class "food__carbs", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Carbs food ] [ text <| food.name ]
+                , div [ class "food__calories interactable", onClick <| EditFood Calories food ] [ text <| String.fromInt food.calories ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
+                ]
+
+        Calories ->
+            let
+                valid =
+                    validInput Calories edit.value
+            in
+            li [ class "food" ]
+                [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
+                , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
+                , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
+                , input [ class "food__calories", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Calories food ] [ text <| food.name ]
+                , div [ class "food__done interactable", classList [ ( "valid", valid ) ], onClick <| EditFoodDone valid ] [ text "Klar" ]
                 ]
 
         _ ->

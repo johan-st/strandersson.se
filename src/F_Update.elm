@@ -198,21 +198,17 @@ updateMeal msg model =
             , localStorageSet <| MC.encoder newMC
             )
 
-        EditFoodDone valid ->
-            if valid then
-                ( { model
-                    | edit = Nothing
-                  }
-                , Cmd.none
-                )
+        EditFoodDone _ ->
+            ( { model
+                | edit = Nothing
+              }
+            , Cmd.none
+            )
 
-            else
-                ( model, Cmd.none )
-
-        RemoveFood index ->
+        RemoveFood food ->
             let
                 newModel =
-                    { model | currentMealCalculator = MC.remove index model.currentMealCalculator }
+                    { model | currentMealCalculator = MC.remove food.id model.currentMealCalculator }
             in
             ( newModel, localStorageSet <| MC.encoder newModel.currentMealCalculator )
 

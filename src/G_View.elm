@@ -4,7 +4,8 @@ import A_Model exposing (..)
 import B_Message exposing (..)
 import Browser exposing (Document)
 import C_Data exposing (..)
-import Html
+import Html exposing (div)
+import Html.Attributes exposing (id)
 import View.Footer as Footer
 import View.Header as Header
 import View.Page.Home as PageHome
@@ -42,15 +43,19 @@ docTitle route =
 
 pageViewer : Model -> Html.Html Msg
 pageViewer model =
-    case model.route of
-        HomeRoute ->
-            PageHome.view
+    let
+        viewMain =
+            case model.route of
+                HomeRoute ->
+                    PageHome.view
 
-        MealRoute ->
-            Html.map Meal <| PageMealCalculator.view model.mealCalcModel
+                MealRoute ->
+                    Html.map Meal <| PageMealCalculator.view model.mealCalcModel
 
-        NotFoundRoute ->
-            NotFound404.view
+                NotFoundRoute ->
+                    NotFound404.view
+    in
+    div [ id "main" ] [ viewMain ]
 
 
 
