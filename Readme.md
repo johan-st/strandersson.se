@@ -26,7 +26,7 @@ a tool for myself when cooking. Makes it easier to calculate macros (protein, ca
 
 ## NOTE!
 
-The food data is fetched after load from a json file. This data is from _livsmedelsverket_. To update or rebuild data, fetch the data from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `LivsmedelsDB.csv` and place it in the `dataSource` folder. Now run csvToJson.js (probably like this. `node ./dataSource/csvToJson.js`) to convert the csv to json. This will create the static folder and place the json file in it. Filename is `livsmedelsDB.csv`
+The food data for the search is fetched after load. Technically it is a json-file on the server. This data is from _livsmedelsverket_. To update or rebuild data, fetch the data from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `LivsmedelsDB.csv` and place it in the `dataSource` folder. Now run csvToJson.js (probably like this. `node ./dataSource/csvToJson.js`) to convert the csv to json. This will create the static folder and place the json file in it. Filename is `livsmedelsDB.csv`
 
 
 ## Development Process
@@ -39,7 +39,7 @@ I chose to build this tool in a delightful little language called Elm. It is a f
 
 ### testing
 
-I built the module for the logic, state and encode/decode thereof first. I created tests alongside my efforts to validate my code. After beeing confident I had most basic features in place I built the _Main module_. It is is responsible for the on-page representation o the calculator and for handling input and storing and retrieving state from local storage
+I built the module for the logic, state and encode/decode thereof first. I created tests alongside my efforts to validate my code. After beeing confident I had most basic features in place I built the _Main module_. It was responsible for the on-page representation of the calculator and for handling input and storing and retrieving state from local storage
 
 ## Future
 
@@ -61,6 +61,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - highlight food if kcal estimate missmatch the given value
 - tooltip for kcal estimate
 - Save and restore several meals
+- remove :not() from css
 
 #### Interaction
 
@@ -77,12 +78,9 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 - make input feedback more clear
 - add units to list
-- prettier "remove"
-- find a layout for phone
+- check contrast in colors (e.g. text and text-muted)
 
 #### on-ice
-
-- show percentage for macros per kcal (troublesome)
 
 ---
 
