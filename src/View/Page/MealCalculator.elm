@@ -248,7 +248,7 @@ viewFoods fs edit =
 
 viewFoodListHeader : Html MealMsg
 viewFoodListHeader =
-    li []
+    li [ class "foodList__header" ]
         [ div [ class "foodList__info" ] [ text "Mängd i g. Kalorier i kcal/100g. Övriga i g/100g" ]
         , div [ class "food food--header" ]
             [ div [ class "food__name" ] [ text "Namn" ]
@@ -388,60 +388,56 @@ viewFoodEdit food edit =
 
 viewResult : MC.MCResult -> Html MealMsg
 viewResult res =
+    section [ class "results" ]
+        [ viewPercentages res
+        , viewPartials "per portion" res.portion
+        , viewPartials "totalt" res.total
+        ]
+
+
+viewPercentages : MC.MCResult -> Html MealMsg
+viewPercentages res =
     let
-        estimate =
-            "~ " ++ String.fromInt res.portion.estimatedKcal ++ " kcal (from macros)"
-
-        protPercent =
-            case res.percentByWeight of
-                Just percentByWeight ->
-                    toPercent percentByWeight.protein ++ " %"
-
-                Nothing ->
-                    "N/A"
-
-        fatPercent =
-            case res.percentByWeight of
-                Just percentByWeight ->
-                    toPercent percentByWeight.fat ++ " %"
-
-                Nothing ->
-                    "N/A"
-
-        carbsPercent =
-            case res.percentByWeight of
-                Just percentByWeight ->
-                    toPercent percentByWeight.carbs ++ " %"
-
-                Nothing ->
-                    "N/A"
+        header =
+            h3 [ class "results__header" ] [ text "fördeling i percent" ]
     in
-    table []
-        [ thead []
-            [ tr []
-                [ th [] [ text "Calories" ]
-                , th [] [ text "Protein" ]
-                , th [] [ text "Fat" ]
-                , th [] [ text "Carbs" ]
-                , th [] [ text "Portion Weight" ]
+    case res.percentByWeight of
+        Just percentByWeight ->
+            div [ class "results__percentages" ]
+                [ header
+                , viewLabelAndData "results__percentage" "protein" (toPercent percentByWeight.protein)
+                , viewLabelAndData "results__percentage" "fett" (toPercent percentByWeight.fat)
+                , viewLabelAndData "results__percentage" "kolhydrater" (toPercent percentByWeight.carbs)
                 ]
-            ]
-        , tbody []
-            [ tr []
-                [ td [] [ text <| String.fromInt res.portion.calories ++ " kcal" ]
-                , td [] [ text <| roundToString res.portion.protein ++ " g" ]
-                , td [] [ text <| roundToString res.portion.fat ++ " g" ]
-                , td [] [ text <| roundToString res.portion.carbs ++ " g" ]
-                , td [] [ text <| String.fromInt res.portion.weight ++ " g" ]
+
+        Nothing ->
+            div [ class "results__percentages" ]
+                [ header
+                , viewLabelAndData "results__percentage" "protein" "N/A"
+                , viewLabelAndData "results__percentage" "fett" "N/A"
+                , viewLabelAndData "results__percentage" "kolhydrater" "N/A"
                 ]
-            , tr []
-                [ td [] [ text estimate ]
-                , td [] [ text protPercent ]
-                , td [] [ text fatPercent ]
-                , td [] [ text carbsPercent ]
-                , td [] [ text "-" ]
-                ]
-            ]
+
+
+viewPartials : String -> MC.MCResultPartial -> Html MealMsg
+viewPartials titel portion =
+    div [ class "resultsPartial" ]
+        [ h3 [ class "results__header" ] [ text titel ]
+        , viewLabelAndData "resultsPartial__kcal" "kalorier" (String.fromInt portion.calories ++ " kcal")
+
+        -- , viewLabelAndData "resultsPartial__estimate" "kalorier (uppskattat)" (String.fromInt portion.estimatedKcal ++ " kcal")
+        , viewLabelAndData "resultsPartial__protein" "protein" (roundToString portion.protein ++ " g")
+        , viewLabelAndData "resultsPartial__fat" "fett" (roundToString portion.fat ++ " g")
+        , viewLabelAndData "resultsPartial__carbs" "kolhydrater" (roundToString portion.carbs ++ " g")
+        , viewLabelAndData "resultsPartial__weight" "vikt" (String.fromInt portion.weight ++ " g")
+        ]
+
+
+viewLabelAndData : String -> String -> String -> Html MealMsg
+viewLabelAndData className label data =
+    div [ class className ]
+        [ div [ class "resultsPartial__label" ] [ text label ]
+        , div [ class "resultsPartial__data" ] [ text data ]
         ]
 
 

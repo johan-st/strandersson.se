@@ -208,12 +208,18 @@ a:focus {
   padding-left: 0;
   list-style: none;
   display: grid;
-  grid-template:
-  "info" auto  
-  "header" auto /
-    1fr;
   grid-gap: 1rem;
 }
+#mealCalculator .foodList__header {
+  display: grid;
+  grid-template:
+  "info _" auto
+  "header header" auto /
+  4fr 1.4fr ;
+  text-align: center;
+  gap: 0.2rem;
+}
+
 #mealCalculator .foodList__info {
   grid-area: info;
   color: var(--col-text-muted);
@@ -227,15 +233,27 @@ a:focus {
 #mealCalculator .food {
   display: grid;
   grid-template:
-  "nam nam nam wei delete" auto 
-  "pro fat car cal delete" auto /
-  1fr 1fr 1fr 1fr 1fr;
+  "nam nam nam wei _ delete" auto 
+  "pro fat car cal _ delete" auto /
+  1fr 1fr 1fr 1fr .4fr 1fr;
   text-align: center;
   gap: 0.2rem;
+}
+#mealCalculator .food>input {
+  /* unsure why 6 px was te magic number */
+  width: calc(100% - 6px);
 }
 #mealCalculator .food>* {
   border: 1px solid var(--col-text-muted);
 }
+#mealCalculator .food:hover:not(.food--header) > * {
+  border-color: var(--col-accented-muted);
+}
+#mealCalculator .food:not(.food--header)>*:hover {
+  border-color: var(--col-accented);
+  color: var(--col-accented);
+}
+
 #mealCalculator .food>input{
   color: var(--col-warning);
   background-color: var(--col-warning-bg);
@@ -263,6 +281,14 @@ a:focus {
 #mealCalculator .food__carbs {
   grid-area: car;
 }
+
+/* #mealCalculator .food__protein,
+#mealCalculator .food__fat,
+#mealCalculator .food__carbs,
+#mealCalculator .food__calories
+{
+  color: var(--col-text-muted);
+} */
 #mealCalculator .food__delete, 
 #mealCalculator .food__done {
   grid-area: delete;
@@ -270,8 +296,9 @@ a:focus {
   place-items: center;
   color: var(--col-warning);
 }
+
 #mealCalculator .food--header .food__delete {
- color: var(--col-text-muted);
+  color: var(--col-text-muted);
 }
 #mealCalculator .food__done {
   color: var(--col-accented-muted);
@@ -280,6 +307,70 @@ a:focus {
   color: var(--col-valid);
 }
 
-#mealCalculator .food__delete:hover {
+#mealCalculator .food:not(.food--header) .food__delete:hover {
   background-color: var(--col-warning-bg);
 }
+
+
+#mealCalculator .results {
+  grid-area: results;
+  display: grid;
+  gap: 1rem;
+  text-align: center;
+}
+#mealCalculator .results__percentages {
+  display: grid;
+  grid-template:
+  "head head head" auto
+  "prot fat carbs" auto /
+    1fr 1fr 1fr;
+  gap: .2rem;
+}
+#mealCalculator .results__percentages>* {
+  border: 1px solid var(--col-text-muted);
+}
+
+#mealCalculator .resultsPartial {
+  display: grid;
+  grid-template:
+  "head head head" auto
+  "kcal kcal weight" auto 
+  "prot fat carbs" auto /
+    1fr 1fr 1fr;
+  gap: .2rem;
+}
+#mealCalculator .resultsPartial>* {
+  border: 1px solid var(--col-text-muted);
+}
+
+#mealCalculator .results__header {
+  margin: 0;
+  grid-area: head;
+  color: var(--col-text-muted);
+  line-height: 1.5;
+  border: 0;
+  text-decoration: underline;
+}
+#mealCalculator .resultsPartial__label {
+  color: var(--col-text-muted);
+}
+
+#mealCalculator .resultsPartial__kcal {
+  grid-area: kcal;
+}
+#mealCalculator .resultsPartial__estimate {
+  grid-area: esti;
+}
+#mealCalculator .resultsPartial__protein {
+  grid-area: prot;
+}
+#mealCalculator .resultsPartial__fat {
+  grid-area: fat;
+}
+#mealCalculator .resultsPartial__carbs {
+  grid-area: carbs;
+}
+#mealCalculator .resultsPartial__weight {
+  grid-area: weight;
+}
+
