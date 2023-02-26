@@ -233,7 +233,7 @@ updateMeal msg model =
                         , searchResults = []
                     }
             in
-            ( newModel, Cmd.none )
+            ( newModel, localStorageSet <| MC.encoder newModel.currentMealCalculator )
 
         ToggleAddManual ->
             case model.addManual of
