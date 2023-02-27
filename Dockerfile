@@ -5,7 +5,7 @@ FROM debian:bullseye-slim as build
 
 # install node and npm (apt has an old version of node, so we use the node source )
 RUN apt update && apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - 
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - 
 RUN apt install -y nodejs
 # No cleanup nessecary as we are using a multi-stage build
 
