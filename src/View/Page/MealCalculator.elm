@@ -399,7 +399,7 @@ viewPercentages : MC.MCResult -> Html MealMsg
 viewPercentages res =
     let
         header =
-            h3 [ class "results__header" ] [ text "fördeling i percent" ]
+            h3 [ class "results__header" ] [ text "fördeling" ]
     in
     case res.percentByWeight of
         Just percentByWeight ->

@@ -246,11 +246,9 @@ a:focus {
 #mealCalculator .food>* {
   border: 1px solid var(--col-text-muted);
 }
-#mealCalculator .food:hover:not(.food--header) > * {
-  border-color: var(--col-accented-muted);
-}
+
 #mealCalculator .food:not(.food--header)>*:hover {
-  border-color: var(--col-accented);
+  border-color: var(--col-accented-muted);
   color: var(--col-accented);
 }
 
@@ -294,6 +292,11 @@ a:focus {
   grid-area: delete;
   display: grid;
   place-items: center;
+  color: var(--col-warning);
+}
+
+#mealCalculator .food:not(.food--header)>.food__delete:hover {
+  border-color: var(--col-warning);
   color: var(--col-warning);
 }
 
