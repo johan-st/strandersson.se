@@ -54,6 +54,6 @@ COPY nginx/conf.d/ /etc/nginx/conf.d/
 
 # last layer because it's most likely to change.
 # copy build files
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+COPY --from=build /usr/src/app/dist /usr/share/nginx/strandersson.se
 
 
