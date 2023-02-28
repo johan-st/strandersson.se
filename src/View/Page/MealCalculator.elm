@@ -249,7 +249,7 @@ viewFoods fs edit =
 viewFoodListHeader : Html MealMsg
 viewFoodListHeader =
     li [ class "foodList__header" ]
-        [ div [ class "foodList__info" ] [ text "Mängd i g. Kalorier i kcal/100g. Övriga i g/100g" ]
+        [ div [ class "foodList__info" ] [ text "Kalorier i kcal/100g. Övriga i g/100g" ]
         , div [ class "food food--header" ]
             [ div [ class "food__name" ] [ text "Namn" ]
             , div [ class "food__weight" ] [ text "Mängd" ]
@@ -280,7 +280,7 @@ viewFoodNormal : MC.Food -> Html MealMsg
 viewFoodNormal food =
     li [ class "food" ]
         [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
-        , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+        , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
         , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
         , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
         , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
@@ -299,7 +299,7 @@ viewFoodEdit food edit =
             in
             li [ class "food" ]
                 [ input [ class "food__name", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Name food ] [ text <| food.name ]
-                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
                 , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
                 , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
                 , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
@@ -329,7 +329,7 @@ viewFoodEdit food edit =
             in
             li [ class "food" ]
                 [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
-                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
                 , input [ class "food__protein", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Protein food ] [ text <| food.name ]
                 , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
                 , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
@@ -344,7 +344,7 @@ viewFoodEdit food edit =
             in
             li [ class "food" ]
                 [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
-                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
                 , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
                 , input [ class "food__fat", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Fat food ] [ text <| food.name ]
                 , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
@@ -359,7 +359,7 @@ viewFoodEdit food edit =
             in
             li [ class "food" ]
                 [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
-                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
                 , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
                 , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
                 , input [ class "food__carbs", classList [ ( "valid", valid ) ], value edit.value, onInput <| EditFoodInput Carbs food ] [ text <| food.name ]
@@ -374,7 +374,7 @@ viewFoodEdit food edit =
             in
             li [ class "food" ]
                 [ div [ class "food__name interactable", onClick <| EditFood Name food ] [ text <| food.name ]
-                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ]
+                , div [ class "food__weight interactable", onClick <| EditFood Weight food ] [ text <| String.fromInt food.weight ++ " g" ]
                 , div [ class "food__protein interactable", onClick <| EditFood Protein food ] [ text <| String.fromFloat food.protein ]
                 , div [ class "food__fat interactable", onClick <| EditFood Fat food ] [ text <| String.fromFloat food.fat ]
                 , div [ class "food__carbs interactable", onClick <| EditFood Carbs food ] [ text <| String.fromFloat food.carbs ]
@@ -390,8 +390,8 @@ viewResult : MC.MCResult -> Html MealMsg
 viewResult res =
     section [ class "results" ]
         [ viewPercentages res
-        , viewPartials "per portion" res.portion
-        , viewPartials "totalt" res.total
+        , viewPartials "per portion" "resultsPartial resultsPartial--portion" res.portion
+        , viewPartials "totalt" "resultsPartial resultsPartial--total" res.total
         ]
 
 
@@ -419,9 +419,9 @@ viewPercentages res =
                 ]
 
 
-viewPartials : String -> MC.MCResultPartial -> Html MealMsg
-viewPartials titel portion =
-    div [ class "resultsPartial" ]
+viewPartials : String -> String -> MC.MCResultPartial -> Html MealMsg
+viewPartials titel additionalClass portion =
+    div [ class additionalClass ]
         [ h3 [ class "results__header" ] [ text titel ]
         , viewLabelAndData "resultsPartial__kcal" "kalorier" (String.fromInt portion.calories ++ " kcal")
 

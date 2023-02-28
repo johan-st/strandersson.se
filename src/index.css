@@ -207,9 +207,8 @@ a:focus {
   grid-area: foodList;
   padding-left: 0;
   list-style: none;
-  display: grid;
-  grid-gap: 1rem;
 }
+
 #mealCalculator .foodList__header {
   display: grid;
   grid-template:
@@ -238,6 +237,7 @@ a:focus {
   1fr 1fr 1fr 1fr .4fr 1fr;
   text-align: center;
   gap: 0.2rem;
+  margin-bottom:1rem;
 }
 #mealCalculator .food>input {
   /* unsure why 6 px was te magic number */
@@ -245,12 +245,12 @@ a:focus {
 }
 #mealCalculator .food>* {
   border: 1px solid var(--col-text-muted);
+  display: grid;
+  place-items: center;
+  min-height: 1.5rem;
+  white-space: nowrap;
 }
 
-#mealCalculator .food:not(.food--header)>*:hover {
-  border-color: var(--col-accented-muted);
-  color: var(--col-accented);
-}
 
 #mealCalculator .food>input{
   color: var(--col-warning);
@@ -261,12 +261,19 @@ a:focus {
   background-color: var(--col-valid-bg);
 }
 
-#mealCalculator .food__name {
+#mealCalculator  .food__name {
   grid-area: nam;
+  min-height: 2rem;
+  white-space: normal;
+}
+#mealCalculator .food:not(.food--header) .food__name ,
+#mealCalculator .food:not(.food--header) .food__weight {
+  font-weight: 700;
 }
 #mealCalculator .food__weight {
   grid-area: wei;
 }
+
 #mealCalculator .food__calories {
   grid-area: cal;
 }
@@ -280,13 +287,6 @@ a:focus {
   grid-area: car;
 }
 
-/* #mealCalculator .food__protein,
-#mealCalculator .food__fat,
-#mealCalculator .food__carbs,
-#mealCalculator .food__calories
-{
-  color: var(--col-text-muted);
-} */
 #mealCalculator .food__delete, 
 #mealCalculator .food__done {
   grid-area: delete;
@@ -295,6 +295,16 @@ a:focus {
   color: var(--col-warning);
 }
 
+#mealCalculator .food__done {
+  color: var(--col-accented-muted);
+}
+#mealCalculator .food__done.valid {
+  color: var(--col-valid);
+}
+#mealCalculator .food:not(.food--header)>*:hover {
+  border-color: var(--col-accented-muted);
+  color: var(--col-accented);
+}
 #mealCalculator .food:not(.food--header)>.food__delete:hover {
   border-color: var(--col-warning);
   color: var(--col-warning);
@@ -302,12 +312,6 @@ a:focus {
 
 #mealCalculator .food--header .food__delete {
   color: var(--col-text-muted);
-}
-#mealCalculator .food__done {
-  color: var(--col-accented-muted);
-}
-#mealCalculator .food__done.valid {
-  color: var(--col-valid);
 }
 
 #mealCalculator .food:not(.food--header) .food__delete:hover {
@@ -317,11 +321,17 @@ a:focus {
 
 #mealCalculator .results {
   grid-area: results;
-  display: grid;
-  gap: 1rem;
   text-align: center;
+  display: grid;
+  grid-template:
+  "prec" auto
+  "port" auto
+  "total" auto/
+    1fr;
+    place-content: end;
 }
 #mealCalculator .results__percentages {
+  grid-area: prec;
   display: grid;
   grid-template:
   "head head head" auto
@@ -342,6 +352,13 @@ a:focus {
     1fr 1fr 1fr;
   gap: .2rem;
 }
+#mealCalculator .resultsPartial--portions {
+  grid-area: port;
+}
+#mealCalculator .resultsPartial--total {
+  grid-area: total;
+}
+
 #mealCalculator .resultsPartial>* {
   border: 1px solid var(--col-text-muted);
 }
@@ -357,7 +374,6 @@ a:focus {
 #mealCalculator .resultsPartial__label {
   color: var(--col-text-muted);
 }
-
 #mealCalculator .resultsPartial__kcal {
   grid-area: kcal;
 }
@@ -377,3 +393,43 @@ a:focus {
   grid-area: weight;
 }
 
+/* mediaquery for larger screens */
+@media screen and (min-width: 35rem) {
+  #mealCalculator {
+    max-width: 60em;
+    width: 100%;
+    grid-template:
+      "addFood results" auto
+      "foodList foodList" auto /
+      1fr 1fr;
+  }
+  #mealCalculator .foodList__header {
+    grid-template:
+    "info _" auto
+    "header header" auto /
+    10fr 1.4fr ;
+  }
+  #mealCalculator .food {
+    display: grid;
+    grid-template:
+    "nam pro fat car cal wei _ delete" auto /
+    4fr 1fr 1fr 1fr 1fr 1fr .4fr 1fr;
+    text-align: center;
+    gap: 0.2rem;
+    margin-bottom:1rem;
+  }
+  #mealCalculator  .food__name {
+    min-height: auto;
+  }
+  #mealCalculator .results {
+    grid-area: results;
+    text-align: center;
+    display: grid;
+    grid-template:
+    "total" auto
+    "port" auto
+    "prec" auto /
+      1fr;
+  }
+  
+}
