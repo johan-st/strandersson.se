@@ -56,12 +56,15 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 #### Bugs
 
+#### Code
+- remove :not() from css
+- set max-width on #main instead of child components
+
 #### Features
 
 - highlight food if kcal estimate missmatch the given value
 - tooltip for kcal estimate
 - Save and restore several meals
-- remove :not() from css
 
 #### Interaction
 
