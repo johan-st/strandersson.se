@@ -1,17 +1,38 @@
 :root {
-  --col-accented-muted: #4787a8;
+  --col-primary: #b5b5b5;
+  --col-primary-muted: #666;
+  --col-primary-bg: #333;
   --col-accented: #fdfeff;
-  --col-warning: #fa3b00;
-  --col-warning-bg: #441000;
-  --col-background: #333;
-  --col-text: #b5b5b5;
-  --col-text-muted: #666;
+  --col-accented-muted: #4787a8;
+  --col-accented-bg: #004763;
+  --col-warn: #fa3b00;
+  --col-warn-bg: #441000;
   --col-valid: #9f9;
   --col-valid-bg: #040;
+  --border-width: 1px;
+  --border-radius: .2rem;
 }
+
+@media screen and (prefers-color-scheme: light) {
+  :root {
+    --col-primary: #1b1b1b;
+    --col-primary-muted: #aaa;
+    --col-primary-bg: #fff;
+    --col-accented: #3888d3;
+    --col-accented-muted: #99ccfc;
+    --col-accented-bg: #e4f1ff;
+    --col-warn: #fa5d29;
+    --col-warn-bg: #fff2ee;
+    --col-valid: #005300;
+    --col-valid-bg: #eaffe3;
+    --border-width: 1px;
+    --border-radius: 0.2rem;
+   }
+}
+
 html {
-  color: var(--col-text);
-  background-color: var(--col-background);
+  color: var(--col-primary);
+  background-color: var(--col-primary-bg);
   font-size: 100%;
   font-family: "Roboto", sans-serif;
 }
@@ -32,16 +53,11 @@ a {
 a:hover {
   text-decoration: underline;
 }
-a:active {
-  color: var(--col-warning);
-}
-a:focus {
-  outline: 0.2em solid var(--col-warning);
-  border: none;
-}
+
 .warning {
-  color: var(--col-warning);
+  color: var(--col-warn);
 }
+
 .interactable {
   cursor: pointer;
 }
@@ -55,7 +71,7 @@ a:focus {
 
 #header .logo {
   height: 3rem;
-  background-color: var(--col-accented-muted);
+  background-color: var(--col-accented-bg);
 }
 
 #header .logo__link {
@@ -73,7 +89,7 @@ a:focus {
   height: 5rem;
   cursor: pointer;
   color: var(--col-accented);
-  background-color: var(--col-background);
+  background-color: var(--col-accented-bg);
   border: 0.2em solid var(--col-accented-muted);
   border-radius: 50%;
   place-items: center;
@@ -101,18 +117,18 @@ a:focus {
   text-align: center;
   font-size: 1.5rem;
   border: 0.2em solid var(--col-accented-muted);
-  border-radius: 0.5em;
+  border-radius: var(--border-radius);
   padding: 0.5rem;
 }
 
 #header .nav__link:active {
-  color: var(--col-warning);
-  border-color: var(--col-warning);
+  color: var(--col-warn);
+  border-color: var(--col-warn);
 }
 
 #header .nav__link--current {
-  color: var(--col-text-muted);
-  border-color: var(--col-text-muted);
+  color: var(--col-primary-muted);
+  border-color: var(--col-primary-muted);
   cursor: default;
 }
 
@@ -132,7 +148,7 @@ a:focus {
 
 #footer {
   margin-top: auto;
-  color: var(--col-text-muted);
+  color: var(--col-primary-muted);
   display: grid;
   font-size: 0.8rem;
   line-height: 2;
@@ -143,8 +159,8 @@ a:focus {
     1fr 1fr;
 }
 #footer > * {
-  border-top: 1px solid var(--col-text-muted);
-  color: var(--col-text-muted);
+  border-top: 1px solid var(--col-primary-muted);
+  color: var(--col-primary-muted);
 }
 #footer a {
   color: var(--col-accented-muted);
@@ -211,14 +227,14 @@ a:focus {
 
 #mealCalculator .food > .food__info {
   grid-area: inf;
-  color: var(--col-text-muted);
+  color: var(--col-primary-muted);
   font-size: .8rem;
   place-items: end;
   border: none;
 }
 
-#mealCalculator .food.food--header {
-  color: var(--col-text-muted);
+#mealCalculator .food.food__header {
+  color: var(--col-primary-muted);
   display: grid;
   grid-template:
   "inf inf inf inf _ __" auto 
@@ -244,7 +260,8 @@ a:focus {
   width: calc(100% - 6px);
 }
 #mealCalculator .food>* {
-  border: 1px solid var(--col-text-muted);
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
   display: grid;
   place-items: center;
   min-height: 1.5rem;
@@ -253,8 +270,8 @@ a:focus {
 
 
 #mealCalculator .food>input{
-  color: var(--col-warning);
-  background-color: var(--col-warning-bg);
+  color: var(--col-warn);
+  background-color: var(--col-warn-bg);
 }
 #mealCalculator .food>*.valid {
   color: var(--col-valid);
@@ -291,7 +308,7 @@ a:focus {
   grid-area: delete;
   display: grid;
   place-items: center;
-  color: var(--col-warning);
+  color: var(--col-warn);
 }
 
 #mealCalculator .food__done {
@@ -300,23 +317,20 @@ a:focus {
 #mealCalculator .food__done.valid {
   color: var(--col-valid);
 }
-#mealCalculator .food:not(.food--header)>*:hover {
+#mealCalculator .food:not(.food__header)>*:hover {
   border-color: var(--col-accented-muted);
   color: var(--col-accented);
+  background-color: var(--col-accented-bg);
 }
-#mealCalculator .food:not(.food--header)>.food__delete:hover {
-  border-color: var(--col-warning);
-  color: var(--col-warning);
-}
-
-#mealCalculator .food--header .food__delete {
-  color: var(--col-text-muted);
+#mealCalculator .food:not(.food__header)>.food__delete:hover {
+  border-color: var(--col-warn);
+  color: var(--col-warn);
+  background-color: var(--col-warn-bg);
 }
 
-#mealCalculator .food:not(.food--header) .food__delete:hover {
-  background-color: var(--col-warning-bg);
+#mealCalculator .food__header .food__delete {
+  color: var(--col-primary-muted);
 }
-
 
 #mealCalculator .results {
   grid-area: results;
@@ -339,7 +353,9 @@ a:focus {
   gap: .2rem;
 }
 #mealCalculator .results__percentages>* {
-  border: 1px solid var(--col-text-muted);
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
+
 }
 
 #mealCalculator .resultsPartial {
@@ -359,19 +375,20 @@ a:focus {
 }
 
 #mealCalculator .resultsPartial>* {
-  border: 1px solid var(--col-text-muted);
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
 }
 
 #mealCalculator .results__header {
   margin: 0;
   grid-area: head;
-  color: var(--col-text-muted);
+  color: var(--col-primary-muted);
   line-height: 1.5;
   border: 0;
   text-decoration: underline;
 }
 #mealCalculator .resultsPartial__label {
-  color: var(--col-text-muted);
+  color: var(--col-primary-muted);
 }
 #mealCalculator .resultsPartial__kcal {
   grid-area: kcal;
@@ -402,13 +419,15 @@ a:focus {
       "foodList foodList" auto /
       1fr 1fr;
   }
-  #mealCalculator .foodList__header {
+  #mealCalculator .food.food__header {
+    display: grid;
     grid-template:
-    "info info info info info info _ _" auto
-    "header header header header header header header header" auto /
+    "inf inf inf inf inf inf _ __" auto 
+    "nam pro fat car cal wei _ delete" auto /
     4fr 1fr 1fr 1fr 1fr 1fr .4fr 1fr;
     text-align: center;
-    gap: 0.2rem; 
+    gap: 0.2rem;
+    margin-bottom:1rem;
    }
    
   #mealCalculator .food {
