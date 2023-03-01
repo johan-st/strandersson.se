@@ -267,7 +267,9 @@ a:focus {
   white-space: normal;
   font-weight: 700;
 }
+#mealCalculator .food__weight {
  grid-area: wei;
+  white-space: normal;
   font-weight: 700;
 }
 
