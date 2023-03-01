@@ -65,6 +65,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - highlight food if kcal estimate missmatch the given value
 - tooltip for kcal estimate
 - Save and restore several meals
+- toggle light/dark mode
 
 #### Interaction
 
