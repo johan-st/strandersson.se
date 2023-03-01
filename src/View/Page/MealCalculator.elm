@@ -249,7 +249,7 @@ viewFoods fs edit =
 viewFoodListHeader : Html MealMsg
 viewFoodListHeader =
     li [ class "foodList__header" ]
-        [ div [ class "food food--header" ]
+        [ div [ class "food food__header" ]
             [ div [ class "food__info" ] [ text "Kalorier i kcal/100g. Övriga i g/100g" ]
             , div [ class "food__name" ] [ text "Namn" ]
             , div [ class "food__weight" ] [ text "Mängd" ]
