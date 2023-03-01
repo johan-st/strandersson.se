@@ -209,25 +209,25 @@ a:focus {
   list-style: none;
 }
 
-#mealCalculator .foodList__header {
-  display: grid;
-  grid-template:
-  "info _" auto
-  "header header" auto /
-  4fr 1.4fr ;
-  text-align: center;
-  gap: 0.2rem;
-}
-
-#mealCalculator .foodList__info {
-  grid-area: info;
+#mealCalculator .food > .food__info {
+  grid-area: inf;
   color: var(--col-text-muted);
   font-size: .8rem;
-  text-align: end;
+  place-items: end;
+  border: none;
 }
-#mealCalculator .food--header {
-  grid-area: header;
+
+#mealCalculator .food.food--header {
   color: var(--col-text-muted);
+  display: grid;
+  grid-template:
+  "inf inf inf inf _ __" auto 
+  "nam nam nam wei _ delete" auto 
+  "pro fat car cal _ delete" auto /
+  1fr 1fr 1fr 1fr .4fr 1fr;
+  text-align: center;
+  gap: 0.2rem;
+  margin-bottom:1rem;
 }
 #mealCalculator .food {
   display: grid;
@@ -265,13 +265,10 @@ a:focus {
   grid-area: nam;
   min-height: 2rem;
   white-space: normal;
-}
-#mealCalculator .food:not(.food--header) .food__name ,
-#mealCalculator .food:not(.food--header) .food__weight {
   font-weight: 700;
 }
-#mealCalculator .food__weight {
-  grid-area: wei;
+ grid-area: wei;
+  font-weight: 700;
 }
 
 #mealCalculator .food__calories {
@@ -405,10 +402,13 @@ a:focus {
   }
   #mealCalculator .foodList__header {
     grid-template:
-    "info _" auto
-    "header header" auto /
-    10fr 1.4fr ;
-  }
+    "info info info info info info _ _" auto
+    "header header header header header header header header" auto /
+    4fr 1fr 1fr 1fr 1fr 1fr .4fr 1fr;
+    text-align: center;
+    gap: 0.2rem; 
+   }
+   
   #mealCalculator .food {
     display: grid;
     grid-template:
