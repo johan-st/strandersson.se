@@ -1,0 +1,41 @@
+{
+  "name": "strandersson.se",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "elm-test \"src/**/*Tests.elm\"",
+    "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
+    "start": "set BUILD_TAG=%DATE% %TIME% && parcel && set BUILD_TAG= ",
+    "build": "set BUILD_TAG=%DATE% %TIME% && parcel build --no-source-maps && set BUILD_TAG=",
+    "build:noEnv": "parcel build",
+    "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t johanst/strandersson.se  ../  && set BUILD_TIME=",
+    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johan-st/strandersson.se.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johan-st/strandersson.se/issues"
+  },
+  "homepage": "https://github.com/johan-st/strandersson.se#readme",
+  "devDependencies": {
+    "@parcel/transformer-elm": "^2.8.3",
+    "elm": "^0.19.1-5",
+    "elm-format": "^0.8.5",
+    "elm-test": "^0.19.1-revision11",
+    "parcel": "^2.8.3",
+    "parcel-reporter-static-files-copy": "^1.5.0"
+  },
+  "targets": {
+    "default": {
+      "source": [
+        "src/index.html"
+      ],
+      "distDir": "dist"
+    }
+  }
+}
