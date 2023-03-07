@@ -1,160 +1,456 @@
 :root {
-  --col-accented-muted: #4787a8;
+  --col-primary: #b5b5b5;
+  --col-primary-muted: #666;
+  --col-primary-bg: #333;
   --col-accented: #fdfeff;
+  --col-accented-muted: #4787a8;
+  --col-accented-bg: #004763;
   --col-warn: #fa3b00;
-  --col-background: #333;
-  --col-text: #b5b5b5;
-  --col-valid: #afa;
+  --col-warn-bg: #441000;
+  --col-valid: #9f9;
+  --col-valid-bg: #040;
+  --border-width: 1px;
+  --border-radius: .2rem;
 }
+
+@media screen and (prefers-color-scheme: light) {
+  :root {
+    --col-primary: #1b1b1b;
+    --col-primary-muted: #aaa;
+    --col-primary-bg: #fff;
+    --col-accented: #3888d3;
+    --col-accented-muted: #99ccfc;
+    --col-accented-bg: #e4f1ff;
+    --col-warn: #fa5d29;
+    --col-warn-bg: #fff2ee;
+    --col-valid: #005300;
+    --col-valid-bg: #eaffe3;
+    --border-width: 1px;
+    --border-radius: 0.2rem;
+   }
+}
+
 html {
-  color: var(--col-text);
-  background-color: var(--col-background);
-  font-size: 14px;
+  color: var(--col-primary);
+  background-color: var(--col-primary-bg);
+  font-size: 100%;
   font-family: "Roboto", sans-serif;
 }
-@media (max-width: 540px) {
-  html {
-    max-width: 100%;
-    font-size: 11px;
-  }
-}
-.wrapper {
+
+body {
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding-bottom: 2rem;
-}
-
-input {
-  border: 1px solid var(--col-accented-muted);
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
-}
-
-input.valid {
-  background-color: var(--col-valid);
-}
-
-input {
-  width: 100px;
 }
 
 a {
-  color: var(--col-accented-muted);
-}
-
-a:visited {
-  color: var(--col-accented-muted);
-}
-
-#main,
-#header {
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-.inputs-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.input-wrapper {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-}
-
-label {
-  margin-left: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.subtext {
-  font-size: 0.8em;
-  margin: 0 auto 0.5em;
-}
-
-.submit {
-  margin: 0.5rem auto 1rem auto;
-  width: 200px;
-}
-
-.interactable {
-  cursor: pointer;
-}
-
-/* FOODS & RESULT TABLE */
-#food-list td:hover {
   color: var(--col-accented);
-  border-color: var(--col-accented);
-  border-style: solid;
-}
-#food-list td.danger:hover {
-  color: var(--col-warn);
-  border-color: var(--col-warn);
+  text-decoration: none;
 }
 
-#food-list th:first-child,
-#food-list td:first-child {
-  flex: 2;
-}
-
-#food-list tbody > tr:hover {
-  color: var(--col-accented);
-}
-#food-list tbody tr:hover > td {
-  border-color: var(--col-accented);
-}
-
-table {
-  width: 100%;
-  border: 1px solid var(--col-accented-muted);
-}
-thead > tr {
-  color: var(--col-accented-muted);
-}
-tr {
-  display: flex;
-}
-td {
-  border: 1px dotted var(--col-accented-muted);
-}
-th,
-td {
-  display: block;
-  flex: 1;
-  text-align: center;
-}
-td > input {
-  width: calc(100% - 20px);
-}
-
-/* SEARCH */
-
-#search {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 1rem auto;
+a:hover {
+  text-decoration: underline;
 }
 
 .warning {
   color: var(--col-warn);
 }
-/* FOOTER */
-#footer {
-  color: #555;
-  background-color: #222;
-  justify-content: space-between;
-  line-height: 1.5;
-  display: flex;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+
+.interactable {
+  cursor: pointer;
+}
+/* ------ */
+/* HEADER */
+/* ------ */
+#header {
+  color: var(--col-accented-muted);
+  margin-bottom: 3rem;
 }
 
+#header .logo {
+  height: 3rem;
+  background-color: var(--col-accented-bg);
+}
+
+#header .logo__link {
+  color: var(--col-accented);
+  text-decoration: none;
+  font-size: 1.5em;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+#header .nav__toggle {
+  width: 5rem;
+  height: 5rem;
+  cursor: pointer;
+  color: var(--col-accented);
+  background-color: var(--col-accented-bg);
+  border: 0.2em solid var(--col-accented-muted);
+  border-radius: 50%;
+  place-items: center;
+  transition: all 0.2s ease-in-out;
+  display: grid;
+  margin: 0.5rem 0.5rem -5.4rem auto;
+  font-size: 1.5rem;
+  position: relative;
+  top: -3.3rem;
+  z-index: 1;
+}
+
+#header .nav {
+  display: none;
+  place-items: center;
+  grid-template-rows: 1fr;
+}
+#header .nav--open {
+  display: grid;
+}
+#header .nav__link {
+  color: var(--col-accented-muted);
+  width: 90vw;
+  text-decoration: none;
+  text-align: center;
+  font-size: 1.5rem;
+  border: 0.2em solid var(--col-accented-muted);
+  border-radius: var(--border-radius);
+  padding: 0.5rem;
+}
+
+#header .nav__link:active {
+  color: var(--col-warn);
+  border-color: var(--col-warn);
+}
+
+#header .nav__link--current {
+  color: var(--col-primary-muted);
+  border-color: var(--col-primary-muted);
+  cursor: default;
+}
+
+/* ---- */
+/* MAIN */
+/* ---- */
+#main{
+  overflow: hidden;
+  width: 95vw;
+  margin: 0 auto 5em;
+}
+
+
+/* ------ */
+/* FOOTER */
+/* ------ */
+
+#footer {
+  margin-top: auto;
+  color: var(--col-primary-muted);
+  display: grid;
+  font-size: 0.8rem;
+  line-height: 2;
+  text-align: center;
+  grid-template:
+    "madeBy source" 2em
+    "buildTag buildTag" 2em /
+    1fr 1fr;
+}
 #footer > * {
-  padding: 0 1rem;
+  border-top: 1px solid var(--col-primary-muted);
+  color: var(--col-primary-muted);
+}
+#footer a {
+  color: var(--col-accented-muted);
+}
+#footer p {
+  margin: 0;
+}
+
+#footer .madeBy {
+  grid-area: madeBy;
+}
+
+#footer .buildTag {
+  grid-area: buildTag;
+}
+
+#footer .sourceCode {
+  grid-area: source;
+}
+@media screen and (min-width: 36rem) {
+  #footer {
+    grid-template:
+      "madeBy buildTag source" 2em/
+      1fr 1fr 1fr;
+  }
+}
+
+/* --------------- */
+/* MEAL CALCULATOR */
+/* --------------- */
+
+#mealCalculator {
+  display: grid;
+  margin: 0 auto;
+  max-width: 95vw;
+  width: 100%;
+  grid-template:
+    "addFood" auto
+    "foodList" auto
+    "results" auto/
+    1fr;
+
+  grid-gap: 1rem;
+}
+
+#mealCalculator .addFood {
+  grid-area: addFood;
+  display: grid;
+}
+
+#mealCalculator .addManual {
+  display: none;
+}
+
+#mealCalculator .addManual--open {
+  display: grid;
+}
+
+#mealCalculator .foodList {
+  grid-area: foodList;
+  padding-left: 0;
+  list-style: none;
+}
+
+#mealCalculator .food > .food__info {
+  grid-area: inf;
+  color: var(--col-primary-muted);
+  font-size: .8rem;
+  place-items: end;
+  border: none;
+}
+
+#mealCalculator .food.food__header {
+  color: var(--col-primary-muted);
+  display: grid;
+  grid-template:
+  "inf inf inf inf _ __" auto 
+  "nam nam nam wei _ delete" auto 
+  "pro fat car cal _ delete" auto /
+  1fr 1fr 1fr 1fr .4fr 1fr;
+  text-align: center;
+  gap: 0.2rem;
+  margin-bottom:1rem;
+}
+#mealCalculator .food {
+  display: grid;
+  grid-template:
+  "nam nam nam wei _ delete" auto 
+  "pro fat car cal _ delete" auto /
+  1fr 1fr 1fr 1fr .4fr 1fr;
+  text-align: center;
+  gap: 0.2rem;
+  margin-bottom:1rem;
+}
+#mealCalculator .food>input {
+  /* unsure why 6 px was te magic number */
+  width: calc(100% - 6px);
+}
+#mealCalculator .food>* {
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
+  display: grid;
+  place-items: center;
+  min-height: 1.5rem;
+  white-space: nowrap;
+}
+
+
+#mealCalculator .food>input{
+  color: var(--col-warn);
+  background-color: var(--col-warn-bg);
+}
+#mealCalculator .food>*.valid {
+  color: var(--col-valid);
+  background-color: var(--col-valid-bg);
+}
+
+#mealCalculator  .food__name {
+  grid-area: nam;
+  min-height: 2rem;
+  white-space: normal;
+  font-weight: 700;
+}
+#mealCalculator .food__weight {
+ grid-area: wei;
+  white-space: normal;
+  font-weight: 700;
+}
+
+#mealCalculator .food__calories {
+  grid-area: cal;
+}
+#mealCalculator .food__protein {
+  grid-area: pro;
+}
+#mealCalculator .food__fat {
+  grid-area: fat;
+}
+#mealCalculator .food__carbs {
+  grid-area: car;
+}
+
+#mealCalculator .food__delete, 
+#mealCalculator .food__done {
+  grid-area: delete;
+  display: grid;
+  place-items: center;
+  color: var(--col-warn);
+}
+
+#mealCalculator .food__done {
+  color: var(--col-accented-muted);
+}
+#mealCalculator .food__done.valid {
+  color: var(--col-valid);
+}
+#mealCalculator .food:not(.food__header)>*:hover {
+  border-color: var(--col-accented-muted);
+  color: var(--col-accented);
+  background-color: var(--col-accented-bg);
+}
+#mealCalculator .food:not(.food__header)>.food__delete:hover {
+  border-color: var(--col-warn);
+  color: var(--col-warn);
+  background-color: var(--col-warn-bg);
+}
+
+#mealCalculator .food__header .food__delete {
+  color: var(--col-primary-muted);
+}
+
+#mealCalculator .results {
+  grid-area: results;
+  text-align: center;
+  display: grid;
+  grid-template:
+  "prec" auto
+  "port" auto
+  "total" auto/
+    1fr;
+    place-content: end;
+}
+#mealCalculator .results__percentages {
+  grid-area: prec;
+  display: grid;
+  grid-template:
+  "head head head" auto
+  "prot fat carbs" auto /
+    1fr 1fr 1fr;
+  gap: .2rem;
+}
+#mealCalculator .results__percentages>* {
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
+
+}
+
+#mealCalculator .resultsPartial {
+  display: grid;
+  grid-template:
+  "head head head" auto
+  "kcal kcal weight" auto 
+  "prot fat carbs" auto /
+    1fr 1fr 1fr;
+  gap: .2rem;
+}
+#mealCalculator .resultsPartial--portions {
+  grid-area: port;
+}
+#mealCalculator .resultsPartial--total {
+  grid-area: total;
+}
+
+#mealCalculator .resultsPartial>* {
+  border: var(--border-width) solid var(--col-primary-muted);
+  border-radius: var(--border-radius);
+}
+
+#mealCalculator .results__header {
+  margin: 0;
+  grid-area: head;
+  color: var(--col-primary-muted);
+  line-height: 1.5;
+  border: 0;
+  text-decoration: underline;
+}
+#mealCalculator .resultsPartial__label {
+  color: var(--col-primary-muted);
+}
+#mealCalculator .resultsPartial__kcal {
+  grid-area: kcal;
+}
+#mealCalculator .resultsPartial__estimate {
+  grid-area: esti;
+}
+#mealCalculator .resultsPartial__protein {
+  grid-area: prot;
+}
+#mealCalculator .resultsPartial__fat {
+  grid-area: fat;
+}
+#mealCalculator .resultsPartial__carbs {
+  grid-area: carbs;
+}
+#mealCalculator .resultsPartial__weight {
+  grid-area: weight;
+}
+
+/* mediaquery for larger screens */
+@media screen and (min-width: 35rem) {
+  #mealCalculator {
+    max-width: 60em;
+    width: 100%;
+    grid-template:
+      "addFood results" auto
+      "foodList foodList" auto /
+      1fr 1fr;
+  }
+  #mealCalculator .food.food__header {
+    display: grid;
+    grid-template:
+    "inf inf inf inf inf inf _ __" auto 
+    "nam pro fat car cal wei _ delete" auto /
+    4fr 1fr 1fr 1fr 1fr 1fr .4fr 1fr;
+    text-align: center;
+    gap: 0.2rem;
+    margin-bottom:1rem;
+   }
+   
+  #mealCalculator .food {
+    display: grid;
+    grid-template:
+    "nam pro fat car cal wei _ delete" auto /
+    4fr 1fr 1fr 1fr 1fr 1fr .4fr 1fr;
+    text-align: center;
+    gap: 0.2rem;
+    margin-bottom:1rem;
+  }
+  #mealCalculator  .food__name {
+    min-height: auto;
+  }
+  #mealCalculator .results {
+    grid-area: results;
+    text-align: center;
+    display: grid;
+    grid-template:
+    "total" auto
+    "port" auto
+    "prec" auto /
+      1fr;
+  }
+  
 }

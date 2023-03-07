@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const filename = 'livsmedelsDB.csv'
+const filename = 'LivsmedelsDB.csv'
 
 const data = fs.readFileSync(path.join(__dirname, filename), 'utf8');
 
@@ -14,6 +14,11 @@ if (data.indexOf('\r\n') > -1) {
 } else {
     lines = data.split('\n')
 }
+
+// get first field of first line (version of database)
+let version = lines[0].split(';')[0]
+// trim special chatacters and non-space whitespace
+version = version.replace(/[\u200B-\u200D\uFEFF]/g, '').trim()
 
 // split into columns
 let columns = []
@@ -44,14 +49,15 @@ for (let i = 0; i < columns.length; i++) {
     livsmedel.push(obj)
 }
 
-const json = { version: 1, livsmedel: livsmedel }
+const json = {
+    version: 2,
+    source: version,
+    livsmedel: livsmedel
+}
+
 // create folders if they doesn't exist
 if (!fs.existsSync(path.join(__dirname, '../static'))) {
     fs.mkdirSync(path.join(__dirname, '../static'));
-    // if (!fs.existsSync(path.join(__dirname, '../static/data'))) {
-    // fs.mkdirSync(path.join(__dirname, '../static/data'));
-    // }
 }
 // save json
-fs.writeFileSync(path.join(__dirname, '../static/livsmedelsDB.json'), JSON.stringify(json, null, 2), 'utf8')
-// fs.writeFileSync(path.join(__dirname, '../static/data/livsmedelsDB.json'), JSON.stringify(json, null, 2), 'utf8')
+fs.writeFileSync(path.join(__dirname, '../static/LivsmedelsDB.json'), JSON.stringify(json, null, 0), 'utf8')

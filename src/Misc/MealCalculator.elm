@@ -1,6 +1,7 @@
 module Misc.MealCalculator exposing
     ( Food
     , MCResult
+    , MCResultPartial
     , MealCalculator(..)
     , NewFood
     , add

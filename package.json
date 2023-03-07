@@ -5,11 +5,11 @@
   "scripts": {
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
-    "start": "set BUILD_TAG=%DATE% %TIME% && parcel && set BUILD_TAG= ",
-    "build": "set BUILD_TAG=%DATE% %TIME% && parcel build --no-source-maps && set BUILD_TAG=",
-    "build:noEnv": "parcel build",
-    "docker:build": "set BUILD_TAG=%DATE% %TIME% && docker build --build-arg=BUILD_TAG -t johanst/strandersson.se  ../  && set BUILD_TIME=",
-    "docker:run": "docker run --rm -it -p 80:80 johanst/strandersson.se"
+    "start": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel ",
+    "build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel build --no-source-maps",
+    "docker:build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') docker build --build-arg=BUILD_TAG -t strandersson .",
+    "docker:start": "docker run --rm -it -p 80:80 strandersson",
+    "deploy:latest": "./scripts/digitalocean.sh"
   },
   "repository": {
     "type": "git",
