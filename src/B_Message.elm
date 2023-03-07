@@ -11,28 +11,16 @@ import Url
 -- import Time exposing (Time)
 
 
-type Route
-    = HomeRoute
-    | MealRoute
-    | NotFoundRoute
-
-
 type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url.Url
       -- menu
     | ToggleMenu
       -- | TimeChange Time
-      -- router
-    | NavigateTo Route
-      -- home
-    | Home HomeMsg
-      -- meal
+    | NoOp
     | Meal MealMsg
-
-
-type HomeMsg
-    = NoOp
+      -- 404
+    | NotFound Never
 
 
 

@@ -36,15 +36,10 @@ html {
   font-size: 100%;
   font-family: "Roboto", sans-serif;
 }
-@media (max-width: 540px) {
-  html {
-    max-width: 100%;
-    font-size: 11px;
-  }
-}
-.wrapper {
-  display: flex;
-  flex-direction: column;
+
+body {
+  padding: 0;
+  margin: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
