@@ -11,7 +11,6 @@ import B_Message exposing (..)
 import Browser.Navigation as Nav
 import C_Data exposing (..)
 import D_Command exposing (getLivsmedel)
-import F_Update exposing (..)
 import Html exposing (..)
 import Json.Decode as D
 import Json.Encode
@@ -20,12 +19,35 @@ import Url
 
 
 
+-- import Navigation exposing (Location)
+-- import UrlParser as Url exposing ((</>))
 ---------------------------------------------------
 -- This is where we hard-code stuff like routes,
 -- init states, etc.
 -- As we may need to run a 'Cmd' inside an 'init'
 -- we populate this stage last.
 ---------------------------------------------------
+--
+--
+--------------------------
+-- routes & reverse routes
+--------------------------
+-- routeParser : Url.Parser (Route -> a) a
+-- routeParser =
+--     Url.oneOf
+--         [ Url.map HomeRoute Url.top
+--         , Url.map SettingsRoute (Url.s "settings")
+--         , Url.map DonutsRoute (Url.s "donuts")
+--         ]
+-- reverseRoute : Route -> String
+-- reverseRoute route =
+--     case route of
+--         SettingsRoute ->
+--             "#/settings"
+--         DonutsRoute ->
+--             "#/donuts"
+--         _ ->
+--             "#/"
 ------------------
 -- init
 ------------------
@@ -38,16 +60,18 @@ type alias Flags =
 
 
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
+init flags _ _ =
     let
         fcNull =
             D.decodeValue (D.null True) flags.foodCalculator
 
         cmd =
             getLivsmedel
+
+        -- cmd = Cmd.batch [ getLivsmedel ]
     in
     if fcNull == Ok True then
-        initBlank flags url key cmd
+        initBlank flags cmd
 
     else
         let
@@ -56,7 +80,7 @@ init flags url key =
         in
         case fcRes of
             Err _ ->
-                initBlank flags url key cmd
+                initBlank flags cmd
 
             Ok mc ->
                 ( { build = flags.build
@@ -78,8 +102,8 @@ init flags url key =
                 )
 
 
-initBlank : Flags -> Url.Url -> Nav.Key -> Cmd Msg -> ( Model, Cmd Msg )
-initBlank flags url key cmd =
+initBlank : Flags -> Cmd Msg -> ( Model, Cmd Msg )
+initBlank flags cmd =
     ( { build = flags.build
       , key = key
       , route = routeParser url
@@ -99,7 +123,7 @@ initBlank flags url key cmd =
     )
 
 
-initMealcalculatorInputs : MealCalculator -> MealInputs
+initMealcalculatorInputs : MealCalculator -> Inputs
 initMealcalculatorInputs mc =
     let
         cookedWeightLocal =

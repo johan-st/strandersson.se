@@ -1,14 +1,11 @@
-module F_Update exposing (..)
+module F_Update exposing (update)
 
 import A_Model exposing (..)
 import B_Message exposing (..)
-import Browser exposing (UrlRequest(..))
-import Browser.Navigation as Nav
 import C_Data exposing (..)
 import D_Command exposing (..)
 import Fuzzy
 import Misc.MealCalculator as MC
-import Url exposing (Url)
 
 
 
@@ -62,56 +59,8 @@ update msg model =
             in
             ( { model | mealCalcModel = newMealModel }, Cmd.map Meal cmd )
 
-        NoOp ->
-            ( model, Cmd.none )
-
-        NotFound _ ->
-            ( model, Cmd.none )
-
-
-
--- ------
--- ROUTES
--- ------
-
-
-routeParser : Url -> Route
-routeParser url =
-    let
-        pathList =
-            url.path
-                |> String.split "/"
-                |> List.filter (\s -> s /= "")
-                |> List.map String.toLower
-    in
-    case pathList of
-        [] ->
-            HomeRoute
-
-        "meal" :: _ ->
-            MealRoute
-
         _ ->
-            NotFoundRoute
-
-
-pathFromRoute : Route -> String
-pathFromRoute route =
-    case route of
-        HomeRoute ->
-            "/"
-
-        MealRoute ->
-            "/meal"
-
-        NotFoundRoute ->
-            "/404"
-
-
-
--- ---------------
--- MEAL CALCULATOR
--- ---------------
+            Debug.todo "update: not implemented"
 
 
 updateMeal : MealMsg -> ModelMealCalculator -> ( ModelMealCalculator, Cmd MealMsg )
@@ -174,7 +123,7 @@ updateMeal msg model =
                             "not implemented"
             in
             ( { model
-                | edit = Just <| MealEdit food.id field str
+                | edit = Just <| Edit food.id field str
               }
             , Cmd.none
             )
@@ -182,7 +131,7 @@ updateMeal msg model =
         EditFoodInput field food str ->
             let
                 newEdit =
-                    MealEdit food.id field str
+                    Edit food.id field str
 
                 newMC =
                     if validInput field str then
@@ -325,7 +274,7 @@ updateModelWithInputs model field value =
     )
 
 
-updateInputs : InputField -> String -> MealInputs -> MealInputs
+updateInputs : InputField -> String -> Inputs -> Inputs
 updateInputs field value inputs =
     case field of
         Name ->
@@ -353,7 +302,7 @@ updateInputs field value inputs =
             { inputs | cookedWeight = value }
 
 
-clearInputs : MC.MealCalculator -> MealInputs
+clearInputs : MC.MealCalculator -> Inputs
 clearInputs fc =
     let
         cookedWeight =
@@ -430,7 +379,7 @@ validInput f str =
                 |> Maybe.withDefault False
 
 
-inputsToFood : MealInputs -> Maybe MC.NewFood
+inputsToFood : Inputs -> Maybe MC.NewFood
 inputsToFood i =
     let
         mName =
@@ -495,8 +444,15 @@ inputsToFood i =
             Nothing
 
 
+commaFloat : String -> Maybe Float
+commaFloat s =
+    s
+        |> String.replace "," "."
+        |> String.toFloat
 
--- filter livsmedeö
+
+
+-- FILTER
 
 
 {-| lower limit is the minimum numver of chaacters needed to attempt search
@@ -545,9 +501,7 @@ filterFuzz query list =
 
 
 
--- -------
 -- HEPLERS
--- -------
 
 
 {-| trim whitespace and convert to lower case
@@ -557,10 +511,3 @@ root str =
     str
         |> String.trim
         |> String.toLower
-
-
-commaFloat : String -> Maybe Float
-commaFloat s =
-    s
-        |> String.replace "," "."
-        |> String.toFloat
