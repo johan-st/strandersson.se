@@ -46,4 +46,4 @@ const log = (shouldPrint, ...args) => {
     }
 }
 
-module.exports = { timedPromise, getFeatureFlags, log }
+export { timedPromise, getFeatureFlags, log, defaultFeatureFlags }

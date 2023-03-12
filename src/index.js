@@ -11,25 +11,42 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
             && navigator.serviceWorker.register(
-                new URL('./sw.js', import.meta.url)
+                new URL('./sw.js', import.meta.url),
+                { scope: "/", type: "module" }
             )
     });
 }
 
+// unregister service worker
+// if ("serviceWorker" in navigator) {
+//     window.addEventListener("load", () => {
+//         navigator.serviceWorker
+//             && navigator.serviceWorker.getRegistrations()
+//                 .then(registrations => {
+//                     for (let registration of registrations) {
+//                         registration.unregister()
+//                     }
+//                 })
+//     });
+// }
 
 
-// INIYALIZE THE APP
+
+
+
+// INIT
 const ff = getFeatureFlags();
-const timeout = timedPromise(500);
+const timeout = timedPromise(2000);
 // wait for the feature flags to be loaded or timeout
 Promise.race([ff, timeout])
     .then(ff => {
         // Set the feature flags on window so they can be accessed from the service worker (what is a better way?)
         if (ff.flags.includes("debug")) {
-            log("Debug mode enabled");
-            log(`featureFlags (version: ${ff.version}): `, ff.flags);
-            log("Build tag:", buildTag);
-            log("Node env:", nodeEnv);
+            debug = true;
+            log(debug, "Debug mode enabled");
+            log(debug, `featureFlags (version: ${ff.version}): `, ff.flags);
+            log(debug, "Build tag:", buildTag);
+            log(debug, "Node env:", nodeEnv);
         }
 
         // decide what tag to show in the footer
@@ -46,7 +63,7 @@ Promise.race([ff, timeout])
         const flags = {
             foodCalculator: storedData ? JSON.parse(storedData) : null,
             build,
-            featureFlags: ff,
+            // featureFlags: ff,
         }
         window.app = Elm.Main.init({
             node: document.querySelector("body"),
@@ -64,5 +81,4 @@ Promise.race([ff, timeout])
         console.log(error);
     });
 
-log(true, "App started");
 

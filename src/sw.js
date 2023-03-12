@@ -1,49 +1,33 @@
 
-const cacheName = "v20230312-3"; // Change value to force update
+// const cache = "v20230312-3"; // Change value to force update
+import { manifest, version } from '@parcel/service-worker';
 
+async function install() {
+	console.log("installing", version);
+	console.log("manifest", manifest);
 
-// Register the service worker
-self.addEventListener("install", event => {
-	// Kick out the old service worker
-	self.skipWaiting();
+	const cache = await caches.open(version);
+	await cache.addAll(manifest);
+}
 
-	event.waitUntil(
-		caches.open(cacheName).then(cache => {
-			return cache.addAll([
-				"/",
-				"favicon.ico", // Favicon, IE and fallback for other browsers
-				"index.html", // Main HTML file
-				"index.js", // Main Javascript file
-				"manifest.json", // Manifest file
-				"maskable_icon.png", // Favicon, maskable https://web.dev/maskable-icon
-				"style.css", // Main CSS file
-				"LivsmedelsDB.json", // Database of foodstuffs from Livsmedelsverket (Swedish Food Agency) 
-			]).catch(error => {
-				console.log("Error caching assets", error);
-			});
-		})
+async function activate() {
+	console.log("activating", version);
+
+	const keys = await caches.keys();
+	console.log("keys", keys);
+
+	await Promise.all(
+		keys.map(key => key !== version && caches.delete(key))
 	);
-});
+}
 
-self.addEventListener("activate", event => {
-	// Delete any non-current cache
-	event.waitUntil(
-		caches.keys().then(keys => {
-			Promise.all(
-				keys.map(key => {
-					if (![cacheName].includes(key)) {
-						return caches.delete(key);
-					}
-				})
-			)
-		})
-	);
-});
+addEventListener('install', e => e.waitUntil(install()));
+addEventListener('activate', e => e.waitUntil(activate()));
 
 // Offline-first, cache-first strategy (except for featureFlags.json)
 // Kick off two asynchronous requests, one to the cache and one to the network
 // If there's a cached version available, use it, but fetch an update for next time.
-// Gets data on screen as quickly as possible, then updates once the network has returned the latest data. 
+// Gets data on screen as quickly as possible, then updates once the network has returned the latest data.
 self.addEventListener("fetch", event => {
 	// do not cache the featureFlags.json file
 	// TODO: make this support api calls with no extension
@@ -54,7 +38,7 @@ self.addEventListener("fetch", event => {
 		})
 	} else {
 		event.respondWith(
-			caches.open(cacheName).then(cache => {
+			caches.open(cache).then(cache => {
 				return cache.match(event.request).then(response => {
 					return response || fetch(event.request).then(networkResponse => {
 						cache.put(event.request, networkResponse.clone());
@@ -65,4 +49,18 @@ self.addEventListener("fetch", event => {
 	}
 })
 
-// TODO: unregister service worker if feature flag is removed
+// // TODO: unregister service worker if feature flag is removed
+
+// // unregister service worker
+// if ("serviceWorker" in navigator) {
+// 	window.addEventListener("load", () => {
+// 		navigator.serviceWorker
+// 			&& navigator.serviceWorker.getRegistrations()
+// 				.then(registrations => {
+// 					for (let registration of registrations) {
+// 						registration.unregister()
+// 					}
+// 				})
+// 	});
+// }
+
