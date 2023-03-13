@@ -26,7 +26,7 @@ a tool for myself when cooking. Makes it easier to calculate macros (protein, ca
 
 ## NOTE!
 
-The food data for the search is fetched after load. Technically it is a json-file on the server. This data is from _livsmedelsverket_. To update or rebuild data, fetch the data from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `LivsmedelsDB.csv` and place it in the `dataSource` folder. Now run csvToJson.js (probably like this. `node ./dataSource/csvToJson.js`) to convert the csv to json. This will create the static folder and place the json file in it. Filename is `livsmedelsDB.csv`
+The food data for the search is fetched after load. Technically it is a json-file on the server. This data is originally from _livsmedelsverket_. To update or rebuild data, fetch the data from [www7.slv.se/SokNaringsinnehall](https://www7.slv.se/SokNaringsinnehall). At the bottom of the page there is a link to download the data as an excel file. Save it as csv, name it `LivsmedelsDB.csv` and place it in the `dataSource` folder. Now run csvToJson.js (probably like this. `node ./dataSource/csvToJson.js`) to convert the csv to json. This will create the static folder and place the json file in it. Filename is `LivsmedelsDB.csv`
 
 
 ## Development Process
