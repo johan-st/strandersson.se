@@ -41,6 +41,10 @@ I chose to build this tool in a delightful little language called Elm. It is a f
 
 I built the module for the logic, state and encode/decode thereof first. I created tests alongside my efforts to validate my code. After beeing confident I had most basic features in place I built the _Main module_. It was responsible for the on-page representation of the calculator and for handling input and storing and retrieving state from local storage
 
+## Features
+- App is installable as a pwa
+- 
+
 ## Future
 
 ### Ideas
@@ -53,9 +57,11 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 ### TODOs
 
-#### Bugs
+#### Bugs/Reliability
+- have rollback option for broken service worker
+- 
 
-#### Code
+#### Refactoring
 - remove :not() from css
 - set max-width on #main instead of child components
 
@@ -65,6 +71,12 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - tooltip for kcal estimate
 - Save and restore several meals
 - toggle light/dark mode
+- have feature-flags be dynamic (currently a file)
+- allow simple math in number input boxes (+-/*)
+- scale all ingredients together, upscale meal/recepie
+- have options page:
+  - dark/light mode (today it's dependent och client)
+- 
 
 #### Interaction
 
