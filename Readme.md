@@ -50,7 +50,6 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - share lists by links
 - have adds and make money (maybe even a whole SEK)
 - remake ui in elm-ui
-- make it a pwa
 
 ### TODOs
 
