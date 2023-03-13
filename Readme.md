@@ -59,7 +59,6 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 #### Bugs/Reliability
 - have rollback option for broken service worker
-- 
 
 #### Refactoring
 - remove :not() from css
@@ -76,9 +75,8 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - scale all ingredients together, upscale meal/recepie
 - have options page:
   - dark/light mode (today it's dependent och client)
-- 
 
-#### Interaction
+#### Interaction/UI
 
 - have kcal estimate as placeholder in input, move it below when input is focused or there is a value
 - click outside of edit input to close
@@ -88,15 +86,12 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - close edit on enter
 - next edit field on tab
 - prev edit field on shift+tab
-
-#### Clarity
-
 - make input feedback more clear
-- add units to list
 - check contrast in colors (e.g. text and text-muted)
+- add units to list
 
-#### on-ice
-
----
+#### Other
+- add icon for ios (apple-touch-icon). [link](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html)
+- create new icons
 
 ---
