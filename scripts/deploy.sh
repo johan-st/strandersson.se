@@ -1,39 +1,40 @@
-#if the first argument is not provided, ask for it
-if [ -z "$1" ]
-then
-  echo "container tag not provided, please provide a tag as the first argument"
-  echo "tag 'latest' deploys to production (info checked 2023-03-14)"
-  echo "tag 'staging' deploys to staging (info checked 2023-03-14)"
-  exit 1
-fi
+#!/bin/bash
 
-# set container tag to the first argument (required)
-tag=$1
+containerName="strandersson"
 
-
-# if no tag is provided, use the current git commit hash
-if [ -z "$buildTag" ]
-then
-  buildTag=$(git rev-parse --short HEAD)
+if [ -z "$1" ]; then
+  echo "no tag specified. Do you want to use 'latest'."
+  echo "(this will overwrite the current latest image and DEPLOY to production.)"
+  read -p "y/n: " -n 1 -r
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "using 'latest'"
+    tag="latest"
+  else
+    echo "no tag specified. Exiting"
+    exit 1
+  fi
 else
-  buildTag=$(date '+%Y%m%d-%H%M%S')
+  tag=$1
 fi
 
-BUILD_TAG=$buildTag
-
-
-
-echo "container tag: $tag"
-echo "build tag: $BUILD_TAG"
+# generate container tags
+commitHash=$(git rev-parse --short HEAD)
+buildTime=$(date '+%Y-%m-%d')
+BUILD_TAG="$(date '+%Y%m%d-%H%M%S') <$commitHash>"
 
 echo ""
-echo "BUILDING: strandersson:$tag" 
-docker build --build-arg=BUILD_TAG -t strandersson:$tag  .
+echo "BUILD_TAG: $BUILD_TAG"
+echo " - BUILDING - "
+docker build --build-arg=BUILD_TAG --build-arg=buildTime --build-arg=commitHash -t $containerName .
 
 echo ""
-echo "TAGGING: registry.digitalocean.com/johan-st/strandersson:$tag"
-docker tag strandersson:$tag registry.digitalocean.com/johan-st/strandersson:$tag
+echo " - TAGGING - $t"
+for t in $commitHash $buildTime $tag; do
+  echo "tagging: $t"
+  docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t
+done
 
 echo ""
-echo "PUSHING: registry.digitalocean.com/johan-st/strandersson:$tag"
-docker push registry.digitalocean.com/johan-st/strandersson:$tag
+echo " - PUSHING - "
+docker push --all-tags registry.digitalocean.com/johan-st/$containerName
