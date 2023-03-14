@@ -1,6 +1,6 @@
-# --------------
-# BUILD AND TEST
-# --------------
+# -------------- #
+# BUILD AND TEST #
+# -------------- #
 FROM debian:bullseye-slim as build
 
 # install node and npm (apt has an old version of node, so we use the node source )
@@ -21,7 +21,7 @@ RUN npm ci
 # and elm.json (elm package file)
 COPY elm.json ./
 
-# copy static files
+# copy static files (not taken into acount by parcel for some reason)
 COPY static ./static
 
 # copy source files
@@ -38,9 +38,9 @@ RUN mv ./static/* ./dist/
 
 
 
-# ----------
-# PRODUCTION
-# ----------
+# ---------- #
+# PRODUCTION #
+# ---------- #
 FROM nginx:1.23.3-alpine-slim as webserver
 
 # copy nginx main config
