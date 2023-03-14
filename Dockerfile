@@ -12,26 +12,26 @@ RUN apt install -y nodejs
 # create app directory
 WORKDIR /usr/src/app
 
-# copy package.json and package-lock.json (npm package file)
+# npm package file and lock file
 COPY package*.json ./
 
 # install dependencies
 RUN npm ci
 
-# and elm.json (elm package file)
+# typescript config file
+COPY tsconfig.json ./
+
+# elm package file
 COPY elm.json ./
 
-# copy static files (not taken into acount by parcel for some reason)
+# copy static files
 COPY static ./static
 
 # copy source files
 COPY src ./src
 
-# test
-RUN npm test
-
-# build
-RUN npm run build
+# test, typecheck and build
+RUN npm test && npm run type && npm run build
 
 # Workaround for issue where static files where not moved on build
 RUN mv ./static/* ./dist/
