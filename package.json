@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "test": "elm-test \"src/**/*Tests.elm\"",
-    "type": "tsc --noEmit",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
+    "type": "tsc --noEmit",
     "start": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel ",
     "build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel build --no-source-maps",
     "docker:build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') docker build --build-arg=BUILD_TAG -t strandersson .",
