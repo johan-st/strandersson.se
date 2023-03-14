@@ -13,4 +13,4 @@ docker build --build-arg=BUILD_TAG --build-arg=buildTime --build-arg=commitHash 
 
 echo ""
 echo " - RUNNING - "
-docker run -p 8080:80 $containerName
+docker run -p --rm 8080:80 $containerName
