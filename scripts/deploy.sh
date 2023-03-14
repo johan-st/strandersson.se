@@ -2,7 +2,7 @@
 if [ -z "$1" ]
 then
   echo "container tag not provided, please provide a tag as the first argument"
-  echo "tag 'production' deploys to production (info checked 2023-03-14)"
+  echo "tag 'latest' deploys to production (info checked 2023-03-14)"
   echo "tag 'staging' deploys to staging (info checked 2023-03-14)"
   exit 1
 fi
