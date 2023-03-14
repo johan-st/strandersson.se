@@ -1,31 +1,3 @@
-import { rejects } from "assert";
-
-/**
- * @example
- * { 
- *  "version": 1, 
- *  "flags": [ "serviceWorker", "debug" ] 
- * }
-*/
-const getFeatureFlags = (): Promise<FeatureFlags> => {
-    return new Promise((resolve, _) => {
-        fetch("/featureFlags.json")
-            .then(resp => resp.json())
-            .then(data => { resolve(data) })
-    })
-}
-
-/**
- * Default feature flags to use if the server is down or client is offline
- */
-const offlineFeatureFlags = {
-    "version": 0,
-    "flags": [
-        "debug",
-        "serviceWorker"
-    ]
-}
-
 /**
  * Never resolves butcan reject with an error. Use to race against a promise that needs a timeout.
  * @param {number} timeout (in ms) 
@@ -48,4 +20,4 @@ const log = (shouldPrint: boolean, ...args: any) => {
     }
 }
 
-export { timedPromise, getFeatureFlags, log, offlineFeatureFlags }
+export { timedPromise, log }

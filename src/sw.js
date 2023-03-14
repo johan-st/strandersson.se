@@ -1,6 +1,6 @@
+import { manifest, version } from '@parcel/service-worker';
 
 const cacheSalt = ""; // Change value to force update
-import { manifest, version } from '@parcel/service-worker';
 
 const saltedVersion = `${version}${cacheSalt}`;
 
@@ -34,7 +34,6 @@ self.addEventListener("fetch", event => {
 	// do not cache the featureFlags.json file
 	// TODO: make this support api calls with no extension
 	if (event.request.url.includes("featureFlags.json")) {
-		console.log("featureFlags.json", event.request.url)
 		fetch(event.request).then(networkResponse => {
 			return networkResponse;
 		})
