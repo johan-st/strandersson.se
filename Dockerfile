@@ -5,7 +5,7 @@ FROM debian:bullseye-slim as build
 
 # install node and npm (apt has an old version of node, so we use the node source )
 RUN apt update && apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - 
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
 RUN apt install -y nodejs
 # No cleanup nessecary as we are using a multi-stage build
 
@@ -36,8 +36,6 @@ RUN npm test && npm run type && npm run build
 # Workaround for issue where static files where not moved on build
 RUN mv ./static/* ./dist/
 
-
-
 # ---------- #
 # PRODUCTION #
 # ---------- #
@@ -55,5 +53,3 @@ COPY nginx/conf.d/ /etc/nginx/conf.d/
 # last layer because it's most likely to change.
 # copy build files
 COPY --from=build /usr/src/app/dist /usr/share/nginx/strandersson.se
-
-

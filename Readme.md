@@ -61,10 +61,12 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 #### Bugs/Reliability
 - have rollback option for broken service worker
+- scripts need to exit with error code if something fails
 
 #### Refactoring
 - remove :not() from css
 - set max-width on #main instead of child components
+- have deploy and build scripts be DRYer
 
 #### Features
 
