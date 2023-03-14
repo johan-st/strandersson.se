@@ -1,23 +1,25 @@
 
-// const cache = "v20230312-3"; // Change value to force update
+const cacheSalt = ""; // Change value to force update
 import { manifest, version } from '@parcel/service-worker';
 
+const saltedVersion = `${version}${cacheSalt}`;
+
 async function install() {
-	console.log("installing", version);
+	console.log("installing", saltedVersion);
 	console.log("manifest", manifest);
 
-	const cache = await caches.open(version);
+	const cache = await caches.open(saltedVersion);
 	await cache.addAll(manifest);
 }
 
 async function activate() {
-	console.log("activating", version);
+	console.log("activating", saltedVersion);
 
 	const keys = await caches.keys();
 	console.log("keys", keys);
 
 	await Promise.all(
-		keys.map(key => key !== version && caches.delete(key))
+		keys.map(key => key !== saltedVersion && caches.delete(key))
 	);
 }
 
@@ -50,17 +52,4 @@ self.addEventListener("fetch", event => {
 })
 
 // // TODO: unregister service worker if feature flag is removed
-
-// // unregister service worker
-// if ("serviceWorker" in navigator) {
-// 	window.addEventListener("load", () => {
-// 		navigator.serviceWorker
-// 			&& navigator.serviceWorker.getRegistrations()
-// 				.then(registrations => {
-// 					for (let registration of registrations) {
-// 						registration.unregister()
-// 					}
-// 				})
-// 	});
-// }
 
