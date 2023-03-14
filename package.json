@@ -10,7 +10,9 @@
     "build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel build --no-source-maps",
     "docker:build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') docker build --build-arg=BUILD_TAG -t strandersson .",
     "docker:start": "docker run --rm -it -p 80:80 strandersson",
-    "deploy:latest": "./scripts/digitalocean.sh"
+    "deploy": "./scripts/deploy.sh",
+    "deploy:stahing": "npm run deploy staging",
+    "deploy:prod": "npm run deploy latest"
   },
   "repository": {
     "type": "git",
