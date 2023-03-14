@@ -54,6 +54,8 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - share lists by links
 - have adds and make money (maybe even a whole SEK)
 - remake ui in elm-ui
+- build time and commit hash insted of current buildTag
+- 
 
 ### TODOs
 
@@ -89,6 +91,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - make input feedback more clear
 - check contrast in colors (e.g. text and text-muted)
 - add units to list
+- search and manual as part of foods list (e.g. last entry in list is search and manual)
 
 #### Other
 - add icon for ios (apple-touch-icon). [link](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html)
