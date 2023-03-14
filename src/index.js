@@ -11,34 +11,18 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
             && navigator.serviceWorker.register(
-                new URL('./sw.js', import.meta.url),
+                new URL('manifest/sw.js', import.meta.url),
                 { scope: "/", type: "module" }
             )
     });
 }
 
-// unregister service worker
-// if ("serviceWorker" in navigator) {
-//     window.addEventListener("load", () => {
-//         navigator.serviceWorker
-//             && navigator.serviceWorker.getRegistrations()
-//                 .then(registrations => {
-//                     for (let registration of registrations) {
-//                         registration.unregister()
-//                     }
-//                 })
-//     });
-// }
-
-
-
-
-
-// INIT
+// GET FEATURE FLAGS
 const ff = getFeatureFlags();
 const timeout = timedPromise(2000);
 // wait for the feature flags to be loaded or timeout
 Promise.race([ff, timeout])
+    // INIT ELM APP
     .then(ff => {
         // Set the feature flags on window so they can be accessed from the service worker (what is a better way?)
         if (ff.flags.includes("debug")) {
