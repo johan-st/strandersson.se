@@ -12,23 +12,26 @@ if [ -z "$1" ]; then
     echo "using 'latest'"
     tag="latest"
   else
-    echo "no tag specified. Exiting"
+    echo " - no tag specified -"
     exit 1
   fi
 else
   tag=$1
 fi
 
-# refuse deploy to production (tag 'latest') if not on main branch and not a clean working tree
+# refuse deploy to production (tag 'latest') if not on main branch
 if [ "$tag" == "latest" ]; then
   if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
-    echo "not on main branch. Exiting"
+    echo " - not on main branch -"
     exit 1
   fi
-  if [ -n "$(git status --porcelain)" ]; then
-    echo "working tree is not clean. Exiting"
-    exit 1
-  fi
+fi
+
+# refuse deploy if working tree is not clean
+if [ -n "$(git status --porcelain)" ]; then
+  echo " - working tree is not clean -"
+  echo "Use 'npm run docker' to run the container locally if you are not ready to commit."
+  exit 1
 fi
 
 echo ""
@@ -42,7 +45,7 @@ echo ""
 echo "CONTAINER IMAGE TAGS:"
 for t in tagDate tagCommitHash tag; do
   if [ -z "${!t}" ]; then
-    echo "failed to create tag $t. Exiting..."
+    echo " - failed to create tag $t -"
     exit 1
   fi
   echo "- ${!t}"
@@ -65,7 +68,7 @@ echo "TAGGING"
 for t in $tagDate $tagHash $tag; do
   echo "tagging: $t"
   if ! docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t; then
-    echo "TAG $t FAILED"
+    echo " - failed to tag $containerName:$t -"
     exit 1
   fi
 done
@@ -73,6 +76,6 @@ done
 echo ""
 echo "PUSHING"
 if ! docker push --all-tags registry.digitalocean.com/johan-st/$containerName; then
-  echo "PUSH FAILED"
+  echo " - failed to push -"
   exit 1
 fi
