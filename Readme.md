@@ -52,7 +52,6 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 ## Features
 - App is installable as a pwa
-- 
 
 ## Future
 
@@ -70,7 +69,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 #### Bugs/Reliability
 - have rollback option for broken service worker
-- scripts need to exit with error code if something fails
+- update manifest on main branch with all icons
 
 #### Refactoring
 - remove :not() from css
@@ -88,6 +87,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - scale all ingredients together, upscale meal/recepie
 - have options page:
   - dark/light mode (today it's dependent och client)
+  - clear data
 
 #### Interaction/UI
 
