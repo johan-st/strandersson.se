@@ -17,8 +17,6 @@ WORKDIR /usr/src/app
 # npm package file and lock file
 COPY package*.json ./
 
-# copy build script
-COPY scripts/parcel-build.sh ./scripts/
 
 # install dependencies
 RUN npm ci
@@ -35,18 +33,14 @@ COPY static ./static
 # copy source files
 COPY src ./src
 
-# args used in build script
+
+# copy build script
+COPY scripts/parcel-build.sh ./scripts/
+
+# args used in build  (changes on every build, place as late as possible)
 ARG BUILD_TAG
 ARG BUILD_TIME
 ARG COMMIT_HASH
-
-# check that args are passed
-# RUN echo "Build tag: $BUILD_TAG" && \
-#     echo "Build time: $BUILD_TIME" && \
-#     echo "Commit hash: $COMMIT_HASH" && \
-#     exit 1
-
-
 
 # test, typecheck and build
 RUN npm test && npm run type && npm run build-prod

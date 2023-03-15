@@ -1,12 +1,5 @@
 #!/bin/bash
 
-echo "ENVIRONMENT VARIABLES:"
-for e in BUILD_TAG BUILD_TIME COMMIT_HASH; do
-    if [ -z "${!e}" ]; then
-        echo "$e is not set - Exiting..."
-        exit 1
-    fi
-    echo "- $e: ${!e}"
-done
+$(dirname "$0")/check-env.sh
 
-BUILD_TAG=${BUILD_TAG} parcel build --no-autoinstall
+BUILD_TAG=${BUILD_TAG} BUILD_TIME=${BUILD_TIME} COMMIT_HASH=${COMMIT_HASH} parcel build --no-autoinstall
