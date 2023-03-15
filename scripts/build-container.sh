@@ -10,6 +10,7 @@ else
 fi
 
 # check if environment variables are set
+echo
 echo "ENVIRONMENT VARIABLES:"
 for e in BUILD_TIME COMMIT_HASH BUILD_TAG; do
     if [ -z "${!e}" ]; then
