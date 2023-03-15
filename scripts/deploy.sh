@@ -31,6 +31,9 @@ if [ "$tag" == "latest" ]; then
   fi
 fi
 
+echo ""
+echo "CONTAINER NAME: $containerName"
+
 # generate tags
 tagDate="$(date '+%Y-%m-%d')"
 tagCommitHash="$(git rev-parse --short HEAD)"
@@ -46,7 +49,7 @@ for t in tagDate tagCommitHash tag; do
 done
 
 echo ""
-echo "BUILDING CONTAINER: $containerName"
+echo "BUILDING CONTAINER"
 if ! docker build \
   --build-arg BUILD_TAG \
   --build-arg BUILD_TIME \
@@ -58,7 +61,7 @@ if ! docker build \
 fi
 
 echo ""
-echo "TAGGING$t"
+echo "TAGGING"
 for t in $tagDate $tagHash $tag; do
   echo "tagging: $t"
   if ! docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t; then
