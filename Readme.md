@@ -61,6 +61,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 #### Bugs/Reliability
 - have rollback option for broken service worker
+- update manifest on main branch with all icons
 
 #### Refactoring
 - remove :not() from css
