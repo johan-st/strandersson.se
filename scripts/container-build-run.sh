@@ -1,4 +1,5 @@
 #!/bin/bash
+
 containerName="strandersson-dev"
 
 # set up environment variables

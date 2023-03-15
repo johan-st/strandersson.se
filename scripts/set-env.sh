@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # use 'source $(dirname "$0")/set-env.sh' to call this script from another script in the same folder
 
 echo
