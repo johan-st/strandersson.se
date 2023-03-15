@@ -19,9 +19,9 @@ else
 fi
 
 # generate env variables
-export COMMIT_HASH=$(git rev-parse --short HEAD)
-export BUILD_TIME=$(date '+%Y%m%d')
-export BUILD_TAG="$BUILD_TIME<$COMMIT_HASH>"
+export COMMIT_HASH="$(git rev-parse --short HEAD)"
+export BUILD_TIME="$(date '+%Y-%m-%d %H:%M:%S')"
+export BUILD_TAG="$(date '+%Y-%m-%d %H:%M:%S') <$COMMIT_HASH>"
 
 # check env variables
 echo "ENVIRONMENT VARIABLES:"
@@ -34,8 +34,8 @@ for e in BUILD_TIME COMMIT_HASH BUILD_TAG; do
 done
 
 # generate tags
-buildTime=$BUILD_TIME
-commitHash=$COMMIT_HASH
+tagDate=$(date '+%Y%m%d')
+tagHash=$COMMIT_HASH
 
 echo ""
 echo " BUILDING (build tag: $BUILD_TAG)"
@@ -51,7 +51,7 @@ fi
 
 echo ""
 echo "TAGGING$t"
-for t in $commitHash $buildTime $tag; do
+for t in $tagDate $tagHash $tag; do
   echo "tagging: $t"
   if ! docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t; then
     echo "TAG $t FAILED"
