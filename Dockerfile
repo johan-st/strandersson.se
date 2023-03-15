@@ -35,7 +35,7 @@ COPY src ./src
 
 
 # copy build script
-COPY scripts/parcel-build.sh ./scripts/
+COPY scripts ./scripts
 
 # args used in build  (changes on every build, place as late as possible)
 ARG BUILD_TAG

@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
   echo "(this will overwrite the current latest image and DEPLOY to production.)"
   read -p "y/n: " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo ""
+    echo
     echo "using 'latest'"
     tag="latest"
   else
@@ -37,14 +37,14 @@ fi
 # set up environment variables
 source $(dirname "$0")/set-env.sh
 
-echo ""
+echo
 echo "CONTAINER NAME: $containerName"
 
 # generate tags
 tagDate="$(date '+%Y-%m-%d')"
 tagCommitHash="$(git rev-parse --short HEAD)"
 
-echo ""
+echo
 echo "CONTAINER IMAGE TAGS:"
 for t in tagDate tagCommitHash tag; do
   if [ -z "${!t}" ]; then
@@ -55,12 +55,12 @@ for t in tagDate tagCommitHash tag; do
 done
 
 # build container
-echo ""
+echo
 if ! $(dirname "$0")/build-container.sh $containerName; then
   exit 1
 fi
 
-echo ""
+echo
 echo "TAGGING"
 for t in $tagDate $tagHash $tag; do
   echo "tagging: $t"
@@ -70,7 +70,7 @@ for t in $tagDate $tagHash $tag; do
   fi
 done
 
-echo ""
+echo
 echo "PUSHING"
 if ! docker push --all-tags registry.digitalocean.com/johan-st/$containerName; then
   echo " - failed to push -"

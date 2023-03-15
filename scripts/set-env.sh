@@ -9,10 +9,9 @@ export BUILD_TIME="$(date '+%Y-%m-%d %H:%M:%S')"
 export BUILD_TAG="$BUILD_TIME <$COMMIT_HASH>"
 
 echo
-echo "LOOKING FOR .env FILE"
 FILE=$(dirname "$0")/../.env
 if ! [ -f "$FILE" ]; then
-    echo "file not found.. skipping. (looked at $FILE)"
+    echo "no '.env' file found... skipping... (looked at $FILE)"
 else
     # set up environment variables from .env
     count=0

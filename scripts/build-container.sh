@@ -20,7 +20,7 @@ for e in BUILD_TIME COMMIT_HASH BUILD_TAG; do
     echo "- $e: ${!e}"
 done
 
-echo ""
+echo
 echo "BUILDING CONTAINER"
 if ! docker build \
     --build-arg BUILD_TAG="${BUILD_TAG}" \

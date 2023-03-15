@@ -10,7 +10,7 @@ if ! $(dirname "$0")/build-container.sh $containerName; then
     exit 1
 fi
 
-echo ""
+echo
 echo " - RUNNING (on port 8080) - "
 if ! docker run \
     --rm \
