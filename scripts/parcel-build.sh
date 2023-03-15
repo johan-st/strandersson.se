@@ -9,6 +9,4 @@ for e in BUILD_TAG BUILD_TIME COMMIT_HASH; do
     echo "- $e: ${!e}"
 done
 
-echo ""
-echo "BUILDING..."
 BUILD_TAG=${BUILD_TAG} parcel build --no-autoinstall
