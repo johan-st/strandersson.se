@@ -63,7 +63,7 @@ fi
 echo
 echo "TAGGING"
 for t in $tagDate $tagCommitHash $tag; do
-  echo "tagging: $t"
+  echo "- $t"
   if ! docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t; then
     echo " - failed to tag $containerName:$t -"
     exit 1
