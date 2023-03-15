@@ -19,6 +19,18 @@ else
   tag=$1
 fi
 
+# refuse deploy to production (tag 'latest') if not on main branch and not a clean working tree
+if [ "$tag" == "latest" ]; then
+  if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+    echo "not on main branch. Exiting"
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain)" ]; then
+    echo "working tree is not clean. Exiting"
+    exit 1
+  fi
+fi
+
 # generate tags
 tagDate="$(date '+%Y-%m-%d')"
 tagCommitHash="$(git rev-parse --short HEAD)"
