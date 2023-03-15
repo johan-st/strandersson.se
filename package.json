@@ -6,12 +6,12 @@
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
     "type": "tsc --noEmit",
-    "start": "parcel",
-    "build": "parcel build",
+    "start": "./scripts/parcel-start.sh",
+    "build-prod": "./scripts/parcel-build.sh",
+    "build": "./scripts/parcel-build_generate-env.sh",
     "docker": "./scripts/container-build-run.sh",
-    "deploy": "./scripts/deploy.sh",
-    "deploy:staging": "npm run deploy staging",
-    "deploy:prod": "npm run deploy latest"
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "deploy:prod": "./scripts/deploy.sh latest"
   },
   "repository": {
     "type": "git",

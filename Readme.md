@@ -33,6 +33,15 @@ The food data for the search is fetched after load. Technically it is a json-fil
 
 As the nature of this is a hobby-project and a help for myself I decided to start small with the minimum that would help me and build from there.
 
+## feature flags
+I am experimenting with feature flags.
+these are the currently available
+
+### front-end
+- `verbose` - enables extra console output
+- `serviceworker` - enables service worker
+
+
 ### Language
 
 I chose to build this tool in a delightful little language called Elm. It is a functional language made for web-apps. It compiles to JavaScript, is fully compatible with all browsers that matters, is very fast and quite small. The functional nature and the type system near guarantee no runtime exceptions.
