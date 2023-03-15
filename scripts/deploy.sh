@@ -2,6 +2,7 @@
 
 containerName="strandersson"
 
+# check if tag is specified
 if [ -z "$1" ]; then
   echo "no tag specified. Do you want to use 'latest'."
   echo "(this will overwrite the current latest image and DEPLOY to production.)"
@@ -18,27 +19,22 @@ else
   tag=$1
 fi
 
-# generate env variables
-export COMMIT_HASH="$(git rev-parse --short HEAD)"
-export BUILD_TIME="$(date '+%Y-%m-%d %H:%M:%S')"
-export BUILD_TAG="$(date '+%Y-%m-%d %H:%M:%S') <$COMMIT_HASH>"
-
-# check env variables
-echo "ENVIRONMENT VARIABLES:"
-for e in BUILD_TIME COMMIT_HASH BUILD_TAG; do
-  if [ -z "${!e}" ]; then
-    echo "$e is not set. Exiting..."
-    exit 1
-  fi
-  echo "- $e: ${!e}"
-done
-
 # generate tags
-tagDate=$(date '+%Y%m%d')
-tagHash=$COMMIT_HASH
+tagDate="$(date '+%Y-%m-%d')"
+tagCommitHash="$(git rev-parse --short HEAD)"
 
 echo ""
-echo " BUILDING (build tag: $BUILD_TAG)"
+echo "CONTAINER IMAGE TAGS:"
+for t in tagDate tagCommitHash tag; do
+  if [ -z "${!t}" ]; then
+    echo "failed to create tag $t. Exiting..."
+    exit 1
+  fi
+  echo "- ${!t}"
+done
+
+echo ""
+echo "BUILDING CONTAINER: $containerName"
 if ! docker build \
   --build-arg BUILD_TAG \
   --build-arg BUILD_TIME \
