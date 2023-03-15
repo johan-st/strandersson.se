@@ -28,11 +28,11 @@ if [ "$tag" == "latest" ]; then
 fi
 
 # refuse deploy if working tree is not clean
-# if [ -n "$(git status --porcelain)" ]; then
-#   echo " - working tree is not clean -"
-#   echo "Use 'npm run docker' to run the container locally if you are not ready to commit."
-#   exit 1
-# fi
+if [ -n "$(git status --porcelain)" ]; then
+  echo " - working tree is not clean -"
+  echo "Use 'npm run docker' to run the container locally if you are not ready to commit."
+  exit 1
+fi
 
 # set up environment variables
 source $(dirname "$0")/set-env.sh
