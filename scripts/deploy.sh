@@ -2,6 +2,7 @@
 
 containerName="strandersson"
 
+# check if tag is specified
 if [ -z "$1" ]; then
   echo "no tag specified. Do you want to use 'latest'."
   echo "(this will overwrite the current latest image and DEPLOY to production.)"
@@ -18,23 +19,45 @@ else
   tag=$1
 fi
 
-# generate container tags
-commitHash=$(git rev-parse --short HEAD)
-buildTime=$(date '+%Y-%m-%d')
-BUILD_TAG="$(date '+%Y%m%d-%H%M%S') <$commitHash>"
+# generate tags
+tagDate="$(date '+%Y-%m-%d')"
+tagCommitHash="$(git rev-parse --short HEAD)"
 
 echo ""
-echo "BUILD_TAG: $BUILD_TAG"
-echo " - BUILDING - "
-docker build --build-arg=BUILD_TAG --build-arg=buildTime --build-arg=commitHash -t $containerName .
-
-echo ""
-echo " - TAGGING - $t"
-for t in $commitHash $buildTime $tag; do
-  echo "tagging: $t"
-  docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t
+echo "CONTAINER IMAGE TAGS:"
+for t in tagDate tagCommitHash tag; do
+  if [ -z "${!t}" ]; then
+    echo "failed to create tag $t. Exiting..."
+    exit 1
+  fi
+  echo "- ${!t}"
 done
 
 echo ""
-echo " - PUSHING - "
-docker push --all-tags registry.digitalocean.com/johan-st/$containerName
+echo "BUILDING CONTAINER: $containerName"
+if ! docker build \
+  --build-arg BUILD_TAG \
+  --build-arg BUILD_TIME \
+  --build-arg COMMIT_HASH \
+  -t $containerName \
+  .; then
+  echo "BUILD FAILED"
+  exit 1
+fi
+
+echo ""
+echo "TAGGING$t"
+for t in $tagDate $tagHash $tag; do
+  echo "tagging: $t"
+  if ! docker tag $containerName registry.digitalocean.com/johan-st/$containerName:$t; then
+    echo "TAG $t FAILED"
+    exit 1
+  fi
+done
+
+echo ""
+echo "PUSHING"
+if ! docker push --all-tags registry.digitalocean.com/johan-st/$containerName; then
+  echo "PUSH FAILED"
+  exit 1
+fi

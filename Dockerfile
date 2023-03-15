@@ -3,9 +3,11 @@
 # -------------- #
 FROM debian:bullseye-slim as build
 
+
+
 # install node and npm (apt has an old version of node, so we use the node source )
 RUN apt update && apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - 
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
 RUN apt install -y nodejs
 # No cleanup nessecary as we are using a multi-stage build
 
@@ -14,6 +16,9 @@ WORKDIR /usr/src/app
 
 # npm package file and lock file
 COPY package*.json ./
+
+# copy build script
+COPY scripts/parcel-build.sh ./scripts/
 
 # install dependencies
 RUN npm ci
@@ -30,13 +35,24 @@ COPY static ./static
 # copy source files
 COPY src ./src
 
+# args used in build script
+ARG BUILD_TAG
+ARG BUILD_TIME
+ARG COMMIT_HASH
+
+# check that args are passed
+# RUN echo "Build tag: $BUILD_TAG" && \
+#     echo "Build time: $BUILD_TIME" && \
+#     echo "Commit hash: $COMMIT_HASH" && \
+#     exit 1
+
+
+
 # test, typecheck and build
-RUN npm test && npm run type && npm run build
+RUN npm test && npm run type && npm run build-prod
 
 # Workaround for issue where static files where not moved on build
 RUN mv ./static/* ./dist/
-
-
 
 # ---------- #
 # PRODUCTION #
@@ -55,5 +71,3 @@ COPY nginx/conf.d/ /etc/nginx/conf.d/
 # last layer because it's most likely to change.
 # copy build files
 COPY --from=build /usr/src/app/dist /usr/share/nginx/strandersson.se
-
-

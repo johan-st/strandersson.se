@@ -3,11 +3,22 @@ import { Elm } from "./Main.elm";
 import { timedPromise, log } from "./helpers";
 import { getFeatureFlags, offlineFeatureFlags, flag as f, FeatureFlags } from "./featureFlags";
 
-
-
 // build time from environment variable
-const buildTag = process.env.BUILD_TAG ? process.env.BUILD_TAG : "BUILD_TAG Not Set";
-const nodeEnv = process.env.NODE_ENV ? process.env.NODE_ENV : "NODE_ENV Not Set";
+const nodeEnv = process.env.NODE_ENV ? process.env.NODE_ENV : "<not set>"
+const buildTag = process.env.BUILD_TAG ? process.env.BUILD_TAG : "<not set>"
+const buildTime = process.env.BUILD_TIME ? process.env.BUILD_TIME : "<not set>"
+const commitHash = process.env.COMMIT_HASH ? process.env.COMMIT_HASH : "<not set>"
+
+
+// development mode (stripped away by parcel on production build 
+// ref:https://parceljs.org/features/production/) 
+console.debug("Environment:\n", nodeEnv);
+if (process.env.NODE_ENV !== 'production') {
+    console.debug("dev mode enabled");
+    console.debug("build tag:\n", buildTag);
+    console.debug("build time:\n", buildTime);
+    console.debug("commit hash:\n", commitHash);
+}
 
 // GET FEATURE FLAGS (promise)
 const ff = getFeatureFlags();
@@ -17,14 +28,14 @@ const ffProm = Promise.race([ff, timeout])
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         // register service worker
-        console.debug("registering service worker")
-        navigator.serviceWorker
-            && navigator.serviceWorker.register(
-                new URL('sw.js', import.meta.url),
-                { scope: "/", type: "module" })
-                .then(registration => {
-                    console.debug("Service worker registered", registration);
-                })
+        // console.debug("registering service worker")
+        // navigator.serviceWorker
+        //     && navigator.serviceWorker.register(
+        //         new URL('sw.js', import.meta.url),
+        //         { scope: "/", type: "module" })
+        //         .then(registration => {
+        //             console.debug("Service worker registered", registration);
+        //         })
         // wait for the feature flags to be loaded or timeout
         ffProm.then(ff => {
             if (ff.flags.includes(f.sw)) {

@@ -6,13 +6,12 @@
     "test": "elm-test \"src/**/*Tests.elm\"",
     "test:watch": "elm-test \"src/**/*Tests.elm\" --watch",
     "type": "tsc --noEmit",
-    "start": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel ",
-    "build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') parcel build",
-    "docker:build": "BUILD_TAG=$(date '+%Y%m%d-%H%M%S') docker build --build-arg=BUILD_TAG -t strandersson .",
-    "docker:start": "docker run --rm -it -p 80:80 strandersson",
-    "deploy": "./scripts/deploy.sh",
-    "deploy:staging": "npm run deploy staging",
-    "deploy:prod": "npm run deploy latest"
+    "start": "./scripts/parcel-start.sh",
+    "build-prod": "./scripts/parcel-build.sh",
+    "build": "./scripts/parcel-build_generate-env.sh",
+    "docker": "./scripts/container-build-run.sh",
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "deploy:prod": "./scripts/deploy.sh latest"
   },
   "repository": {
     "type": "git",

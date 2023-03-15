@@ -33,6 +33,15 @@ The food data for the search is fetched after load. Technically it is a json-fil
 
 As the nature of this is a hobby-project and a help for myself I decided to start small with the minimum that would help me and build from there.
 
+## feature flags
+I am experimenting with feature flags.
+these are the currently available
+
+### front-end
+- `verbose` - enables extra console output
+- `serviceworker` - enables service worker
+
+
 ### Language
 
 I chose to build this tool in a delightful little language called Elm. It is a functional language made for web-apps. It compiles to JavaScript, is fully compatible with all browsers that matters, is very fast and quite small. The functional nature and the type system near guarantee no runtime exceptions.
@@ -43,7 +52,6 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 
 ## Features
 - App is installable as a pwa
-- 
 
 ## Future
 
@@ -66,6 +74,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 #### Refactoring
 - remove :not() from css
 - set max-width on #main instead of child components
+- have deploy and build scripts be DRYer
 
 #### Features
 
@@ -78,6 +87,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - scale all ingredients together, upscale meal/recepie
 - have options page:
   - dark/light mode (today it's dependent och client)
+  - clear data
 
 #### Interaction/UI
 

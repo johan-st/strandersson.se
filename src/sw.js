@@ -1,6 +1,6 @@
 import { manifest, version } from '@parcel/service-worker';
 
-const cacheSalt = ""; // Change value to force update
+const cacheSalt = "1"; // Change value to force update
 
 const saltedVersion = `${version}${cacheSalt}`;
 
