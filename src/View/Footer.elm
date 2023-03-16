@@ -18,7 +18,7 @@ view model =
         , p [ class "buildTag" ] [ text model.build ]
         , p
             [ class "sourceCode" ]
-            [ text "Source code: "
+            [ text "source on "
             , a [ href "https://github.com/johan-st/strandersson.se" ] [ text "GitHub" ]
             ]
         ]
