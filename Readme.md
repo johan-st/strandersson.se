@@ -70,6 +70,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 #### Bugs/Reliability
 - have rollback option for broken service worker
 - update manifest on main branch with all icons
+- investigate why old tags "are stuck" to new images when pushing with --all-tags
 
 #### Refactoring
 - remove :not() from css
