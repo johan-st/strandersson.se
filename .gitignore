@@ -1,4 +1,4 @@
-# parcel 
+# parcel
 .parcel-cache
 
 # Elm
@@ -12,3 +12,4 @@ dist
 
 # secret files
 .secret*
+.env
