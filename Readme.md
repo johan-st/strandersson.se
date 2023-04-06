@@ -10,6 +10,18 @@ Johan Strand: [jst.dev](https://jst.dev)
 
 This is an Elm app. I am trying out a new structure for this project. I have decided to use [this structure](https://github.com/madasebrof/elm-taco-donut). It is quite a departure from the usual Elm app. I am hoping to learn something new and get a better understanding of how to structure Elm apps.
 
+## Development Process
+deploy by pushing to main branch
+- `/dist` folder is public
+- catch-all document is the `index.html` in dist. (i.e. all paths are handled by the same index.html.)
+```bash
+#example
+npm run build
+git add .
+git commit -m "commit message"
+git push
+```
+
 ---
 
 ---
