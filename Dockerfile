@@ -51,17 +51,25 @@ RUN mv ./static/* ./dist/
 # ---------- #
 # PRODUCTION #
 # ---------- #
-FROM nginx:1.23.3-alpine-slim as webserver
+# FROM nginx:1.23.3-alpine-slim as webserver
 
-# copy nginx main config
-COPY nginx/nginx.conf /etc/nginx/
+# # copy nginx main config
+# COPY nginx/nginx.conf /etc/nginx/
 
-# Remove default configuration.
-RUN rm -r /etc/nginx/conf.d
+# # Remove default configuration.
+# RUN rm -r /etc/nginx/conf.d
 
-# add our own conf.d with specifics for strandersson.se
-COPY nginx/conf.d/ /etc/nginx/conf.d/
+# # add our own conf.d with specifics for strandersson.se
+# COPY nginx/conf.d/ /etc/nginx/conf.d/
 
-# last layer because it's most likely to change.
-# copy build files
-COPY --from=build /usr/src/app/dist /usr/share/nginx/strandersson.se
+# # last layer because it's most likely to change.
+# # copy build files
+# COPY --from=build /usr/src/app/dist /usr/share/nginx/strandersson.se
+
+
+
+# ------ #
+# STATIC #
+# ------ #
+COPY --from=build /usr/src/app/dist /dist
+WORKDIR /dist

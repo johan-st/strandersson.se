@@ -1,6 +1,9 @@
+name: strandersson
+
 alerts:
 - rule: DEPLOYMENT_FAILED
 - rule: DOMAIN_FAILED
+
 domains:
 - domain: strandersson.se
   type: PRIMARY
@@ -8,30 +11,20 @@ domains:
 - domain: www.strandersson.se
   type: ALIAS
   zone: strandersson.se
+
 ingress: {}
-name: strandersson
+
 region: ams
+
 static_sites:
-- build_command: hugo
-  dir: dist
-  catchall_document: index.html
-  build_command: npm run build
-  output_dir: dist
+- name: strandersson-static
   github:
-    repo: strandersson/strandersson.se
+    repo: johan-st/strandersson.se
     branch: master
     deploy_on_push: true
-
-# services:
-# - http_port: 80
-#   image:
-#     deploy_on_push:
-#       enabled: true
-#     registry_type: DOCR
-#     repository: strandersson
-#     tag: latest
-#   instance_count: 1
-#   instance_size_slug: basic-xxs
-#   name: strandersson
-#   routes:
-#   - path: /
+  source_dir: /
+  dockerfile_path: /Dockerfile
+  output_dir: /dist
+  catchall_document: index.html
+  routes:
+  - path: /
