@@ -83,6 +83,7 @@ I built the module for the logic, state and encode/decode thereof first. I creat
 - have rollback option for broken service worker
 - update manifest on main branch with all icons
 - investigate why old tags "are stuck" to new images when pushing with --all-tags
+- search should filter until there are less than a set number of hits. then fuzzy find to fill in the rest 
 
 #### Refactoring
 - remove :not() from css
