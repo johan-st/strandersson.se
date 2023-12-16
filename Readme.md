@@ -1,8 +1,15 @@
+
+
+
+-----------------------
+----------------------
+# OLD
+-------------------
 # strandersson.se
 
 _A domain and collection of tools and things for our family._ ([link](https://strandersson.se))
 
-I have decided to take inspiration from [this structure](https://github.com/madasebrof/elm-taco-donut) and use it as a step-off point for this project.
+I tried out the [this structure](https://github.com/madasebrof/elm-taco-donut) but in the end I do not enjoy it as much as the canonical Elm structure. I will revert to that.
 
 Johan Strand: [jst.dev](https://jst.dev)
 
